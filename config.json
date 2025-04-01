@@ -1,0 +1,14 @@
+{
+    "pomodoro_minutes": 1,
+    "breathing_cycles": 5,
+    "enabled": true,
+    "show_statusbar_timer": true,
+    "inhale_duration": 4,
+    "inhale_enabled": true,
+    "hold_duration": 4,
+    "hold_enabled": false,
+    "exhale_duration": 6,
+    "exhale_enabled": true,
+    "show_circular_timer": true,
+    "timer_position": "右上角"
+}

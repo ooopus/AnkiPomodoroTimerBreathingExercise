@@ -1,3 +1,4 @@
 __pycache__
 .venv
 meta.json
+.ruff_cache
