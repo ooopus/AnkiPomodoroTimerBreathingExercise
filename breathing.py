@@ -2,15 +2,24 @@ from aqt import mw
 import time
 from PyQt6.QtCore import Qt, QPointF
 from PyQt6.QtGui import QBrush
-from PyQt6.QtWidgets import QWidget, QDialog, QLabel, QSizePolicy, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import (
+    QWidget,
+    QDialog,
+    QLabel,
+    QSizePolicy,
+    QVBoxLayout,
+    QPushButton,
+)
 from PyQt6.QtCore import QTimer
 from PyQt6.QtGui import QPainter, QColor
 from .constants import PHASES
 from .config import get_config  # Changed from direct config import
 
+
 # --- 呼吸训练动画 Widget ---
 class BreathingAnimationWidget(QWidget):
     """Displays the expanding/contracting circle animation for breathing."""
+
     INHALE = "INHALE"
     HOLD = "HOLD"
     EXHALE = "EXHALE"
@@ -26,9 +35,9 @@ class BreathingAnimationWidget(QWidget):
         self._min_radius_ratio = 0.2
         self._max_radius_ratio = 0.8
         # Define colors using QColor constants or hex strings
-        self._color_inhale = QColor("#87CEEB") # Sky Blue
-        self._color_hold = QColor("#ADD8E6")   # Light Blue
-        self._color_exhale = QColor("#B0E0E6") # Powder Blue
+        self._color_inhale = QColor("#87CEEB")  # Sky Blue
+        self._color_hold = QColor("#ADD8E6")  # Light Blue
+        self._color_exhale = QColor("#B0E0E6")  # Powder Blue
         self.setMinimumSize(150, 150)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -39,7 +48,7 @@ class BreathingAnimationWidget(QWidget):
         self._phase_duration_ms = duration_seconds * 1000
         self._start_time = time.time()
         self._progress = 0.0
-        self._animation_timer.stop() # Stop previous timer explicitly
+        self._animation_timer.stop()  # Stop previous timer explicitly
 
         if self._phase_duration_ms > 0:
             # Start timer with a reasonable interval for smooth animation (e.g., 33ms ~ 30fps)
@@ -65,13 +74,12 @@ class BreathingAnimationWidget(QWidget):
             # Should not be called if duration is 0 as timer isn't started, but handle defensively
             self._progress = 1.0
 
-        self.update() # Request a repaint
+        self.update()  # Request a repaint
 
         # Stop the timer precisely when progress reaches 1.0
         if self._progress >= 1.0:
-             # print("Animation: Phase complete") # Debug print
-             self._animation_timer.stop()
-
+            # print("Animation: Phase complete") # Debug print
+            self._animation_timer.stop()
 
     def paintEvent(self, event):
         """Paints the breathing circle."""
@@ -81,13 +89,15 @@ class BreathingAnimationWidget(QWidget):
         width, height = self.width(), self.height()
         center = QPointF(width / 2, height / 2)
         # Calculate radius based on the smaller dimension to fit circle
-        max_available_radius = min(width, height) / 2 * 0.9 # Use 90% of available space
+        max_available_radius = (
+            min(width, height) / 2 * 0.9
+        )  # Use 90% of available space
         min_radius = max_available_radius * self._min_radius_ratio
         max_radius = max_available_radius * self._max_radius_ratio
         radius_range = max_radius - min_radius
 
-        current_radius = min_radius # Default radius
-        current_color = QColor(Qt.GlobalColor.gray) # Default color
+        current_radius = min_radius  # Default radius
+        current_color = QColor(Qt.GlobalColor.gray)  # Default color
 
         # Determine radius and color based on phase and progress
         if self._current_phase_key == self.INHALE:
@@ -105,16 +115,16 @@ class BreathingAnimationWidget(QWidget):
 
         # Handle zero duration phases to show the final state immediately
         if self._phase_duration_ms <= 0:
-             if self._current_phase_key == self.INHALE:
+            if self._current_phase_key == self.INHALE:
                 current_radius = max_radius
-             elif self._current_phase_key == self.HOLD:
-                current_radius = max_radius # Hold starts at max
-             elif self._current_phase_key == self.EXHALE:
+            elif self._current_phase_key == self.HOLD:
+                current_radius = max_radius  # Hold starts at max
+            elif self._current_phase_key == self.EXHALE:
                 current_radius = min_radius
 
         # Draw the circle
         painter.setBrush(QBrush(current_color))
-        painter.setPen(Qt.PenStyle.NoPen) # No border
+        painter.setPen(Qt.PenStyle.NoPen)  # No border
         painter.drawEllipse(center, current_radius, current_radius)
 
 
@@ -126,11 +136,11 @@ class BreathingDialog(QDialog):
         super().__init__(parent or mw)
         self.setWindowTitle("呼吸训练")
         self.setModal(True)
-        self.target_cycles = max(1, target_cycles) # Ensure at least one cycle
+        self.target_cycles = max(1, target_cycles)  # Ensure at least one cycle
         self.completed_cycles = 0
         # Timer used via singleShot to trigger phase changes
         self._phase_advance_timer = QTimer(self)
-        self._pending_single_shot = None # Keep track if needed
+        self._pending_single_shot = None  # Keep track if needed
 
         print(f"BreathingDialog: Initialized for {self.target_cycles} cycles.")
 
@@ -138,40 +148,56 @@ class BreathingDialog(QDialog):
         self.active_phases = []
         for phase_def in PHASES:
             key = phase_def["key"]
-            is_enabled = get_config().get(f"{key}_enabled", phase_def["default_enabled"])
-            duration = get_config().get(f"{key}_duration", phase_def["default_duration"])
+            is_enabled = get_config().get(
+                f"{key}_enabled", phase_def["default_enabled"]
+            )
+            duration = get_config().get(
+                f"{key}_duration", phase_def["default_duration"]
+            )
             if is_enabled:
-                self.active_phases.append({
-                    "label": phase_def["label"],
-                    "duration": duration,
-                    "anim_phase": phase_def["anim_phase"]
-                })
-                print(f"BreathingDialog: Added active phase '{phase_def['label']}' ({duration}s)")
+                self.active_phases.append(
+                    {
+                        "label": phase_def["label"],
+                        "duration": duration,
+                        "anim_phase": phase_def["anim_phase"],
+                    }
+                )
+                print(
+                    f"BreathingDialog: Added active phase '{phase_def['label']}' ({duration}s)"
+                )
 
         if not self.active_phases:
-             # This case should be prevented by the check in show_breathing_dialog
-             print("BreathingDialog Error: No active phases configured. Closing.")
-             # Schedule closing after the constructor finishes
-             QTimer.singleShot(0, self.reject)
-             return
+            # This case should be prevented by the check in show_breathing_dialog
+            print("BreathingDialog Error: No active phases configured. Closing.")
+            # Schedule closing after the constructor finishes
+            QTimer.singleShot(0, self.reject)
+            return
 
-        self.current_phase_index = -1 # Start at -1 so first call to update sets index 0
+        self.current_phase_index = (
+            -1
+        )  # Start at -1 so first call to update sets index 0
 
         # --- UI Elements ---
         self.layout = QVBoxLayout(self)
         self.animation_widget = BreathingAnimationWidget(self)
-        self.layout.addWidget(self.animation_widget, 1) # Give animation widget stretch factor
+        self.layout.addWidget(
+            self.animation_widget, 1
+        )  # Give animation widget stretch factor
 
         self.instruction_label = QLabel("准备...", self)
         self.instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.instruction_label.setStyleSheet("font-size: 20px; font-weight: bold; margin-top: 10px;")
+        self.instruction_label.setStyleSheet(
+            "font-size: 20px; font-weight: bold; margin-top: 10px;"
+        )
 
         # Cycle Counter Label
-        self.cycle_label = QLabel(f"循环: {self.completed_cycles + 1} / {self.target_cycles}", self)
+        self.cycle_label = QLabel(
+            f"循环: {self.completed_cycles + 1} / {self.target_cycles}", self
+        )
         self.cycle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.cycle_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")
 
-        self.skip_button = QPushButton("跳过训练", self) # Changed label slightly
+        self.skip_button = QPushButton("跳过训练", self)  # Changed label slightly
 
         self.layout.addWidget(self.instruction_label)
         self.layout.addWidget(self.cycle_label)
@@ -182,31 +208,37 @@ class BreathingDialog(QDialog):
         self.resize(300, 350)
 
         # --- Connections ---
-        self.skip_button.clicked.connect(self.reject) # Skip closes the dialog
+        self.skip_button.clicked.connect(self.reject)  # Skip closes the dialog
 
         # --- Start the process ---
         print("BreathingDialog: Starting first phase...")
-        self._advance_to_next_phase() # Start the first phase
+        self._advance_to_next_phase()  # Start the first phase
 
     def _advance_to_next_phase(self):
         """Handles logic for moving to the next phase or completing the exercise."""
-        self._pending_single_shot = None # Clear flag
+        self._pending_single_shot = None  # Clear flag
 
         # Determine next phase index and if a cycle was just completed
         next_phase_index = (self.current_phase_index + 1) % len(self.active_phases)
-        just_completed_cycle = (next_phase_index == 0 and self.current_phase_index != -1) # True if wrapping around
+        just_completed_cycle = (
+            next_phase_index == 0 and self.current_phase_index != -1
+        )  # True if wrapping around
 
         # Increment cycle count *after* completing the last phase of a cycle
         if just_completed_cycle:
             self.completed_cycles += 1
-            print(f"BreathingDialog: Completed cycle {self.completed_cycles}/{self.target_cycles}")
-            self.cycle_label.setText(f"循环: {min(self.completed_cycles + 1, self.target_cycles)} / {self.target_cycles}") # Update label, cap first number
+            print(
+                f"BreathingDialog: Completed cycle {self.completed_cycles}/{self.target_cycles}"
+            )
+            self.cycle_label.setText(
+                f"循环: {min(self.completed_cycles + 1, self.target_cycles)} / {self.target_cycles}"
+            )  # Update label, cap first number
 
             # Check if target cycles are reached
             if self.completed_cycles >= self.target_cycles:
                 print("BreathingDialog: Target cycles reached. Finishing.")
-                self.accept() # Finish successfully
-                return # Stop processing
+                self.accept()  # Finish successfully
+                return  # Stop processing
 
         # Set the index for the *upcoming* phase
         self.current_phase_index = next_phase_index
@@ -219,18 +251,25 @@ class BreathingDialog(QDialog):
         self.instruction_label.setText(f"{label} ({duration}s)")
         self.animation_widget.set_phase(anim_phase_key, duration)
         # Ensure cycle label reflects the *current* cycle number
-        self.cycle_label.setText(f"循环: {self.completed_cycles + 1} / {self.target_cycles}")
+        self.cycle_label.setText(
+            f"循环: {self.completed_cycles + 1} / {self.target_cycles}"
+        )
 
-        print(f"BreathingDialog: Starting phase {self.current_phase_index + 1}/{len(self.active_phases)} ('{label}', {duration}s) of cycle {self.completed_cycles + 1}")
+        print(
+            f"BreathingDialog: Starting phase {self.current_phase_index + 1}/{len(self.active_phases)} ('{label}', {duration}s) of cycle {self.completed_cycles + 1}"
+        )
 
         # Schedule the next call to _advance_to_next_phase after the current phase duration
         if duration > 0:
             # Use singleShot to call this method again after the delay
-            self._pending_single_shot = QTimer.singleShot(duration * 1000, self._advance_to_next_phase)
+            self._pending_single_shot = QTimer.singleShot(
+                duration * 1000, self._advance_to_next_phase
+            )
         else:
             # If duration is 0, advance immediately (with a tiny delay for event loop)
-            self._pending_single_shot = QTimer.singleShot(10, self._advance_to_next_phase)
-
+            self._pending_single_shot = QTimer.singleShot(
+                10, self._advance_to_next_phase
+            )
 
     def stop_all_timers(self):
         """Stops the animation and any pending phase advancement."""
@@ -239,9 +278,8 @@ class BreathingDialog(QDialog):
         # Attempt to cancel the pending singleShot if it exists and hasn't fired
         # QTimer.singleShot returns None, so we can't easily cancel it.
         # Stopping the underlying timer might work if the singleShot hasn't triggered yet.
-        self._phase_advance_timer.stop() # Stop the timer used for singleShot
+        self._phase_advance_timer.stop()  # Stop the timer used for singleShot
         # It's usually sufficient that the dialog closing prevents further execution.
-
 
     # Override closing methods to ensure timers are stopped
     def closeEvent(self, event):

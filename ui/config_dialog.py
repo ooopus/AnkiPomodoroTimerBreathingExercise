@@ -1,27 +1,33 @@
 from aqt import mw
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox,
-    QSpinBox, QDialogButtonBox, QFrame, QGroupBox, QComboBox
+    QDialog,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QCheckBox,
+    QSpinBox,
+    QDialogButtonBox,
+    QFrame,
+    QGroupBox,
+    QComboBox,
 )
-from ..constants import (
-    PHASES, 
-    DEFAULT_POMODORO_MINUTES, 
-    DEFAULT_BREATHING_CYCLES
-)
+from ..constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
 from ..config import save_config, get_config, get_pomodoro_timer
 from .statusbar import show_timer_in_statusbar
 
+
 class ConfigDialog(QDialog):
     """Configuration dialog for Pomodoro and Breathing settings."""
+
     def __init__(self, parent=None):
         super().__init__(parent or mw)
-        
+
         # Use our config system instead of Anki's
         config = get_config()
-        
+
         self.setWindowTitle("番茄钟 & 呼吸设置")
         self.layout = QVBoxLayout(self)
-        self.phase_widgets = {} # Store phase widgets {key: {"checkbox": QCheckBox, "spinbox": QSpinBox}}
+        self.phase_widgets = {}  # Store phase widgets {key: {"checkbox": QCheckBox, "spinbox": QSpinBox}}
 
         # --- General Settings ---
         general_group = QGroupBox("常规设置")
@@ -36,10 +42,12 @@ class ConfigDialog(QDialog):
         self.show_timer_checkbox = QCheckBox("在状态栏显示计时器", self)
         self.show_timer_checkbox.setChecked(config.get("show_statusbar_timer", True))
         self.show_circular_timer_checkbox = QCheckBox("显示圆形计时器", self)
-        self.show_circular_timer_checkbox.setChecked(config.get("show_circular_timer", True))
+        self.show_circular_timer_checkbox.setChecked(
+            config.get("show_circular_timer", True)
+        )
         display_layout.addWidget(self.show_timer_checkbox)
         display_layout.addWidget(self.show_circular_timer_checkbox)
-        
+
         # 窗口位置选项
         position_layout = QHBoxLayout()
         position_label = QLabel("计时器窗口位置:", self)
@@ -48,7 +56,7 @@ class ConfigDialog(QDialog):
         self.position_combo.setCurrentText(config.get("timer_position", "左上角"))
         position_layout.addWidget(position_label)
         position_layout.addWidget(self.position_combo)
-        
+
         general_layout.addLayout(display_layout)
         general_layout.addLayout(position_layout)
 
@@ -57,7 +65,9 @@ class ConfigDialog(QDialog):
         self.pomo_spinbox = QSpinBox(self)
         self.pomo_spinbox.setMinimum(1)
         self.pomo_spinbox.setMaximum(180)
-        self.pomo_spinbox.setValue(config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES))
+        self.pomo_spinbox.setValue(
+            config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
+        )
         pomo_label_unit = QLabel("分钟", self)
         pomo_layout.addWidget(pomo_label)
         pomo_layout.addWidget(self.pomo_spinbox)
@@ -77,7 +87,9 @@ class ConfigDialog(QDialog):
         self.cycles_spinbox = QSpinBox(self)
         self.cycles_spinbox.setMinimum(0)
         self.cycles_spinbox.setMaximum(50)
-        self.cycles_spinbox.setValue(config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES))
+        self.cycles_spinbox.setValue(
+            config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
+        )
         cycles_layout.addWidget(cycles_label)
         cycles_layout.addWidget(self.cycles_spinbox)
         breathing_layout.addLayout(cycles_layout)
@@ -102,13 +114,13 @@ class ConfigDialog(QDialog):
 
             # Checkbox to enable/disable the phase
             chk = QCheckBox(f"{phase['label']}", self)
-            chk.setChecked(config.get(f"{key}_enabled", phase['default_enabled']))
+            chk.setChecked(config.get(f"{key}_enabled", phase["default_enabled"]))
 
             # Spinbox for phase duration
             spn = QSpinBox(self)
             spn.setMinimum(0)
             spn.setMaximum(60)
-            spn.setValue(config.get(f"{key}_duration", phase['default_duration']))
+            spn.setValue(config.get(f"{key}_duration", phase["default_duration"]))
             phase_layout.addWidget(QLabel("秒", self))
 
             # Enable/disable spinbox based on checkbox state
@@ -133,8 +145,9 @@ class ConfigDialog(QDialog):
 
         # --- Dialog Buttons (Save/Cancel) ---
         button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel,
-            self
+            QDialogButtonBox.StandardButton.Save
+            | QDialogButtonBox.StandardButton.Cancel,
+            self,
         )
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
@@ -174,7 +187,7 @@ class ConfigDialog(QDialog):
         """Saves the configuration and closes the dialog."""
         print("Saving configuration...")
         config = get_config()
-        
+
         # Save general settings
         config["enabled"] = self.enable_checkbox.isChecked()
         config["show_statusbar_timer"] = self.show_timer_checkbox.isChecked()
@@ -182,24 +195,29 @@ class ConfigDialog(QDialog):
         config["timer_position"] = self.position_combo.currentText()
         config["pomodoro_minutes"] = self.pomo_spinbox.value()
         config["breathing_cycles"] = self.cycles_spinbox.value()
-    
+
         # Save phase settings
         for key, widgets in self.phase_widgets.items():
             config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
             config[f"{key}_duration"] = widgets["spinbox"].value()
-    
+
         save_config()
         print("Configuration saved.")
-    
+
         # Apply changes immediately
         timer = get_pomodoro_timer()
         show_timer_in_statusbar(timer and timer.isActive())
-    
+
         if not config["enabled"] and timer and timer.isActive():
             print("Plugin disabled, stopping active Pomodoro timer.")
             timer.stop_timer()
-        elif config["enabled"] and mw.state == "review" and timer and not timer.isActive():
+        elif (
+            config["enabled"]
+            and mw.state == "review"
+            and timer
+            and not timer.isActive()
+        ):
             print("Plugin enabled while in review, starting timer.")
             timer.start_timer(config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES))
-    
+
         super().accept()

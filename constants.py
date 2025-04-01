@@ -1,8 +1,26 @@
 # 呼吸阶段定义
 PHASES = [
-    {"key": "inhale", "label": "吸气", "default_duration": 4, "default_enabled": True, "anim_phase": "INHALE"},
-    {"key": "hold", "label": "屏住", "default_duration": 4, "default_enabled": False, "anim_phase": "HOLD"},
-    {"key": "exhale", "label": "呼气", "default_duration": 6, "default_enabled": True, "anim_phase": "EXHALE"}
+    {
+        "key": "inhale",
+        "label": "吸气",
+        "default_duration": 4,
+        "default_enabled": True,
+        "anim_phase": "INHALE",
+    },
+    {
+        "key": "hold",
+        "label": "屏住",
+        "default_duration": 4,
+        "default_enabled": False,
+        "anim_phase": "HOLD",
+    },
+    {
+        "key": "exhale",
+        "label": "呼气",
+        "default_duration": 6,
+        "default_enabled": True,
+        "anim_phase": "EXHALE",
+    },
 ]
 
 # 默认配置

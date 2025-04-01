@@ -4,6 +4,7 @@ from .config import get_config, set_pomodoro_timer, get_timer_label
 from .constants import STATUSBAR_DEFAULT_TEXT
 from .ui.circular_timer import setup_circular_timer
 
+
 class PomodoroTimer(QTimer):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -16,6 +17,7 @@ class PomodoroTimer(QTimer):
     def start_timer(self, minutes):
         """Starts the Pomodoro timer for the given number of minutes."""
         from .ui import show_timer_in_statusbar
+
         config = get_config()  # Use our config getter
 
         if not config.get("enabled", True):
@@ -38,7 +40,7 @@ class PomodoroTimer(QTimer):
         self.remaining_seconds = self.total_seconds
         print(f"Pomodoro timer started for {minutes} minutes.")
         self.update_display()
-        self.start(1000) # Tick every second
+        self.start(1000)  # Tick every second
         show_timer_in_statusbar(config.get("show_statusbar_timer", True))
 
     def stop_timer(self):
@@ -48,7 +50,7 @@ class PomodoroTimer(QTimer):
         if self.isActive():
             print("Pomodoro timer stopped.")
             self.stop()
-        
+
         # 确保在主线程执行UI更新
         def _clear_display():
             self.remaining_seconds = 0
@@ -57,9 +59,8 @@ class PomodoroTimer(QTimer):
             show_timer_in_statusbar(False)  # 再隐藏状态栏
             if self.circular_timer:
                 self.circular_timer.set_progress(0, 1)  # 重置圆形计时器
-        
-        mw.progress.timer(10, _clear_display, False)
 
+        mw.progress.timer(10, _clear_display, False)
 
     def update_timer(self):
         """Called every second to decrease remaining time and check for finish."""
@@ -69,32 +70,35 @@ class PomodoroTimer(QTimer):
         else:
             from .hooks import on_pomodoro_finished
             from .ui import show_timer_in_statusbar
-            
+
             print("Pomodoro timer finished.")
-            self.stop() # Stop the QTimer itself
+            self.stop()  # Stop the QTimer itself
             show_timer_in_statusbar(False)  # 确保状态栏立即隐藏
-            on_pomodoro_finished() # Trigger the next action
+            on_pomodoro_finished()  # Trigger the next action
 
     def update_display(self):
         def _update():
             from .ui import show_timer_in_statusbar
             from .constants import STATUSBAR_FORMAT, STATUSBAR_ICON
+
             label = get_timer_label()
             if label:
                 if self.remaining_seconds > 0:
                     mins, secs = divmod(self.remaining_seconds, 60)
-                    label.setText(STATUSBAR_FORMAT.format(
-                        icon=STATUSBAR_ICON,
-                        mins=mins, 
-                        secs=secs
-                    ))
+                    label.setText(
+                        STATUSBAR_FORMAT.format(
+                            icon=STATUSBAR_ICON, mins=mins, secs=secs
+                        )
+                    )
                     show_timer_in_statusbar(True)
                 else:
                     label.setText(STATUSBAR_DEFAULT_TEXT)
-            
+
             # 更新圆形计时器
             if self.circular_timer:
-                self.circular_timer.set_progress(self.remaining_seconds, self.total_seconds)
-        
+                self.circular_timer.set_progress(
+                    self.remaining_seconds, self.total_seconds
+                )
+
         # 确保在主线程执行UI更新
         mw.progress.timer(10, _update, False)
