@@ -1,0 +1,41 @@
+name: Build Anki Addon
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set Filename
+      id: set_vars
+      run: |
+        REPO_NAME=${{ github.event.repository.name }}
+        TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+        echo "FILENAME_BASE=${REPO_NAME}-${TIMESTAMP}" >> $GITHUB_ENV
+        echo "Generated filename base: ${REPO_NAME}-${TIMESTAMP}"
+
+    - name: Zip Python files with structure
+      run: |
+        zip -r "${{ env.FILENAME_BASE }}.zip" . -i '*.py'
+        if [ ! -f "${{ env.FILENAME_BASE }}.zip" ]; then
+          echo "Error: Failed to create zip file."
+          exit 1
+        fi
+        echo "Successfully created ${{ env.FILENAME_BASE }}.zip"
+
+    - name: Rename to .ankiaddon
+      run: |
+        mv "${{ env.FILENAME_BASE }}.zip" "${{ env.FILENAME_BASE }}.ankiaddon"
+        echo "Renamed to ${{ env.FILENAME_BASE }}.ankiaddon"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: anki-addon-${{ env.FILENAME_BASE }}
+        path: ${{ env.FILENAME_BASE }}.ankiaddon

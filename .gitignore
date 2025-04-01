@@ -4,4 +4,4 @@ meta.json
 .ruff_cache
 config.json
 .DS_Store
-add.ankiaddon
+*.ankiaddon
