@@ -1,6 +1,7 @@
 from typing import Optional
 from PyQt6.QtWidgets import QLabel
 
+
 class TimerState:
     def __init__(self):
         self._pomodoro_timer = None
@@ -22,7 +23,9 @@ class TimerState:
     def timer_label(self, value: Optional[QLabel]):
         self._timer_label = value
 
+
 _timer_state = None
+
 
 def get_timer_state() -> TimerState:
     global _timer_state
@@ -30,14 +33,18 @@ def get_timer_state() -> TimerState:
         _timer_state = TimerState()
     return _timer_state
 
+
 def get_pomodoro_timer():
     return get_timer_state().pomodoro_timer
+
 
 def set_pomodoro_timer(timer) -> None:
     get_timer_state().pomodoro_timer = timer
 
+
 def get_timer_label() -> Optional[QLabel]:
     return get_timer_state().timer_label
+
 
 def set_timer_label(label: Optional[QLabel]) -> None:
     get_timer_state().timer_label = label

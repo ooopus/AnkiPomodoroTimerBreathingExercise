@@ -9,6 +9,7 @@ from .ui.circular_timer import setup_circular_timer
 class PomodoroTimer(QTimer):
     def __init__(self, parent=None):
         from .config import get_config
+
         super().__init__(parent)
         self.remaining_seconds = 0
         self.total_seconds = 0
@@ -21,7 +22,7 @@ class PomodoroTimer(QTimer):
         """Starts the Pomodoro timer for the given number of minutes."""
         from .ui import show_timer_in_statusbar
         from .config import get_config
-        
+
         config = get_config()  # Use our config getter
 
         if not config.get("enabled", True):
@@ -90,20 +91,30 @@ class PomodoroTimer(QTimer):
     def update_display(self):
         def _update():
             from .ui import show_timer_in_statusbar
-            from .constants import STATUSBAR_FORMAT, STATUSBAR_FILLED_TOMATO, STATUSBAR_EMPTY_TOMATO
+            from .constants import (
+                STATUSBAR_FORMAT,
+                STATUSBAR_FILLED_TOMATO,
+                STATUSBAR_EMPTY_TOMATO,
+            )
 
             label = get_timer_label()
             if label:
                 if self.remaining_seconds > 0:
                     mins, secs = divmod(self.remaining_seconds, 60)
                     # 构建进度显示
-                    completed = self.config.get('completed_pomodoros', 0)
-                    target = self.config.get('pomodoros_before_long_break', 4)
-                    progress = STATUSBAR_FILLED_TOMATO * completed + STATUSBAR_EMPTY_TOMATO * (target - completed)
-                    
+                    completed = self.config.get("completed_pomodoros", 0)
+                    target = self.config.get("pomodoros_before_long_break", 4)
+                    progress = (
+                        STATUSBAR_FILLED_TOMATO * completed
+                        + STATUSBAR_EMPTY_TOMATO * (target - completed)
+                    )
+
                     label.setText(
                         STATUSBAR_FORMAT.format(
-                            icon=STATUSBAR_FILLED_TOMATO, mins=mins, secs=secs, progress=progress
+                            icon=STATUSBAR_FILLED_TOMATO,
+                            mins=mins,
+                            secs=secs,
+                            progress=progress,
                         )
                     )
                     show_timer_in_statusbar(True)

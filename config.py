@@ -10,6 +10,7 @@ from .constants import (
     DEFAULT_SHOW_CIRCULAR_TIMER,
     DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
     DEFAULT_LONG_BREAK_MINUTES,
+    DEFAULT_MAX_BREAK_DURATION,
 )
 
 # Update CONFIG_PATH to use Anki's addon folder
@@ -50,8 +51,6 @@ class AddonState:
             self._config = self._load_config()
         return self._config
 
-
-
     def _load_config(self) -> Dict[str, Any]:
         """加载配置并设置默认值"""
         config = self._load_config_from_file()
@@ -73,6 +72,8 @@ class AddonState:
             config["pomodoros_before_long_break"] = DEFAULT_POMODOROS_BEFORE_LONG_BREAK
         if "long_break_minutes" not in config:
             config["long_break_minutes"] = DEFAULT_LONG_BREAK_MINUTES
+        if "max_break_duration" not in config:
+            config["max_break_duration"] = DEFAULT_MAX_BREAK_DURATION * 60  # 转换为秒
 
         # 对每个呼吸阶段做同样处理
         for phase in PHASES:
@@ -98,11 +99,11 @@ class AddonState:
             config["show_circular_timer"] = bool(
                 config.get("show_circular_timer", DEFAULT_SHOW_CIRCULAR_TIMER)
             )
-            config["completed_pomodoros"] = int(
-                config.get("completed_pomodoros", 0)
-            )
+            config["completed_pomodoros"] = int(config.get("completed_pomodoros", 0))
             config["pomodoros_before_long_break"] = int(
-                config.get("pomodoros_before_long_break", DEFAULT_POMODOROS_BEFORE_LONG_BREAK)
+                config.get(
+                    "pomodoros_before_long_break", DEFAULT_POMODOROS_BEFORE_LONG_BREAK
+                )
             )
             config["long_break_minutes"] = int(
                 config.get("long_break_minutes", DEFAULT_LONG_BREAK_MINUTES)
@@ -170,6 +171,7 @@ def get_config() -> Dict[str, Any]:
 def get_pomodoro_timer():
     """返回当前番茄钟计时器实例"""
     return get_state()._pomodoro_timer
+
 
 def get_timer_label() -> Optional[QLabel]:
     """返回当前计时器标签实例"""

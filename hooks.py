@@ -7,6 +7,7 @@ from .breathing import BreathingDialog
 from .config import get_config, save_config
 from .timer_utils import get_pomodoro_timer
 from .pomodoro import PomodoroTimer
+import time
 
 # --- Anki 钩子函数 ---
 
@@ -48,21 +49,35 @@ def on_state_did_change(new_state: str, old_state: str):
 def on_pomodoro_finished():
     """Called when the Pomodoro timer reaches zero."""
     config = get_config()
-    completed = config.get('completed_pomodoros', 0) + 1
-    target = config.get('pomodoros_before_long_break', 4)
+    current_time = time.time()
+    last_pomodoro_time = config.get("last_pomodoro_time", 0)
+    max_break_duration = config.get("max_break_duration", 30 * 60)  # 默认30分钟
     
-    # 更新完成的番茄钟数量
-    config['completed_pomodoros'] = completed
-    save_config()
+    # 检查距离上次番茄钟完成的时间
+    if last_pomodoro_time and (current_time - last_pomodoro_time) > max_break_duration:
+        # 超过最大间隔时间，重置计数
+        config["completed_pomodoros"] = 0
+        tooltip("休息时间过长，番茄钟计数已重置。", period=3000)
+    else:
+        # 未超时，增加完成数
+        completed = config.get("completed_pomodoros", 0) + 1
+        config["completed_pomodoros"] = completed
+        
+    # 更新最后完成时间
+    config["last_pomodoro_time"] = current_time
+    
+    # 获取目标数量
+    target = config.get("pomodoros_before_long_break", 4)
     
     # 检查是否需要长休息
-    if completed >= target:
-        long_break_mins = config.get('long_break_minutes', 15)
+    if config["completed_pomodoros"] >= target:
+        long_break_mins = config.get("long_break_minutes", 15)
         tooltip(f"恭喜完成{target}个番茄钟！建议休息{long_break_mins}分钟。", period=5000)
-        config['completed_pomodoros'] = 0  # 重置计数
-        save_config()
+        config["completed_pomodoros"] = 0
     else:
         tooltip("番茄钟时间到！休息一下。", period=3000)
+    
+    save_config()
     
     # Ensure we are on the main thread before changing state or showing dialog
     mw.progress.timer(100, lambda: _after_pomodoro_finish_tasks(), False)

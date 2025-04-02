@@ -74,6 +74,24 @@ class ConfigDialog(QDialog):
         pomo_layout.addWidget(pomo_label_unit)
         general_layout.addLayout(pomo_layout)
 
+        # 添加最大间隔时间设置
+        max_break_layout = QHBoxLayout()
+        max_break_label = QLabel("最大间隔时间:", self)
+        self.max_break_spinbox = QSpinBox(self)
+        self.max_break_spinbox.setMinimum(1)
+        self.max_break_spinbox.setMaximum(120)
+        self.max_break_spinbox.setValue(config.get("max_break_duration", 30 * 60) // 60)  # 转换为分钟
+        max_break_label_unit = QLabel("分钟", self)
+        max_break_layout.addWidget(max_break_label)
+        max_break_layout.addWidget(self.max_break_spinbox)
+        max_break_layout.addWidget(max_break_label_unit)
+        general_layout.addLayout(max_break_layout)
+
+        # 添加提示标签
+        max_break_hint = QLabel("超过此时间后，累计的连续番茄钟将归零", self)
+        max_break_hint.setStyleSheet("font-style: italic; color: grey;")
+        general_layout.addWidget(max_break_hint)
+
         general_group.setLayout(general_layout)
         self._main_layout.addWidget(general_group)
 
@@ -195,6 +213,7 @@ class ConfigDialog(QDialog):
         config["timer_position"] = self.position_combo.currentText()
         config["pomodoro_minutes"] = self.pomo_spinbox.value()
         config["breathing_cycles"] = self.cycles_spinbox.value()
+        config["max_break_duration"] = self.max_break_spinbox.value() * 60
 
         # Save phase settings
         for key, widgets in self.phase_widgets.items():
