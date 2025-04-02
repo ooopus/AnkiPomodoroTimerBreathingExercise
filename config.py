@@ -8,6 +8,8 @@ from .constants import (
     DEFAULT_BREATHING_CYCLES,
     DEFAULT_SHOW_STATUSBAR_TIMER,
     DEFAULT_SHOW_CIRCULAR_TIMER,
+    DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
+    DEFAULT_LONG_BREAK_MINUTES,
 )
 from .pomodoro import PomodoroTimer
 
@@ -80,6 +82,12 @@ class AddonState:
             config["show_statusbar_timer"] = DEFAULT_SHOW_STATUSBAR_TIMER
         if "show_circular_timer" not in config:
             config["show_circular_timer"] = DEFAULT_SHOW_CIRCULAR_TIMER
+        if "completed_pomodoros" not in config:
+            config["completed_pomodoros"] = 0
+        if "pomodoros_before_long_break" not in config:
+            config["pomodoros_before_long_break"] = DEFAULT_POMODOROS_BEFORE_LONG_BREAK
+        if "long_break_minutes" not in config:
+            config["long_break_minutes"] = DEFAULT_LONG_BREAK_MINUTES
 
         # 对每个呼吸阶段做同样处理
         for phase in PHASES:
@@ -105,6 +113,15 @@ class AddonState:
             config["show_circular_timer"] = bool(
                 config.get("show_circular_timer", DEFAULT_SHOW_CIRCULAR_TIMER)
             )
+            config["completed_pomodoros"] = int(
+                config.get("completed_pomodoros", 0)
+            )
+            config["pomodoros_before_long_break"] = int(
+                config.get("pomodoros_before_long_break", DEFAULT_POMODOROS_BEFORE_LONG_BREAK)
+            )
+            config["long_break_minutes"] = int(
+                config.get("long_break_minutes", DEFAULT_LONG_BREAK_MINUTES)
+            )
             for phase in PHASES:
                 config[f"{phase['key']}_duration"] = int(
                     config.get(f"{phase['key']}_duration", phase["default_duration"])
@@ -123,6 +140,9 @@ class AddonState:
                 "enabled": True,
                 "show_statusbar_timer": DEFAULT_SHOW_STATUSBAR_TIMER,
                 "show_circular_timer": DEFAULT_SHOW_CIRCULAR_TIMER,
+                "completed_pomodoros": 0,
+                "pomodoros_before_long_break": DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
+                "long_break_minutes": DEFAULT_LONG_BREAK_MINUTES,
             }
             for phase in PHASES:
                 config[f"{phase['key']}_duration"] = phase["default_duration"]

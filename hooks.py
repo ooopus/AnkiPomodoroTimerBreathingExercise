@@ -4,7 +4,7 @@ from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QDialog
 from .constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
 from .breathing import BreathingDialog
-from .config import get_config, get_pomodoro_timer
+from .config import get_config, get_pomodoro_timer, save_config
 from .pomodoro import PomodoroTimer
 
 # --- Anki 钩子函数 ---
@@ -46,9 +46,23 @@ def on_state_did_change(new_state: str, old_state: str):
 
 def on_pomodoro_finished():
     """Called when the Pomodoro timer reaches zero."""
-    tooltip(
-        "番茄钟时间到！休息一下。", period=3000
-    )  # "Pomodoro time's up! Take a break."
+    config = get_config()
+    completed = config.get('completed_pomodoros', 0) + 1
+    target = config.get('pomodoros_before_long_break', 4)
+    
+    # 更新完成的番茄钟数量
+    config['completed_pomodoros'] = completed
+    save_config()
+    
+    # 检查是否需要长休息
+    if completed >= target:
+        long_break_mins = config.get('long_break_minutes', 15)
+        tooltip(f"恭喜完成{target}个番茄钟！建议休息{long_break_mins}分钟。", period=5000)
+        config['completed_pomodoros'] = 0  # 重置计数
+        save_config()
+    else:
+        tooltip("番茄钟时间到！休息一下。", period=3000)
+    
     # Ensure we are on the main thread before changing state or showing dialog
     mw.progress.timer(100, lambda: _after_pomodoro_finish_tasks(), False)
 

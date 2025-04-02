@@ -14,6 +14,7 @@ class PomodoroTimer(QTimer):
         self.timeout.connect(self.update_timer)
         set_pomodoro_timer(self)
         self.circular_timer = None
+        self.config = get_config()
 
     def start_timer(self, minutes):
         """Starts the Pomodoro timer for the given number of minutes."""
@@ -87,15 +88,20 @@ class PomodoroTimer(QTimer):
     def update_display(self):
         def _update():
             from .ui import show_timer_in_statusbar
-            from .constants import STATUSBAR_FORMAT, STATUSBAR_ICON
+            from .constants import STATUSBAR_FORMAT, STATUSBAR_FILLED_TOMATO, STATUSBAR_EMPTY_TOMATO
 
             label = get_timer_label()
             if label:
                 if self.remaining_seconds > 0:
                     mins, secs = divmod(self.remaining_seconds, 60)
+                    # 构建进度显示
+                    completed = self.config.get('completed_pomodoros', 0)
+                    target = self.config.get('pomodoros_before_long_break', 4)
+                    progress = STATUSBAR_FILLED_TOMATO * completed + STATUSBAR_EMPTY_TOMATO * (target - completed)
+                    
                     label.setText(
                         STATUSBAR_FORMAT.format(
-                            icon=STATUSBAR_ICON, mins=mins, secs=secs
+                            icon=STATUSBAR_FILLED_TOMATO, mins=mins, secs=secs, progress=progress
                         )
                     )
                     show_timer_in_statusbar(True)
