@@ -1,13 +1,14 @@
 from aqt import mw
 from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QWidget
-from .config import get_config, set_pomodoro_timer, get_timer_label
+from .timer_utils import set_pomodoro_timer, get_timer_label
 from .constants import STATUSBAR_DEFAULT_TEXT
 from .ui.circular_timer import setup_circular_timer
 
 
 class PomodoroTimer(QTimer):
     def __init__(self, parent=None):
+        from .config import get_config
         super().__init__(parent)
         self.remaining_seconds = 0
         self.total_seconds = 0
@@ -19,7 +20,8 @@ class PomodoroTimer(QTimer):
     def start_timer(self, minutes):
         """Starts the Pomodoro timer for the given number of minutes."""
         from .ui import show_timer_in_statusbar
-
+        from .config import get_config
+        
         config = get_config()  # Use our config getter
 
         if not config.get("enabled", True):

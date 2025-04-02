@@ -1,14 +1,19 @@
 from aqt import mw
 from PyQt6.QtWidgets import QLabel
-from ..config import get_config, get_pomodoro_timer, get_timer_label, set_timer_label
+from typing import Union
+from ..config import get_config
+from ..timer_utils import get_pomodoro_timer, get_timer_label, set_timer_label
 from ..constants import STATUSBAR_DEFAULT_TEXT
 
 
-def show_timer_in_statusbar(show: bool):
+def show_timer_in_statusbar(show: Union[bool, None]) -> None:
     """Adds or removes the timer label from the Anki status bar."""
     config = get_config()
     timer = get_pomodoro_timer()
     label = get_timer_label()
+
+    if show is None:
+        show = False
 
     if (
         not show
@@ -19,9 +24,10 @@ def show_timer_in_statusbar(show: bool):
 
             def remove_widget():
                 current_label = get_timer_label()
-                if current_label:
+                status_bar = mw.statusBar()
+                if current_label is not None and status_bar is not None:
                     try:
-                        mw.statusBar().removeWidget(current_label)
+                        status_bar.removeWidget(current_label)
                         current_label.deleteLater()
                         set_timer_label(None)
                     except Exception as e:
@@ -35,11 +41,13 @@ def show_timer_in_statusbar(show: bool):
         def add_widget():
             new_label = QLabel(STATUSBAR_DEFAULT_TEXT)
             try:
-                mw.statusBar().addPermanentWidget(new_label, 0)
-                new_label.show()
-                set_timer_label(new_label)
-                if timer:
-                    timer.update_display()
+                status_bar = mw.statusBar()
+                if status_bar is not None:
+                    status_bar.addPermanentWidget(new_label, 0)
+                    new_label.show()
+                    set_timer_label(new_label)
+                    if timer:
+                        timer.update_display()
             except Exception as e:
                 print(f"Error adding timer widget: {e}")
 

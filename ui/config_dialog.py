@@ -26,7 +26,7 @@ class ConfigDialog(QDialog):
         config = get_config()
 
         self.setWindowTitle("番茄钟 & 呼吸设置")
-        self.layout = QVBoxLayout(self)
+        self._main_layout = QVBoxLayout(self)
         self.phase_widgets = {}  # Store phase widgets {key: {"checkbox": QCheckBox, "spinbox": QSpinBox}}
 
         # --- General Settings ---
@@ -75,7 +75,7 @@ class ConfigDialog(QDialog):
         general_layout.addLayout(pomo_layout)
 
         general_group.setLayout(general_layout)
-        self.layout.addWidget(general_group)
+        self._main_layout.addWidget(general_group)
 
         # --- Breathing Settings ---
         breathing_group = QGroupBox("呼吸训练设置")
@@ -141,7 +141,7 @@ class ConfigDialog(QDialog):
         self.cycles_spinbox.valueChanged.connect(self._update_estimated_time)
 
         breathing_group.setLayout(breathing_layout)
-        self.layout.addWidget(breathing_group)
+        self._main_layout.addWidget(breathing_group)
 
         # --- Dialog Buttons (Save/Cancel) ---
         button_box = QDialogButtonBox(
@@ -151,9 +151,9 @@ class ConfigDialog(QDialog):
         )
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
-        self.layout.addWidget(button_box)
+        self._main_layout.addWidget(button_box)
 
-        self.setLayout(self.layout)
+        self.setLayout(self._main_layout)
 
         # Set initial estimated time based on loaded config
         self._update_estimated_time()

@@ -4,7 +4,8 @@ from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QDialog
 from .constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
 from .breathing import BreathingDialog
-from .config import get_config, get_pomodoro_timer, save_config
+from .config import get_config, save_config
+from .timer_utils import get_pomodoro_timer
 from .pomodoro import PomodoroTimer
 
 # --- Anki 钩子函数 ---

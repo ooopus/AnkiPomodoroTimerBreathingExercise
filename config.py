@@ -11,7 +11,6 @@ from .constants import (
     DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
     DEFAULT_LONG_BREAK_MINUTES,
 )
-from .pomodoro import PomodoroTimer
 
 # Update CONFIG_PATH to use Anki's addon folder
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
@@ -51,21 +50,7 @@ class AddonState:
             self._config = self._load_config()
         return self._config
 
-    @property
-    def pomodoro_timer(self) -> Optional[PomodoroTimer]:
-        return self._pomodoro_timer
 
-    @pomodoro_timer.setter
-    def pomodoro_timer(self, value: PomodoroTimer):
-        self._pomodoro_timer = value
-
-    @property
-    def timer_label(self) -> Optional[QLabel]:
-        return self._timer_label
-
-    @timer_label.setter
-    def timer_label(self, value: QLabel):
-        self._timer_label = value
 
     def _load_config(self) -> Dict[str, Any]:
         """加载配置并设置默认值"""
@@ -182,17 +167,10 @@ def get_config() -> Dict[str, Any]:
     return get_state().config
 
 
-def get_pomodoro_timer() -> Optional[PomodoroTimer]:
-    return get_state().pomodoro_timer
-
+def get_pomodoro_timer():
+    """返回当前番茄钟计时器实例"""
+    return get_state()._pomodoro_timer
 
 def get_timer_label() -> Optional[QLabel]:
-    return get_state().timer_label
-
-
-def set_pomodoro_timer(timer: PomodoroTimer) -> None:
-    get_state().pomodoro_timer = timer
-
-
-def set_timer_label(label: QLabel) -> None:
-    get_state().timer_label = label
+    """返回当前计时器标签实例"""
+    return get_state()._timer_label

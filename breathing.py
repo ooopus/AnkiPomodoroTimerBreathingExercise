@@ -178,11 +178,9 @@ class BreathingDialog(QDialog):
         )  # Start at -1 so first call to update sets index 0
 
         # --- UI Elements ---
-        self._main_layout = QVBoxLayout(self)
+        layout = QVBoxLayout()
         self.animation_widget = BreathingAnimationWidget(self)
-        self._main_layout.addWidget(
-            self.animation_widget, 1
-        )  # 使用新的变量名
+        layout.addWidget(self.animation_widget, 1)
 
         self.instruction_label = QLabel("准备...", self)
         self.instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -199,10 +197,10 @@ class BreathingDialog(QDialog):
 
         self.skip_button = QPushButton("跳过训练", self)  # Changed label slightly
 
-        self.layout.addWidget(self.instruction_label)
-        self.layout.addWidget(self.cycle_label)
-        self.layout.addWidget(self.skip_button)
-        self.setLayout(self._main_layout)  # 使用 setLayout 而不是直接赋值
+        layout.addWidget(self.instruction_label)
+        layout.addWidget(self.cycle_label)
+        layout.addWidget(self.skip_button)
+        self.setLayout(layout)
 
         # Resize dialog to be reasonable
         self.resize(300, 350)
