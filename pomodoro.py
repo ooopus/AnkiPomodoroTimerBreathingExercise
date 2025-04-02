@@ -1,5 +1,6 @@
 from aqt import mw
 from PyQt6.QtCore import QTimer
+from PyQt6.QtWidgets import QWidget
 from .config import get_config, set_pomodoro_timer, get_timer_label
 from .constants import STATUSBAR_DEFAULT_TEXT
 from .ui.circular_timer import setup_circular_timer
@@ -30,10 +31,17 @@ class PomodoroTimer(QTimer):
         # 处理圆形计时器的显示逻辑
         if config.get("show_circular_timer", True):
             # 如果计时器不存在或其父窗口已被关闭，则创建新的计时器
-            if not self.circular_timer or not self.circular_timer.parent().isVisible():
+            parent_widget = (
+                self.circular_timer.parent() if self.circular_timer else None
+            )
+            if not self.circular_timer or (
+                isinstance(parent_widget, QWidget) and not parent_widget.isVisible()
+            ):
                 self.circular_timer = setup_circular_timer()
         elif self.circular_timer:
-            self.circular_timer.parent().close()
+            parent_widget = self.circular_timer.parent()
+            if isinstance(parent_widget, QWidget):
+                parent_widget.close()
             self.circular_timer = None
 
         self.total_seconds = minutes * 60

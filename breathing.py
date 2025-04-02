@@ -178,11 +178,11 @@ class BreathingDialog(QDialog):
         )  # Start at -1 so first call to update sets index 0
 
         # --- UI Elements ---
-        self.layout = QVBoxLayout(self)
+        self._main_layout = QVBoxLayout(self)
         self.animation_widget = BreathingAnimationWidget(self)
-        self.layout.addWidget(
+        self._main_layout.addWidget(
             self.animation_widget, 1
-        )  # Give animation widget stretch factor
+        )  # 使用新的变量名
 
         self.instruction_label = QLabel("准备...", self)
         self.instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -202,7 +202,7 @@ class BreathingDialog(QDialog):
         self.layout.addWidget(self.instruction_label)
         self.layout.addWidget(self.cycle_label)
         self.layout.addWidget(self.skip_button)
-        self.setLayout(self.layout)
+        self.setLayout(self._main_layout)  # 使用 setLayout 而不是直接赋值
 
         # Resize dialog to be reasonable
         self.resize(300, 350)

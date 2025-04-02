@@ -33,7 +33,7 @@ def on_reviewer_did_start(reviewer):
 
 def on_state_did_change(new_state: str, old_state: str):
     """Stops the Pomodoro timer when leaving the reviewer state."""
-    timer = get_pomodoro_timer()
+    timer: PomodoroTimer | None = get_pomodoro_timer()  # 添加类型注解
     config = get_config()
     if old_state == "review" and new_state != "review":
         if timer and timer.isActive() and config.get("enabled", True):
@@ -41,7 +41,7 @@ def on_state_did_change(new_state: str, old_state: str):
                 f"Left reviewer state ({old_state} -> {new_state}). Stopping Pomodoro timer."
             )
             timer.stop_timer()
-            tooltip("番茄钟已暂停。", period=2000)
+            tooltip("番茄钟已终止。", period=2000)
 
 
 def on_pomodoro_finished():

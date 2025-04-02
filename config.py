@@ -1,8 +1,6 @@
-# 移除 mw 导入
 import json
 import os
 from typing import Dict, Any, Optional
-from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QLabel
 from .constants import (
     PHASES,
@@ -11,6 +9,7 @@ from .constants import (
     DEFAULT_SHOW_STATUSBAR_TIMER,
     DEFAULT_SHOW_CIRCULAR_TIMER,
 )
+from .pomodoro import PomodoroTimer
 
 # Update CONFIG_PATH to use Anki's addon folder
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
@@ -51,11 +50,11 @@ class AddonState:
         return self._config
 
     @property
-    def pomodoro_timer(self) -> Optional[QTimer]:
+    def pomodoro_timer(self) -> Optional[PomodoroTimer]:
         return self._pomodoro_timer
 
     @pomodoro_timer.setter
-    def pomodoro_timer(self, value: QTimer):
+    def pomodoro_timer(self, value: PomodoroTimer):
         self._pomodoro_timer = value
 
     @property
@@ -163,7 +162,7 @@ def get_config() -> Dict[str, Any]:
     return get_state().config
 
 
-def get_pomodoro_timer() -> Optional[QTimer]:
+def get_pomodoro_timer() -> Optional[PomodoroTimer]:
     return get_state().pomodoro_timer
 
 
@@ -171,7 +170,7 @@ def get_timer_label() -> Optional[QLabel]:
     return get_state().timer_label
 
 
-def set_pomodoro_timer(timer: QTimer) -> None:
+def set_pomodoro_timer(timer: PomodoroTimer) -> None:
     get_state().pomodoro_timer = timer
 
 
