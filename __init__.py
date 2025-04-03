@@ -4,7 +4,7 @@ from aqt import mw, gui_hooks
 
 from PyQt6.QtGui import QAction
 
-from .config import get_pomodoro_timer, get_timer_label
+from .timer_utils import get_pomodoro_timer, get_timer_label
 from .hooks import on_reviewer_did_start, on_state_did_change
 from .ui import ConfigDialog, show_timer_in_statusbar
 

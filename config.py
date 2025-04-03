@@ -168,11 +168,6 @@ def get_config() -> Dict[str, Any]:
     return get_state().config
 
 
-def get_pomodoro_timer():
-    """返回当前番茄钟计时器实例"""
-    return get_state()._pomodoro_timer
-
-
 def get_timer_label() -> Optional[QLabel]:
     """返回当前计时器标签实例"""
     return get_state()._timer_label

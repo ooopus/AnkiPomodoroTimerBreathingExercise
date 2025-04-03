@@ -12,7 +12,8 @@ from PyQt6.QtWidgets import (
     QComboBox,
 )
 from ..constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
-from ..config import save_config, get_config, get_pomodoro_timer
+from ..config import save_config, get_config
+from ..timer_utils import get_pomodoro_timer
 from .statusbar import show_timer_in_statusbar
 
 
@@ -60,6 +61,26 @@ class ConfigDialog(QDialog):
         general_layout.addLayout(display_layout)
         general_layout.addLayout(position_layout)
 
+        # 连胜次数设置
+        streak_layout = QHBoxLayout()
+        streak_label = QLabel("连胜上限:", self)
+        self.streak_spinbox = QSpinBox(self)
+        self.streak_spinbox.setMinimum(1)
+        self.streak_spinbox.setMaximum(10)
+        self.streak_spinbox.setValue(config.get("pomodoros_before_long_break", 4))
+
+        streak_label_unit = QLabel("个番茄钟", self)
+        streak_layout.addWidget(streak_label)
+        streak_layout.addWidget(self.streak_spinbox)
+        streak_layout.addWidget(streak_label_unit)
+        general_layout.addLayout(streak_layout)
+
+        # 提示标签
+        streak_hint = QLabel("连续完成指定数量的番茄钟后，将进行长休息", self)
+        streak_hint.setStyleSheet("font-style: italic; color: grey;")
+        general_layout.addWidget(streak_hint)
+
+        # 添加番茄钟时长设置
         pomo_layout = QHBoxLayout()
         pomo_label = QLabel("番茄钟时长:", self)
         self.pomo_spinbox = QSpinBox(self)
@@ -80,7 +101,9 @@ class ConfigDialog(QDialog):
         self.max_break_spinbox = QSpinBox(self)
         self.max_break_spinbox.setMinimum(1)
         self.max_break_spinbox.setMaximum(120)
-        self.max_break_spinbox.setValue(config.get("max_break_duration", 30 * 60) // 60)  # 转换为分钟
+        self.max_break_spinbox.setValue(
+            config.get("max_break_duration", 30 * 60) // 60
+        )  # 转换为分钟
         max_break_label_unit = QLabel("分钟", self)
         max_break_layout.addWidget(max_break_label)
         max_break_layout.addWidget(self.max_break_spinbox)
@@ -205,7 +228,7 @@ class ConfigDialog(QDialog):
         """Saves the configuration and closes the dialog."""
         print("Saving configuration...")
         config = get_config()
-
+    
         # Save general settings
         config["enabled"] = self.enable_checkbox.isChecked()
         config["show_statusbar_timer"] = self.show_timer_checkbox.isChecked()
@@ -214,19 +237,22 @@ class ConfigDialog(QDialog):
         config["pomodoro_minutes"] = self.pomo_spinbox.value()
         config["breathing_cycles"] = self.cycles_spinbox.value()
         config["max_break_duration"] = self.max_break_spinbox.value() * 60
-
+        config["pomodoros_before_long_break"] = self.streak_spinbox.value()
+    
         # Save phase settings
         for key, widgets in self.phase_widgets.items():
             config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
             config[f"{key}_duration"] = widgets["spinbox"].value()
-
+    
         save_config()
         print("Configuration saved.")
-
-        # Apply changes immediately
+    
+        # 立即更新显示
         timer = get_pomodoro_timer()
-        show_timer_in_statusbar(timer and timer.isActive())
-
+        if timer:
+            timer.update_display()
+    
+        # Apply changes immediately
         if not config["enabled"] and timer and timer.isActive():
             print("Plugin disabled, stopping active Pomodoro timer.")
             timer.stop_timer()
@@ -238,5 +264,5 @@ class ConfigDialog(QDialog):
         ):
             print("Plugin enabled while in review, starting timer.")
             timer.start_timer(config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES))
-
+    
         super().accept()

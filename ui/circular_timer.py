@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QDialog, QApplication
 from PyQt6.QtCore import Qt, QRectF
-from PyQt6.QtGui import QPainter, QColor, QPen
+from PyQt6.QtGui import QPainter, QColor, QPen, QLinearGradient, QBrush
 from aqt import mw
 from ..config import get_config
 
@@ -41,7 +41,26 @@ class CircularTimer(QWidget):
             painter.drawArc(rect, 90 * 16, span_angle * 16)
 
         # 绘制剩余时间文本
-        painter.setPen(QColor(0, 0, 0))
+        font = painter.font()
+        font.setPointSize(min(self.width(), self.height()) // 5)  # 自适应字体大小
+        font.setBold(True)  # 加粗
+        painter.setFont(font)
+
+        # 添加文本阴影效果
+        shadow_color = QColor(0, 0, 0, 50)
+        painter.setPen(shadow_color)
+        shadow_offset = 2
+        painter.drawText(
+            rect.adjusted(shadow_offset, shadow_offset, shadow_offset, shadow_offset),
+            Qt.AlignmentFlag.AlignCenter,
+            self.remaining_time,
+        )
+
+        # 绘制主文本
+        text_gradient = QLinearGradient(0, 0, 0, self.height())
+        text_gradient.setColorAt(0, QColor(30, 30, 30))
+        text_gradient.setColorAt(1, QColor(70, 70, 70))
+        painter.setPen(QPen(QBrush(text_gradient), 1))
         painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, self.remaining_time)
 
 

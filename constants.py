@@ -35,5 +35,6 @@ DEFAULT_MAX_BREAK_DURATION = 30  # 默认最大间隔时间30分钟
 # 状态栏显示相关常量
 STATUSBAR_FILLED_TOMATO = "🍅"  # 已完成的番茄
 STATUSBAR_EMPTY_TOMATO = "⭕"  # 未完成的番茄
+STATUSBAR_BREAK_WARNING = "⚠️距离连胜重置还有：" #中断警告
 STATUSBAR_DEFAULT_TEXT = f"{STATUSBAR_FILLED_TOMATO} --:--"
-STATUSBAR_FORMAT = "{icon} {mins:02d}:{secs:02d} {progress}"  # 添加进度显示
+STATUSBAR_FORMAT = "{icon} {mins:02d}:{secs:02d} {progress}"  # 番茄状态显示格式

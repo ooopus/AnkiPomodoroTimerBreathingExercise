@@ -30,6 +30,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
                         status_bar.removeWidget(current_label)
                         current_label.deleteLater()
                         set_timer_label(None)
+                        status_bar.deleteLater()
                     except Exception as e:
                         print(f"Error removing timer widget: {e}")
 
