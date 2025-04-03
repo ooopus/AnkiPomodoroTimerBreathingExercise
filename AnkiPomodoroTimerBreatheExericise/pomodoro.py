@@ -87,10 +87,9 @@ class PomodoroTimer(QTimer):
 
             tooltip("番茄钟计时器已停止。", period=3000)
             self.stop()
-            self.timeout.disconnect()  # Need to disconnect signal
+
             if stop_break_timer:
                 self.break_timer.stop()
-                self.break_timer.timeout.disconnect()  # Need to disconnect break timer signal
 
         # Ensure UI updates run in main thread
         def _clear_display():
@@ -117,7 +116,7 @@ class PomodoroTimer(QTimer):
         if self.break_timer.isActive():
             from aqt.utils import tooltip
 
-            tooltip("休息计时器已停止。", period=3000)
+            tooltip("连胜中断", period=3000)
             self.break_timer.stop()
             # Force immediate display update
             mw.progress.timer(10, lambda: self.update_display(), False)
@@ -126,9 +125,8 @@ class PomodoroTimer(QTimer):
     def update_timer(self):
         if self.remaining_seconds > 0:
             self.remaining_seconds -= 1
-            # Only update display when seconds change
-            if self.remaining_seconds % 5 == 0:  # Update display every 5 seconds
-                self.update_display()
+
+            self.update_display()
 
             # Update total pomodoro time for today
             if mw and mw.state == "review":
@@ -140,7 +138,7 @@ class PomodoroTimer(QTimer):
 
             from aqt.utils import tooltip
 
-            tooltip("番茄钟计时器已完成。", period=3000)
+            tooltip("本次番茄钟结束", period=3000)
             self.stop()
 
             # Set last completion time and start break timer

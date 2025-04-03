@@ -35,14 +35,6 @@ def setup_plugin():
 
         tooltip("警告: 无法添加番茄钟菜单项 (未找到menuTools)。", period=3000)
 
-    # Initial status bar setup if enabled and timer exists (e.g., addon reloaded)
-    timer = get_pomodoro_timer()
-    label = get_timer_label()
-    if timer and timer.isActive():
-        show_timer_in_statusbar(True)
-    elif label:
-        show_timer_in_statusbar(False)
-
 
 def cleanup_plugin():
     """Clean up resources when plugin is unloaded"""

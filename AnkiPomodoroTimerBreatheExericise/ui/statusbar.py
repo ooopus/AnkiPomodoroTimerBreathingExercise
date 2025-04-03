@@ -16,13 +16,11 @@ def remove_widget():
             status_bar = mw.statusBar()
             if status_bar is not None:
                 status_bar.removeWidget(label)
-                label.setParent(None)  # Remove from parent
+                label.setParent(None)
                 label.deleteLater()
                 set_timer_label(None)
-                # Force garbage collection
                 import gc
-
-                gc.collect()
+                label.destroyed.connect(lambda: gc.collect())
         except Exception as e:
             tooltip(f"Error removing timer widget: {e}")
 
@@ -56,11 +54,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
                     status_bar.addPermanentWidget(new_label, 0)
                     new_label.show()
                     set_timer_label(new_label)
-                    if timer:
-                        timer.update_display()
             except Exception as e:
                 tooltip(f"Error adding timer widget: {e}")
 
         mw.progress.timer(0, add_widget, False)
-    elif label and timer and timer.isActive():
-        timer.update_display()

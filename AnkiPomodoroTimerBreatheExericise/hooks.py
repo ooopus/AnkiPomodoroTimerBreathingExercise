@@ -13,23 +13,21 @@ from .pomodoro import PomodoroTimer
 # --- Anki 钩子函数 ---
 
 
-def on_reviewer_did_start(reviewer):
+def on_reviewer_did_start(_reviewer):
     """Starts the Pomodoro timer when the reviewer screen is shown."""
-    config = get_config()  # Use our config getter
+    config = get_config()
     timer = get_pomodoro_timer()
 
     if not config.get("enabled", True):
         return
 
-    # 确保只有一个计时器实例
+    # Ensure we are on the main thread before starting timer
     if timer is None or not isinstance(timer, PomodoroTimer):
         timer = PomodoroTimer(mw)
     else:
-        # 如果休息时间计时器在运行，停止它
         if timer.break_timer.isActive():
             timer.stop_break_timer()
 
-    # 确保在主线程操作
     def _start_timer():
         if not timer.isActive():
             pomo_minutes = config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
