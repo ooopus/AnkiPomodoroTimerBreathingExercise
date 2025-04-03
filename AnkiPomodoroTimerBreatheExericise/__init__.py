@@ -39,7 +39,6 @@ def setup_plugin():
 def cleanup_plugin():
     """Clean up resources when plugin is unloaded"""
     from .ui.statusbar import remove_widget
-    from .timer_utils import get_pomodoro_timer
     
     timer = get_pomodoro_timer()
     if timer:
