@@ -1,6 +1,8 @@
 from aqt import mw
 from PyQt6.QtWidgets import QLabel
 from typing import Union
+
+from aqt.utils import tooltip
 from ..config import get_config
 from ..timer_utils import get_pomodoro_timer, get_timer_label, set_timer_label
 from ..constants import STATUSBAR_DEFAULT_TEXT
@@ -33,7 +35,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
                         set_timer_label(None)
                         status_bar.deleteLater()
                     except Exception as e:
-                        print(f"Error removing timer widget: {e}")
+                        tooltip(f"Error removing timer widget: {e}")
 
             mw.progress.timer(0, remove_widget, False)
         return
@@ -51,7 +53,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
                     if timer:
                         timer.update_display()
             except Exception as e:
-                print(f"Error adding timer widget: {e}")
+                tooltip(f"Error adding timer widget: {e}")
 
         mw.progress.timer(0, add_widget, False)
     elif label and timer and timer.isActive():

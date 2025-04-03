@@ -2,6 +2,7 @@ import json
 import os
 from typing import Dict, Any, Optional
 from PyQt6.QtWidgets import QLabel
+from aqt.utils import tooltip
 from .constants import (
     PHASES,
     DEFAULT_POMODORO_MINUTES,
@@ -36,37 +37,46 @@ class AddonState:
                         raise ValueError("Invalid config format")
                     return config
         except json.JSONDecodeError as e:
-            print(f"配置文件格式错误: {e}")
-            # 记录错误到Anki日志系统
+            from aqt.utils import tooltip
+
+            tooltip(f"配置文件格式错误: {e}", period=3000)
         except Exception as e:
-            print(f"加载配置文件时出错: {e}")
+            from aqt.utils import tooltip
+
+            tooltip(f"加载配置文件时出错: {e}", period=3000)
         return {}
 
     def _save_config_to_file(self) -> None:
-        """保存配置到JSON文件"""
         try:
-            # 验证配置数据
             if not isinstance(self._config, dict):
                 raise ValueError("配置数据必须是字典类型")
-                
-            # 确保目录存在
-            os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-            
-            # 创建临时文件
-            temp_path = CONFIG_PATH + ".tmp"
+
+            config_dir = os.path.dirname(CONFIG_PATH)
+            os.makedirs(config_dir, exist_ok=True)
+
+            # 使用唯一的临时文件名
+            temp_path = f"{CONFIG_PATH}.{os.getpid()}.tmp"
+
+            # 先写入临时文件
             with open(temp_path, "w", encoding="utf-8") as f:
                 json.dump(self._config, f, indent=4, ensure_ascii=False)
-                
+                f.flush()
+                os.fsync(f.fileno())  # 确保写入磁盘
+
             # 原子性替换
-            if os.path.exists(temp_path):
-                os.replace(temp_path, CONFIG_PATH)
-                
-        except ValueError as e:  # JSON encoding error
-            print(f"配置序列化失败: {e}")
-        except OSError as e:
-            print(f"保存配置文件时出错: {e}")
+            os.replace(temp_path, CONFIG_PATH)
+
         except Exception as e:
-            print(f"保存配置时发生意外错误: {e}")
+            if os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except Exception as e:
+                    from aqt.utils import tooltip
+
+                    tooltip(f"清理临时文件时出错: {e}", period=3000)
+            from aqt.utils import tooltip
+
+            tooltip(f"保存配置时发生错误: {e}", period=3000)
 
     @property
     def config(self) -> Dict[str, Any]:
@@ -140,7 +150,7 @@ class AddonState:
                     config.get(f"{phase['key']}_enabled", phase["default_enabled"])
                 )
         except (ValueError, TypeError) as e:
-            print(
+            tooltip(
                 f"Pomodoro Addon: Error loading config, resetting to defaults. Error: {e}"
             )
             # Reset to defaults on error
@@ -160,9 +170,8 @@ class AddonState:
             self._config = config
             self._save_config_to_file()  # 直接使用类方法保存
 
-        # 保存配置到文件
+        # 仅更新内存中的配置，不自动保存
         self._config = config
-        self._save_config_to_file()
         return config
 
 

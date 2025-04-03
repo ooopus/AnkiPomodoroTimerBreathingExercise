@@ -30,10 +30,14 @@ class PomodoroTimer(QTimer):
         config = get_config()
 
         if not config.get("enabled", True):
-            print("Pomodoro timer disabled in config.")
+            from aqt.utils import tooltip
+
+            tooltip("番茄钟计时器已在配置中禁用。", period=3000)
             return
         if minutes <= 0:
-            print(f"Invalid Pomodoro duration: {minutes} minutes. Timer not started.")
+            from aqt.utils import tooltip
+
+            tooltip(f"无效的番茄钟时长: {minutes} 分钟。计时器未启动。", period=3000)
             return
 
         # Check for long idle period before starting new Pomodoro
@@ -47,7 +51,9 @@ class PomodoroTimer(QTimer):
         ):
             config["completed_pomodoros"] = 0
             save_config()
-            print("Long idle period detected. Pomodoro count reset.")
+            from aqt.utils import tooltip
+
+            tooltip("检测到长时间空闲，番茄钟计数已重置。", period=3000)
 
         # 处理圆形计时器的显示逻辑
         if config.get("show_circular_timer", True):
@@ -67,7 +73,9 @@ class PomodoroTimer(QTimer):
 
         self.total_seconds = minutes * 60
         self.remaining_seconds = self.total_seconds
-        print(f"Pomodoro timer started for {minutes} minutes.")
+        from aqt.utils import tooltip
+
+        tooltip(f"番茄钟计时器已启动，时长: {minutes} 分钟。", period=3000)
         self.update_display()
         self.start(1000)  # Tick every second
         show_timer_in_statusbar(config.get("statusbar_format", True))
@@ -78,7 +86,9 @@ class PomodoroTimer(QTimer):
             stop_break_timer (bool): 是否同时停止休息计时器
         """
         if self.isActive():
-            print("Pomodoro timer stopped.")
+            from aqt.utils import tooltip
+
+            tooltip("番茄钟计时器已停止。", period=3000)
             self.stop()
             if stop_break_timer:
                 self.break_timer.stop()
@@ -104,7 +114,9 @@ class PomodoroTimer(QTimer):
     def stop_break_timer(self):
         """停止休息时间计时器"""
         if self.break_timer.isActive():
-            print("Break timer stopped.")
+            from aqt.utils import tooltip
+
+            tooltip("休息计时器已停止。", period=3000)
             self.break_timer.stop()
             # 强制立即更新显示
             mw.progress.timer(10, lambda: self.update_display(), False)
@@ -116,7 +128,7 @@ class PomodoroTimer(QTimer):
             # 仅在秒数变化时更新显示
             if self.remaining_seconds % 5 == 0:  # 每5秒更新一次显示
                 self.update_display()
-            
+
             # 更新当天番茄钟总计时长
             if mw and mw.state == "review":
                 self.config["daily_pomodoro_seconds"] = (
@@ -125,7 +137,9 @@ class PomodoroTimer(QTimer):
         else:
             from .hooks import on_pomodoro_finished
 
-            print("Pomodoro timer finished.")
+            from aqt.utils import tooltip
+
+            tooltip("番茄钟计时器已完成。", period=3000)
             self.stop()
 
             # 设置最后完成时间并启动休息计时器
@@ -134,7 +148,7 @@ class PomodoroTimer(QTimer):
             max_break_duration = self.config.get("max_break_duration", 30 * 60)
             self.remaining_break_seconds = max_break_duration
             self.break_timer.start(1000)
-            
+
             # 立即更新显示
             self.update_display()
             on_pomodoro_finished()
@@ -173,7 +187,7 @@ class PomodoroTimer(QTimer):
                     self.config["daily_pomodoro_seconds"] = 0
                     self.config["last_date"] = today
                     save_config()
-                    
+
                 # 无论是否重置，都计算每日时间
                 daily_total_seconds = self.config.get("daily_pomodoro_seconds", 0)
                 daily_mins, daily_secs = divmod(daily_total_seconds, 60)

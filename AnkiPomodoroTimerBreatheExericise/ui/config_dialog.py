@@ -1,23 +1,17 @@
 from aqt import mw
 from PyQt6.QtWidgets import (
-    QDialog,
     QVBoxLayout,
-    QHBoxLayout,
-    QLabel,
-    QCheckBox,
-    QSpinBox,
     QDialogButtonBox,
-    QFrame,
+    QLabel,
+    QDialog,
     QGroupBox,
     QComboBox,
 )
-from ..constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
-from ..constants import (
-    STATUSBAR_FORMAT_NAMES,
-    DEFAULT_STATUSBAR_FORMAT,
-)
+from aqt.utils import tooltip
 from ..config import save_config, get_config
+from ..constants import STATUSBAR_FORMAT_NAMES, DEFAULT_STATUSBAR_FORMAT
 from ..timer_utils import get_pomodoro_timer
+from .config_components import GeneralSettings, BreathingSettings
 
 
 class ConfigDialog(QDialog):
@@ -33,156 +27,15 @@ class ConfigDialog(QDialog):
         self._main_layout = QVBoxLayout(self)
         self.phase_widgets = {}  # Store phase widgets {key: {"checkbox": QCheckBox, "spinbox": QSpinBox}}
 
-        # --- General Settings ---
-        general_group = QGroupBox("常规设置")
-        general_layout = QVBoxLayout()
+        # 初始化设置组件
+        self.general_settings = GeneralSettings(self.config)
+        self.breathing_settings = BreathingSettings(self.config)
 
-        self.enable_checkbox = QCheckBox("启用番茄钟插件", self)
-        self.enable_checkbox.setChecked(self.config.get("enabled", True))
-        general_layout.addWidget(self.enable_checkbox)
+        # 添加常规设置组件
+        self._main_layout.addWidget(self.general_settings.create_ui(self))
 
-        # 显示选项布局
-        display_layout = QVBoxLayout()
-        self.show_circular_timer_checkbox = QCheckBox("显示圆形计时器", self)
-        self.show_circular_timer_checkbox.setChecked(
-            self.config.get("show_circular_timer", True)
-        )
-        display_layout.addWidget(self.show_circular_timer_checkbox)
-
-        # 窗口位置选项
-        position_layout = QHBoxLayout()
-        position_label = QLabel("计时器窗口位置:", self)
-        self.position_combo = QComboBox(self)
-        self.position_combo.addItems(["左上角", "右上角", "左下角", "右下角"])
-        self.position_combo.setCurrentText(self.config.get("timer_position", "左上角"))
-        position_layout.addWidget(position_label)
-        position_layout.addWidget(self.position_combo)
-
-        general_layout.addLayout(display_layout)
-        general_layout.addLayout(position_layout)
-
-        # 连胜次数设置
-        streak_layout = QHBoxLayout()
-        streak_label = QLabel("连胜上限:", self)
-        self.streak_spinbox = QSpinBox(self)
-        self.streak_spinbox.setMinimum(1)
-        self.streak_spinbox.setMaximum(10)
-        self.streak_spinbox.setValue(self.config.get("pomodoros_before_long_break", 4))
-
-        streak_label_unit = QLabel("个番茄钟", self)
-        streak_layout.addWidget(streak_label)
-        streak_layout.addWidget(self.streak_spinbox)
-        streak_layout.addWidget(streak_label_unit)
-        general_layout.addLayout(streak_layout)
-
-        # 提示标签
-        streak_hint = QLabel("连续完成指定数量的番茄钟后，将进行长休息", self)
-        streak_hint.setStyleSheet("font-style: italic; color: grey;")
-        general_layout.addWidget(streak_hint)
-
-        # 添加番茄钟时长设置
-        pomo_layout = QHBoxLayout()
-        pomo_label = QLabel("番茄钟时长:", self)
-        self.pomo_spinbox = QSpinBox(self)
-        self.pomo_spinbox.setMinimum(1)
-        self.pomo_spinbox.setMaximum(180)
-        self.pomo_spinbox.setValue(
-            self.config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
-        )
-        pomo_label_unit = QLabel("分钟", self)
-        pomo_layout.addWidget(pomo_label)
-        pomo_layout.addWidget(self.pomo_spinbox)
-        pomo_layout.addWidget(pomo_label_unit)
-        general_layout.addLayout(pomo_layout)
-
-        # 添加最大间隔时间设置
-        max_break_layout = QHBoxLayout()
-        max_break_label = QLabel("最大间隔时间:", self)
-        self.max_break_spinbox = QSpinBox(self)
-        self.max_break_spinbox.setMinimum(1)
-        self.max_break_spinbox.setMaximum(120)
-        self.max_break_spinbox.setValue(
-            self.config.get("max_break_duration", 30 * 60) // 60
-        )  # 转换为分钟
-        max_break_label_unit = QLabel("分钟", self)
-        max_break_layout.addWidget(max_break_label)
-        max_break_layout.addWidget(self.max_break_spinbox)
-        max_break_layout.addWidget(max_break_label_unit)
-        general_layout.addLayout(max_break_layout)
-
-        # 添加提示标签
-        max_break_hint = QLabel("超过此时间后，累计的番茄钟将归零", self)
-        max_break_hint.setStyleSheet("font-style: italic; color: grey;")
-        general_layout.addWidget(max_break_hint)
-
-        general_group.setLayout(general_layout)
-        self._main_layout.addWidget(general_group)
-
-        # --- Breathing Settings ---
-        breathing_group = QGroupBox("呼吸训练设置")
-        breathing_layout = QVBoxLayout()
-
-        # Number of Cycles Input
-        cycles_layout = QHBoxLayout()
-        cycles_label = QLabel("呼吸循环次数:", self)
-        self.cycles_spinbox = QSpinBox(self)
-        self.cycles_spinbox.setMinimum(0)
-        self.cycles_spinbox.setMaximum(50)
-        self.cycles_spinbox.setValue(
-            self.config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
-        )
-        cycles_layout.addWidget(cycles_label)
-        cycles_layout.addWidget(self.cycles_spinbox)
-        breathing_layout.addLayout(cycles_layout)
-
-        # Estimated Time Label
-        self.estimated_time_label = QLabel("预计时间: --:--", self)
-        self.estimated_time_label.setStyleSheet("font-style: italic; color: grey;")
-        breathing_layout.addWidget(self.estimated_time_label)
-
-        # Separator
-        line = QFrame()
-        line.setFrameShape(QFrame.Shape.HLine)
-        line.setFrameShadow(QFrame.Shadow.Sunken)
-        breathing_layout.addWidget(line)
-
-        breathing_layout.addWidget(QLabel("每阶段设置:"))
-
-        # Per-phase settings (Inhale, Hold, Exhale)
-        for phase in PHASES:
-            key = phase["key"]
-            phase_layout = QHBoxLayout()
-
-            # Checkbox to enable/disable the phase
-            chk = QCheckBox(f"{phase['label']}", self)
-            chk.setChecked(self.config.get(f"{key}_enabled", phase["default_enabled"]))
-
-            # Spinbox for phase duration
-            spn = QSpinBox(self)
-            spn.setMinimum(0)
-            spn.setMaximum(60)
-            spn.setValue(self.config.get(f"{key}_duration", phase["default_duration"]))
-            phase_layout.addWidget(QLabel("秒", self))
-
-            # Enable/disable spinbox based on checkbox state
-            spn.setEnabled(chk.isChecked())
-            chk.toggled.connect(spn.setEnabled)
-
-            phase_layout.addWidget(chk)
-            phase_layout.addWidget(spn)
-
-            breathing_layout.addLayout(phase_layout)
-            self.phase_widgets[key] = {"checkbox": chk, "spinbox": spn}
-
-            # Connect changes in this phase's controls to update the estimated time
-            chk.toggled.connect(self._update_estimated_time)
-            spn.valueChanged.connect(self._update_estimated_time)
-
-        # Connect cycles spinbox change to update estimated time
-        self.cycles_spinbox.valueChanged.connect(self._update_estimated_time)
-
-        breathing_group.setLayout(breathing_layout)
-        self._main_layout.addWidget(breathing_group)
+        # 添加呼吸训练设置组件
+        self._main_layout.addWidget(self.breathing_settings.create_ui(self))
 
         # --- Dialog Buttons (Save/Cancel) ---
         button_box = QDialogButtonBox(
@@ -225,63 +78,68 @@ class ConfigDialog(QDialog):
     def _update_estimated_time(self):
         """Calculates and updates the estimated breathing time label."""
         try:
-            target_cycles = self.cycles_spinbox.value()
+            breathing_values = self.breathing_settings.get_values()
+            target_cycles = breathing_values["breathing_cycles"]
             single_cycle_duration = 0
             any_phase_active = False
 
             # Calculate duration of one cycle based on *currently selected* values
-            for key, widgets in self.phase_widgets.items():
-                if widgets["checkbox"].isChecked():
-                    single_cycle_duration += widgets["spinbox"].value()
+            for key in self.breathing_settings.phase_widgets:
+                if breathing_values.get(f"{key}_enabled", False):
+                    single_cycle_duration += breathing_values.get(f"{key}_duration", 0)
                     any_phase_active = True
 
             if not any_phase_active or target_cycles <= 0:
-                self.estimated_time_label.setText("预计时间: --:-- (无启用阶段或循环)")
+                self.breathing_settings.widgets["estimated_time"].setText(
+                    "预计时间: --:-- (无启用阶段或循环)"
+                )
                 return
 
             total_seconds = single_cycle_duration * target_cycles
             mins, secs = divmod(total_seconds, 60)
-            self.estimated_time_label.setText(f"预计时间: {mins:02d}:{secs:02d}")
+            self.breathing_settings.widgets["estimated_time"].setText(
+                f"预计时间: {mins:02d}:{secs:02d}"
+            )
 
         except Exception as e:
-            print(f"Error updating estimated time: {e}")
-            self.estimated_time_label.setText("预计时间: 计算错误")
+            tooltip(f"Error updating estimated time: {e}")
+            self.breathing_settings.widgets["estimated_time"].setText(
+                "预计时间: 计算错误"
+            )
 
     def accept(self):
         """Saves the configuration and closes the dialog."""
         try:
-            print("Saving configuration...")
             self.config = get_config()
-            
+
             # 保存所有UI控件的值到配置
-            self.config["enabled"] = self.enable_checkbox.isChecked()
-            self.config["show_circular_timer"] = self.show_circular_timer_checkbox.isChecked()
-            self.config["timer_position"] = self.position_combo.currentText()
-            self.config["pomodoro_minutes"] = self.pomo_spinbox.value()
-            self.config["pomodoros_before_long_break"] = self.streak_spinbox.value()
-            self.config["max_break_duration"] = self.max_break_spinbox.value() * 60  # 转换为秒
-            self.config["breathing_cycles"] = self.cycles_spinbox.value()
+            # Get values from component classes
+            general_values = self.general_settings.get_values()
+            breathing_values = self.breathing_settings.get_values()
+
+            # Update config with component values
+            self.config["enabled"] = general_values["enabled"]
+            self.config["show_circular_timer"] = general_values["show_circular_timer"]
+            self.config["timer_position"] = general_values["timer_position"]
+            self.config["breathing_cycles"] = breathing_values["breathing_cycles"]
             self.config["statusbar_format"] = self.statusbar_format_combo.currentData()
-            
+
             # 保存呼吸阶段设置
             for key, widgets in self.phase_widgets.items():
                 self.config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
                 self.config[f"{key}_duration"] = widgets["spinbox"].value()
-            
+
             save_config()
-            print("Configuration saved.")
-            
+            tooltip("配置已保存")
+
             # 立即更新显示
             timer = get_pomodoro_timer()
             if timer:
                 timer.update_display()
-                
+
             super().accept()
         except Exception as e:
             from aqt.utils import showWarning
-            print(f"Error saving configuration: {e}")
-            showWarning(
-                "配置保存失败",
-                self,
-                f"保存配置时发生错误: {str(e)}"
-            )
+
+            tooltip(f"Error saving configuration: {e}")
+            showWarning("配置保存失败", self, f"保存配置时发生错误: {str(e)}")

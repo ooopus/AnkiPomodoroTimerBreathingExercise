@@ -44,11 +44,10 @@ def on_state_did_change(new_state: str, old_state: str):
     config = get_config()
     if old_state == "review" and new_state != "review":
         if timer and timer.isActive() and config.get("enabled", True):
-            print(
+            tooltip(
                 f"Left reviewer state ({old_state} -> {new_state}). Stopping Pomodoro timer."
             )
             timer.stop_timer(stop_break_timer=False)
-            tooltip("番茄钟已终止。", period=2000)
 
 
 def on_pomodoro_finished():
@@ -83,7 +82,6 @@ def _after_pomodoro_finish_tasks():
 
     # Return to deck browser
     if mw.state == "review":
-        print("Returning to deck browser after Pomodoro.")
         mw.moveToState("deckBrowser")
 
     # 删除这行，因为我们需要保持休息时间显示
@@ -105,27 +103,22 @@ def show_breathing_dialog():
     )
     if not any_phase_enabled:
         tooltip("呼吸训练已跳过 (无启用阶段)。", period=3000)
-        print("Skipping breathing dialog: No phases enabled.")
         return
 
     # Get configured number of cycles using our config system
     target_cycles = config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
     if target_cycles <= 0:
         tooltip("呼吸训练已跳过 (循环次数为 0)。", period=3000)
-        print(f"Skipping breathing dialog: Target cycles is {target_cycles}.")
         return
 
     # Ensure main window is visible before showing modal dialog
     if mw and mw.isVisible():
-        print(f"Showing breathing dialog for {target_cycles} cycles.")
         # Pass target_cycles to the dialog
         dialog = BreathingDialog(target_cycles, mw)
         result = dialog.exec()  # Show modally
         if result == QDialog.DialogCode.Accepted:
-            print("Breathing exercise completed.")
             tooltip("呼吸训练完成！", period=2000)  # "Breathing exercise complete!"
         else:
-            print("Breathing exercise skipped or closed.")
             tooltip("呼吸训练已跳过。", period=2000)  # "Breathing exercise skipped."
     else:
-        print("Skipping breathing dialog: Main window not visible.")
+        tooltip("Skipping breathing dialog: Main window not visible.")
