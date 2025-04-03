@@ -14,7 +14,6 @@ from PyQt6.QtWidgets import (
 from ..constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
 from ..config import save_config, get_config
 from ..timer_utils import get_pomodoro_timer
-from .statusbar import show_timer_in_statusbar
 
 
 class ConfigDialog(QDialog):
@@ -228,7 +227,7 @@ class ConfigDialog(QDialog):
         """Saves the configuration and closes the dialog."""
         print("Saving configuration...")
         config = get_config()
-    
+
         # Save general settings
         config["enabled"] = self.enable_checkbox.isChecked()
         config["show_statusbar_timer"] = self.show_timer_checkbox.isChecked()
@@ -238,20 +237,20 @@ class ConfigDialog(QDialog):
         config["breathing_cycles"] = self.cycles_spinbox.value()
         config["max_break_duration"] = self.max_break_spinbox.value() * 60
         config["pomodoros_before_long_break"] = self.streak_spinbox.value()
-    
+
         # Save phase settings
         for key, widgets in self.phase_widgets.items():
             config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
             config[f"{key}_duration"] = widgets["spinbox"].value()
-    
+
         save_config()
         print("Configuration saved.")
-    
+
         # 立即更新显示
         timer = get_pomodoro_timer()
         if timer:
             timer.update_display()
-    
+
         # Apply changes immediately
         if not config["enabled"] and timer and timer.isActive():
             print("Plugin disabled, stopping active Pomodoro timer.")
@@ -264,5 +263,5 @@ class ConfigDialog(QDialog):
         ):
             print("Plugin enabled while in review, starting timer.")
             timer.start_timer(config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES))
-    
+
         super().accept()

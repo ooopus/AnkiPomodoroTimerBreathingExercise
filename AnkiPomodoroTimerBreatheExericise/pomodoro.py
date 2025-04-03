@@ -137,7 +137,7 @@ class PomodoroTimer(QTimer):
                 STATUSBAR_FORMAT,
                 STATUSBAR_FILLED_TOMATO,
                 STATUSBAR_EMPTY_TOMATO,
-                STATUSBAR_BREAK_WARNING
+                STATUSBAR_BREAK_WARNING,
             )
 
             label = get_timer_label()
