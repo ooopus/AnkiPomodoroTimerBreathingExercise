@@ -10,6 +10,11 @@ from PyQt6.QtWidgets import (
 )
 from ..constants import PHASES, DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES
 
+import gettext
+import os
+localedir = os.path.join(os.path.dirname(__file__), '../locales')
+translation = gettext.translation('messages', localedir, fallback=True)
+_ = translation.gettext
 
 class GeneralSettings:
     """Handles UI components and logic for general settings"""
@@ -24,13 +29,13 @@ class GeneralSettings:
         layout = QVBoxLayout()
 
         # Enable plugin checkbox
-        self.widgets["enable"] = QCheckBox("启用番茄钟插件", parent)
+        self.widgets["enable"] = QCheckBox(_("启用番茄钟插件"), parent)
         self.widgets["enable"].setChecked(self.config.get("enabled", True))
         layout.addWidget(self.widgets["enable"])
 
         # Display options
         display_layout = QVBoxLayout()
-        self.widgets["show_timer"] = QCheckBox("显示圆形计时器", parent)
+        self.widgets["show_timer"] = QCheckBox(_("显示圆形计时器"), parent)
         self.widgets["show_timer"].setChecked(
             self.config.get("show_circular_timer", True)
         )
@@ -38,9 +43,9 @@ class GeneralSettings:
 
         # Window position
         position_layout = QHBoxLayout()
-        position_label = QLabel("计时器窗口位置:", parent)
+        position_label = QLabel(_("计时器窗口位置:"), parent)
         self.widgets["position"] = QComboBox(parent)
-        self.widgets["position"].addItems(["左上角", "右上角", "左下角", "右下角"])
+        self.widgets["position"].addItems([_("左上角"), _("右上角"), _("左下角"), _("右下角")])
         self.widgets["position"].setCurrentText(
             self.config.get("timer_position", "左上角")
         )
@@ -49,40 +54,40 @@ class GeneralSettings:
 
         # Pomodoro streak settings
         streak_layout = QHBoxLayout()
-        streak_label = QLabel("连胜上限:", parent)
+        streak_label = QLabel(_("连胜上限:"), parent)
         self.widgets["streak"] = QSpinBox(parent)
         self.widgets["streak"].setMinimum(1)
         self.widgets["streak"].setMaximum(10)
         self.widgets["streak"].setValue(self.config.get("pomodoros_before_long_break", 4))
-        streak_label_unit = QLabel("个番茄钟", parent)
+        streak_label_unit = QLabel(_("个番茄钟"), parent)
         streak_layout.addWidget(streak_label)
         streak_layout.addWidget(self.widgets["streak"])
         streak_layout.addWidget(streak_label_unit)
 
         # Pomodoro duration
         pomo_layout = QHBoxLayout()
-        pomo_label = QLabel("番茄钟时长:", parent)
+        pomo_label = QLabel(_("番茄钟时长:"), parent)
         self.widgets["pomodoro"] = QSpinBox(parent)
         self.widgets["pomodoro"].setMinimum(1)
         self.widgets["pomodoro"].setMaximum(180)
         self.widgets["pomodoro"].setValue(
             self.config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
         )
-        pomo_label_unit = QLabel("分钟", parent)
+        pomo_label_unit = QLabel(_("分钟"), parent)
         pomo_layout.addWidget(pomo_label)
         pomo_layout.addWidget(self.widgets["pomodoro"])
         pomo_layout.addWidget(pomo_label_unit)
 
         # Max break duration
         max_break_layout = QHBoxLayout()
-        max_break_label = QLabel("最大间隔时间:", parent)
+        max_break_label = QLabel(_("最大间隔时间:"), parent)
         self.widgets["max_break"] = QSpinBox(parent)
         self.widgets["max_break"].setMinimum(1)
         self.widgets["max_break"].setMaximum(120)
         self.widgets["max_break"].setValue(
             self.config.get("max_break_duration", 30 * 60) // 60
         )
-        max_break_label_unit = QLabel("分钟", parent)
+        max_break_label_unit = QLabel(_("分钟"), parent)
         max_break_layout.addWidget(max_break_label)
         max_break_layout.addWidget(self.widgets["max_break"])
         max_break_layout.addWidget(max_break_label_unit)
@@ -95,11 +100,11 @@ class GeneralSettings:
         layout.addLayout(max_break_layout)
 
         # Add hint labels
-        streak_hint = QLabel("连续完成指定数量的番茄钟后，将进行长休息", parent)
+        streak_hint = QLabel(_("连续完成指定数量的番茄钟后，将进行长休息"), parent)
         streak_hint.setStyleSheet("font-style: italic; color: grey;")
         layout.addWidget(streak_hint)
 
-        max_break_hint = QLabel("超过此时间后，累计的番茄钟将归零", parent)
+        max_break_hint = QLabel(_("超过此时间后，累计的番茄钟将归零"), parent)
         max_break_hint.setStyleSheet("font-style: italic; color: grey;")
         layout.addWidget(max_break_hint)
 
@@ -133,7 +138,7 @@ class BreathingSettings:
 
         # Breathing cycles count
         cycles_layout = QHBoxLayout()
-        cycles_label = QLabel("呼吸循环次数:", parent)
+        cycles_label = QLabel(_("呼吸循环次数:"), parent)
         self.widgets["cycles"] = QSpinBox(parent)
         self.widgets["cycles"].setMinimum(0)
         self.widgets["cycles"].setMaximum(50)
@@ -145,7 +150,7 @@ class BreathingSettings:
         layout.addLayout(cycles_layout)
 
         # Estimated time label
-        self.widgets["estimated_time"] = QLabel("预计时间: --:--", parent)
+        self.widgets["estimated_time"] = QLabel(_("预计时间: --:--"), parent)
         self.widgets["estimated_time"].setStyleSheet("font-style: italic; color: grey;")
         layout.addWidget(self.widgets["estimated_time"])
 
@@ -155,7 +160,7 @@ class BreathingSettings:
         line.setFrameShadow(QFrame.Shadow.Sunken)
         layout.addWidget(line)
 
-        layout.addWidget(QLabel("每阶段设置:"))
+        layout.addWidget(QLabel(_("每阶段设置:")))
 
         # Phase settings
         for phase in PHASES:
@@ -171,7 +176,7 @@ class BreathingSettings:
             spn.setMinimum(0)
             spn.setMaximum(60)
             spn.setValue(self.config.get(f"{key}_duration", phase["default_duration"]))
-            phase_layout.addWidget(QLabel("秒", parent))
+            phase_layout.addWidget(QLabel(_("秒"), parent))
 
             # Set spinbox availability based on checkbox state
             spn.setEnabled(chk.isChecked())

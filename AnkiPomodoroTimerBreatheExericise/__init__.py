@@ -8,6 +8,11 @@ from .timer_utils import get_pomodoro_timer
 from .hooks import on_reviewer_did_start, on_state_did_change
 from .ui import ConfigDialog
 
+import gettext
+import os
+localedir = os.path.join(os.path.dirname(__file__), './locales')
+translation = gettext.translation('messages', localedir, fallback=True)
+_ = translation.gettext
 
 def show_config_dialog():
     """Creates and shows the configuration dialog."""
@@ -33,7 +38,7 @@ def setup_plugin():
     else:
         from aqt.utils import tooltip
 
-        
+        tooltip(_("警告: 无法添加番茄钟菜单项 (未找到menuTools)。"), period=3000)
 
 
 def cleanup_plugin():

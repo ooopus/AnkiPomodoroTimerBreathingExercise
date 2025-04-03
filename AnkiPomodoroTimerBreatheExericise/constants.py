@@ -1,3 +1,9 @@
+import gettext
+import os
+localedir = os.path.join(os.path.dirname(__file__), './locales')
+translation = gettext.translation('messages', localedir, fallback=True)
+_ = translation.gettext
+
 # 呼吸阶段定义
 
 PHASES = [
@@ -38,7 +44,7 @@ DEFAULT_STATUSBAR_FORMAT = "ICON_TIME_PROGRESS_WITH_TOTAL_TIME"  # 默认状态�
 # 状态栏显示相关常量
 STATUSBAR_FILLED_TOMATO = "🍅"  # 已完成的番茄
 STATUSBAR_EMPTY_TOMATO = "⭕"  # 未完成的番茄
-STATUSBAR_BREAK_WARNING = "⚠️距离连胜重置还有："  # 中断警告
+STATUSBAR_BREAK_WARNING = _("⚠️距离连胜重置还有：" ) # 中断警告
 STATUSBAR_DEFAULT_TEXT = f"{STATUSBAR_FILLED_TOMATO} --:--"
 STATUSBAR_FORMAT = "{icon} {mins:02d}:{secs:02d} {progress}"  # 番茄状态显示格式
 
@@ -57,10 +63,10 @@ class STATUSBAR_FORMATS:
 
 # 状态栏显示格式选项的显示名称
 STATUSBAR_FORMAT_NAMES = {
-    "NONE": "不显示",
-    "ICON": "仅显示图标",
-    "COUNTDOWN": "仅显示倒计时",
-    "PROGRESS": "仅显示进度",
-    "ICON_COUNTDOWN_PROGRESS": "显示图标+倒计时+进度",
-    "ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME": "显示图标+倒计时+进度+累计使用时间",
+    "NONE": _("不显示",),
+    "ICON": _("仅显示图标"),
+    "COUNTDOWN": _("仅显示倒计时"),
+    "PROGRESS": _("仅显示进度"),
+    "ICON_COUNTDOWN_PROGRESS": _("显示图标+倒计时+进度"),
+    "ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME": _("显示图标+倒计时+进度+累计使用时间"),
 }

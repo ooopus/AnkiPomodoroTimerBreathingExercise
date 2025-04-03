@@ -1,0 +1,188 @@
+# English (United States) translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-04-03 23:44+0900\n"
+"PO-Revision-Date: 2025-04-03 23:50+0900\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en_US\n"
+"Language-Team: en_US <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: __init__.py:36
+msgid "警告: 无法添加番茄钟菜单项 (未找到menuTools)。"
+msgstr "Warning: Cannot add Pomodoro menu item (menuTools not found)."
+
+#: breathing.py:135
+msgid "呼吸训练"
+msgstr "Breathing Exercise"
+
+#: breathing.py:177
+msgid "准备..."
+msgstr "Preparing..."
+
+#: breathing.py:253
+msgid "Failed to stop single shot timer"
+msgstr "Failed to stop single shot timer"
+
+#: constants.py:41
+msgid "⚠️距离连胜重置还有："
+msgstr "⚠️Time until streak reset: "
+
+#: constants.py:60
+msgid "不显示"
+msgstr "Hide"
+
+#: constants.py:61
+msgid "仅显示图标"
+msgstr "Icon only"
+
+#: constants.py:62
+msgid "仅显示倒计时"
+msgstr "Timer only"
+
+#: constants.py:63
+msgid "仅显示进度"
+msgstr "Progress only"
+
+#: constants.py:64
+msgid "显示图标+倒计时+进度"
+msgstr "Show icon + timer + progress"
+
+#: constants.py:65
+msgid "显示图标+倒计时+进度+累计使用时间"
+msgstr "Show icon + timer + progress + total time"
+
+#: hooks.py:69
+msgid "番茄钟时间到！休息一下。"
+msgstr "Pomodoro time's up! Take a break."
+
+#: hooks.py:103
+msgid "呼吸训练已跳过 (无启用阶段)。"
+msgstr "Breathing exercise skipped (no active phase)."
+
+#: hooks.py:109
+msgid "呼吸训练已跳过 (循环次数为 0)。"
+msgstr "Breathing exercise skipped (cycle count is 0)."
+
+#: hooks.py:118
+msgid "呼吸训练完成！"
+msgstr "Breathing exercise completed!"
+
+#: hooks.py:120
+msgid "呼吸训练已跳过。"
+msgstr "Breathing exercise skipped."
+
+#: hooks.py:122
+msgid "跳过呼吸训练 (主窗口不可见)。"
+msgstr "Skipping breathing exercise (main window not visible)."
+
+#: pomodoro.py:35
+msgid "番茄钟计时器已被禁用。"
+msgstr "Pomodoro timer has been disabled."
+
+#: pomodoro.py:56
+msgid "检测到长时间空闲，连胜中断。"
+msgstr "Long idle time detected, streak broken."
+
+#: pomodoro.py:88
+msgid "番茄钟计时器已停止。"
+msgstr "Pomodoro timer stopped."
+
+#: pomodoro.py:119
+msgid "连胜中断"
+msgstr "Streak broken"
+
+#: pomodoro.py:141
+msgid "本次番茄钟结束"
+msgstr "Current Pomodoro finished"
+
+#: ui/config_components.py:27
+msgid "启用番茄钟插件"
+msgstr "Enable Pomodoro plugin"
+
+#: ui/config_components.py:33
+msgid "显示圆形计时器"
+msgstr "Show circular timer"
+
+#: ui/config_components.py:41
+msgid "计时器窗口位置:"
+msgstr "Timer window position:"
+
+#: ui/config_components.py:43
+msgid "左上角"
+msgstr "Top left"
+
+#: ui/config_components.py:43
+msgid "右上角"
+msgstr "Top right"
+
+#: ui/config_components.py:43
+msgid "左下角"
+msgstr "Bottom left"
+
+#: ui/config_components.py:43
+msgid "右下角"
+msgstr "Bottom right"
+
+#: ui/config_components.py:52
+msgid "连胜上限:"
+msgstr "Streak limit:"
+
+#: ui/config_components.py:57
+msgid "个番茄钟"
+msgstr "pomodoros"
+
+#: ui/config_components.py:64
+msgid "番茄钟时长:"
+msgstr "Pomodoro duration:"
+
+#: ui/config_components.py:71 ui/config_components.py:85
+msgid "分钟"
+msgstr "minutes"
+
+#: ui/config_components.py:78
+msgid "最大间隔时间:"
+msgstr "Maximum interval:"
+
+#: ui/config_components.py:98
+msgid "连续完成指定数量的番茄钟后，将进行长休息"
+msgstr "Take a long break after completing specified number of pomodoros"
+
+#: ui/config_components.py:102
+msgid "超过此时间后，累计的番茄钟将归零"
+msgstr "Accumulated pomodoros will reset after this time"
+
+#: ui/config_components.py:136
+msgid "呼吸循环次数:"
+msgstr "Breathing cycle count:"
+
+#: ui/config_components.py:148
+msgid "预计时间: --:--"
+msgstr "Estimated time: --:--"
+
+#: ui/config_components.py:158
+msgid "每阶段设置:"
+msgstr "Phase settings:"
+
+#: ui/config_components.py:174
+msgid "秒"
+msgstr "seconds"
+
+#: ui/config_dialog.py:50
+msgid "选择状态栏显示格式："
+msgstr "Select status bar display format:"
+
+#: ui/config_dialog.py:128
+msgid "配置已保存"
+msgstr "Configuration saved"
+

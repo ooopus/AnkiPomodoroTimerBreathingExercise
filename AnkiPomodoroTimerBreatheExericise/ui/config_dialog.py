@@ -13,6 +13,11 @@ from ..constants import STATUSBAR_FORMAT_NAMES, DEFAULT_STATUSBAR_FORMAT
 from ..timer_utils import get_pomodoro_timer
 from .config_components import GeneralSettings, BreathingSettings
 
+import gettext
+import os
+localedir = os.path.join(os.path.dirname(__file__), '../locales')
+translation = gettext.translation('messages', localedir, fallback=True)
+_ = translation.gettext
 
 class ConfigDialog(QDialog):
     """Configuration dialog for Pomodoro and Breathing settings."""
@@ -47,7 +52,7 @@ class ConfigDialog(QDialog):
         if index >= 0:
             self.statusbar_format_combo.setCurrentIndex(index)
 
-        self.statusbar_format_layout.addWidget(QLabel("选择状态栏显示格式："))
+        self.statusbar_format_layout.addWidget(QLabel(_("选择状态栏显示格式：")))
         self.statusbar_format_layout.addWidget(self.statusbar_format_combo)
         self.statusbar_format_group.setLayout(self.statusbar_format_layout)
 
@@ -125,7 +130,7 @@ class ConfigDialog(QDialog):
             self.config["statusbar_format"] = self.statusbar_format_combo.currentData()
 
             save_config()
-            tooltip("配置已保存")
+            tooltip(_("配置已保存"))
 
             # Update display immediately
             timer = get_pomodoro_timer()

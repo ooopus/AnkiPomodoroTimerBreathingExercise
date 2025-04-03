@@ -10,6 +10,12 @@ from .config import get_config, save_config
 from .timer_utils import get_pomodoro_timer
 from .pomodoro import PomodoroTimer
 
+import gettext
+import os
+localedir = os.path.join(os.path.dirname(__file__), './locales')
+translation = gettext.translation('messages', localedir, fallback=True)
+_ = translation.gettext
+
 # --- Anki 钩子函数 ---
 
 
@@ -66,7 +72,7 @@ def on_pomodoro_finished():
         )
         config["completed_pomodoros"] = 0
     else:
-        tooltip("番茄钟时间到！休息一下。", period=3000)
+        tooltip(_("番茄钟时间到！休息一下。"), period=3000)
 
     save_config()
 
@@ -100,13 +106,13 @@ def show_breathing_dialog():
         config.get(f"{p['key']}_enabled", p["default_enabled"]) for p in PHASES
     )
     if not any_phase_enabled:
-        tooltip("呼吸训练已跳过 (无启用阶段)。", period=3000)
+        tooltip(_("呼吸训练已跳过 (无启用阶段)。"), period=3000)
         return
 
     # Get configured number of cycles using our config system
     target_cycles = config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
     if target_cycles <= 0:
-        tooltip("呼吸训练已跳过 (循环次数为 0)。", period=3000)
+        tooltip(_("呼吸训练已跳过 (循环次数为 0)。"), period=3000)
         return
 
     # Ensure main window is visible before showing modal dialog
@@ -115,8 +121,8 @@ def show_breathing_dialog():
         dialog = BreathingDialog(target_cycles, mw)
         result = dialog.exec()  # Show modally
         if result == QDialog.DialogCode.Accepted:
-            tooltip("呼吸训练完成！", period=2000)  # "Breathing exercise complete!"
+            tooltip(_("呼吸训练完成！"), period=2000)  # "Breathing exercise complete!"
         else:
-            tooltip("呼吸训练已跳过。", period=2000)  # "Breathing exercise skipped."
+            tooltip(_("呼吸训练已跳过。"), period=2000)  # "Breathing exercise skipped."
     else:
-        tooltip("Skipping breathing dialog: Main window not visible.")
+        tooltip(_("跳过呼吸训练 (主窗口不可见)。"), period=2000)

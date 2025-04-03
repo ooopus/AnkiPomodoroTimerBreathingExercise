@@ -6,6 +6,11 @@ from .timer_utils import set_pomodoro_timer, get_timer_label
 
 from .ui.circular_timer import setup_circular_timer
 
+import gettext
+import os
+localedir = os.path.join(os.path.dirname(__file__), './locales')
+translation = gettext.translation('messages', localedir, fallback=True)
+_ = translation.gettext
 
 class PomodoroTimer(QTimer):
     def __init__(self, parent=None):
@@ -32,7 +37,7 @@ class PomodoroTimer(QTimer):
         if not config.get("enabled", True):
             from aqt.utils import tooltip
 
-            tooltip("番茄钟计时器已在配置中禁用。", period=3000)
+            tooltip(_("番茄钟计时器已被禁用。"), period=3000)
             return
         if minutes <= 0:
             from aqt.utils import tooltip
@@ -53,7 +58,7 @@ class PomodoroTimer(QTimer):
             save_config()
             from aqt.utils import tooltip
 
-            tooltip("检测到长时间空闲，番茄钟计数已重置。", period=3000)
+            tooltip(_("检测到长时间空闲，连胜中断。"), period=3000)
 
         # Handle circular timer display logic
         if config.get("show_circular_timer", True):
@@ -85,7 +90,7 @@ class PomodoroTimer(QTimer):
         if self.isActive():
             from aqt.utils import tooltip
 
-            tooltip("番茄钟计时器已停止。", period=3000)
+            tooltip(_("番茄钟计时器已停止。"), period=3000)
             self.stop()
 
             if stop_break_timer:
@@ -116,7 +121,7 @@ class PomodoroTimer(QTimer):
         if self.break_timer.isActive():
             from aqt.utils import tooltip
 
-            tooltip("连胜中断", period=3000)
+            tooltip(_("连胜中断"), period=3000)
             self.break_timer.stop()
             # Force immediate display update
             mw.progress.timer(10, lambda: self.update_display(), False)
@@ -138,7 +143,7 @@ class PomodoroTimer(QTimer):
 
             from aqt.utils import tooltip
 
-            tooltip("本次番茄钟结束", period=3000)
+            tooltip(_("本次番茄钟结束"), period=3000)
             self.stop()
 
             # Set last completion time and start break timer

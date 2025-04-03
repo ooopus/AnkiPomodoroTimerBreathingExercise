@@ -17,7 +17,7 @@ try:
     # from ..config import get_config
     # Assuming it's in the root for now:
     try:
-        from ..config import get_config # Use relative import
+        from ...config import get_config # Use relative import
     except ImportError:
         print("Running standalone or config.py not found relative to timer_common.py.")
         # Fallback to basic mock if relative import fails

@@ -16,6 +16,11 @@ from aqt.utils import tooltip
 from .constants import PHASES
 from .config import get_config  # Changed from direct config import
 
+import gettext
+import os
+localedir = os.path.join(os.path.dirname(__file__), './locales')
+translation = gettext.translation('messages', localedir, fallback=True)
+_ = translation.gettext
 
 # --- Breathing Animation Widget ---
 class BreathingAnimationWidget(QWidget):
@@ -132,7 +137,7 @@ class BreathingDialog(QDialog):
 
     def __init__(self, target_cycles: int, parent=None):
         super().__init__(parent or mw)
-        self.setWindowTitle("呼吸训练")
+        self.setWindowTitle(_("呼吸训练"))
         self.setModal(True)
         self.target_cycles = max(1, target_cycles)  # Ensure at least one cycle
         self.completed_cycles = 0
@@ -174,7 +179,7 @@ class BreathingDialog(QDialog):
         self.animation_widget = BreathingAnimationWidget(self)
         layout.addWidget(self.animation_widget, 1)
 
-        self.instruction_label = QLabel("准备...", self)
+        self.instruction_label = QLabel(_("准备..."), self)
         self.instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.instruction_label.setStyleSheet(
             "font-size: 20px; font-weight: bold; margin-top: 10px;"
@@ -250,7 +255,7 @@ class BreathingDialog(QDialog):
                 try:
                     self._pending_single_shot.stop()  # Try to stop single shot timer
                 except AttributeError:
-                    tooltip("Failed to stop single shot timer")
+                    tooltip(_("Failed to stop single shot timer"))
         else:
             # If duration is 0, advance immediately (with a tiny delay for event loop)
             self._pending_single_shot = QTimer.singleShot(
