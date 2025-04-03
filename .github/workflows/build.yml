@@ -32,5 +32,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: anki-addon
+        name: ${{ env.FILENAME }}
         path: ${{ env.FILENAME }}
