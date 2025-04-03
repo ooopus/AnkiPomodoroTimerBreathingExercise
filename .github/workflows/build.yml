@@ -20,17 +20,8 @@ jobs:
         echo "FILENAME=${REPO_NAME}-${TIMESTAMP}.ankiaddon" >> $GITHUB_ENV
         echo "Generated filename: ${REPO_NAME}-${TIMESTAMP}.ankiaddon"
 
-    - name: Create Anki Addon
-      run: |
-        zip -r "${{ env.FILENAME }}" . -i '*.py'
-        if [ ! -f "${{ env.FILENAME }}" ]; then
-          echo "Error: Failed to create addon file."
-          exit 1
-        fi
-        echo "Successfully created ${{ env.FILENAME }}"
-
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.FILENAME }}
-        path: ${{ env.FILENAME }}
+        path: AnkiPomodoroTimerBreatheExericise
