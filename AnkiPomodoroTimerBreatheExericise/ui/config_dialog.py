@@ -249,82 +249,39 @@ class ConfigDialog(QDialog):
 
     def accept(self):
         """Saves the configuration and closes the dialog."""
-        print("Saving configuration...")
-        config = get_config()
-
-        # Save general settings
-        config["enabled"] = self.enable_checkbox.isChecked()
-        config["show_circular_timer"] = self.show_circular_timer_checkbox.isChecked()
-        config["timer_position"] = self.position_combo.currentText()
-        config["pomodoro_minutes"] = self.pomo_spinbox.value()
-        config["breathing_cycles"] = self.cycles_spinbox.value()
-        config["max_break_duration"] = self.max_break_spinbox.value() * 60
-        config["pomodoros_before_long_break"] = self.streak_spinbox.value()
-        config["statusbar_format"] = self.statusbar_format_combo.currentData()
-
-        # Save phase settings
-        for key, widgets in self.phase_widgets.items():
-            config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
-            config[f"{key}_duration"] = widgets["spinbox"].value()
-
-        save_config()
-        print("Configuration saved.")
-
-        # 立即更新显示
-        timer = get_pomodoro_timer()
-        if timer:
-            timer.update_display()
-
-        # Apply changes immediately
-        if not config["enabled"] and timer and timer.isActive():
-            print("Plugin disabled, stopping active Pomodoro timer.")
-            timer.stop_timer()
-        elif (
-            config["enabled"]
-            and mw.state == "review"
-            and timer
-            and not timer.isActive()
-        ):
-            print("Plugin enabled while in review, starting timer.")
-            timer.start_timer(config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES))
-
-        super().accept()
-
-    def save_config(self):
-        """保存配置到文件"""
-        config = get_config()
-        config["enabled"] = self.enable_checkbox.isChecked()
-        config["show_circular_timer"] = self.show_circular_timer_checkbox.isChecked()
-        config["timer_position"] = self.position_combo.currentText()
-        config["pomodoro_minutes"] = self.pomo_spinbox.value()
-        config["breathing_cycles"] = self.cycles_spinbox.value()
-        config["max_break_duration"] = self.max_break_spinbox.value() * 60
-        config["pomodoros_before_long_break"] = self.streak_spinbox.value()
-
-        # Save phase settings
-        for key, widgets in self.phase_widgets.items():
-            config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
-            config[f"{key}_duration"] = widgets["spinbox"].value()
-
-        save_config()
-        print("Configuration saved.")
-
-        # 立即更新显示
-        timer = get_pomodoro_timer()
-        if timer:
-            timer.update_display()
-
-        # Apply changes immediately
-        if not config["enabled"] and timer and timer.isActive():
-            print("Plugin disabled, stopping active Pomodoro timer.")
-            timer.stop_timer()
-        elif (
-            config["enabled"]
-            and mw.state == "review"
-            and timer
-            and not timer.isActive()
-        ):
-            print("Plugin enabled while in review, starting timer.")
-            timer.start_timer(config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES))
-
-        super().accept()
+        try:
+            print("Saving configuration...")
+            self.config = get_config()
+            
+            # 保存所有UI控件的值到配置
+            self.config["enabled"] = self.enable_checkbox.isChecked()
+            self.config["show_circular_timer"] = self.show_circular_timer_checkbox.isChecked()
+            self.config["timer_position"] = self.position_combo.currentText()
+            self.config["pomodoro_minutes"] = self.pomo_spinbox.value()
+            self.config["pomodoros_before_long_break"] = self.streak_spinbox.value()
+            self.config["max_break_duration"] = self.max_break_spinbox.value() * 60  # 转换为秒
+            self.config["breathing_cycles"] = self.cycles_spinbox.value()
+            self.config["statusbar_format"] = self.statusbar_format_combo.currentData()
+            
+            # 保存呼吸阶段设置
+            for key, widgets in self.phase_widgets.items():
+                self.config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
+                self.config[f"{key}_duration"] = widgets["spinbox"].value()
+            
+            save_config()
+            print("Configuration saved.")
+            
+            # 立即更新显示
+            timer = get_pomodoro_timer()
+            if timer:
+                timer.update_display()
+                
+            super().accept()
+        except Exception as e:
+            from aqt.utils import showWarning
+            print(f"Error saving configuration: {e}")
+            showWarning(
+                "配置保存失败",
+                self,
+                f"保存配置时发生错误: {str(e)}"
+            )

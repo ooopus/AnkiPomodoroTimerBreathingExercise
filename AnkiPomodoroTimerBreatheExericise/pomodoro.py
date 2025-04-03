@@ -113,11 +113,15 @@ class PomodoroTimer(QTimer):
     def update_timer(self):
         if self.remaining_seconds > 0:
             self.remaining_seconds -= 1
+            # 仅在秒数变化时更新显示
+            if self.remaining_seconds % 5 == 0:  # 每5秒更新一次显示
+                self.update_display()
+            
             # 更新当天番茄钟总计时长
-            self.config["daily_pomodoro_seconds"] = (
-                self.config.get("daily_pomodoro_seconds", 0) + 1
-            )
-            self.update_display()
+            if mw and mw.state == "review":
+                self.config["daily_pomodoro_seconds"] = (
+                    self.config.get("daily_pomodoro_seconds", 0) + 1
+                )
         else:
             from .hooks import on_pomodoro_finished
 
@@ -130,7 +134,9 @@ class PomodoroTimer(QTimer):
             max_break_duration = self.config.get("max_break_duration", 30 * 60)
             self.remaining_break_seconds = max_break_duration
             self.break_timer.start(1000)
-
+            
+            # 立即更新显示
+            self.update_display()
             on_pomodoro_finished()
 
     def update_display(self):

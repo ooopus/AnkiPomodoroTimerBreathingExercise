@@ -30,20 +30,43 @@ class AddonState:
         try:
             if os.path.exists(CONFIG_PATH):
                 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    config = json.load(f)
+                    # 验证配置完整性
+                    if not isinstance(config, dict):
+                        raise ValueError("Invalid config format")
+                    return config
+        except json.JSONDecodeError as e:
+            print(f"配置文件格式错误: {e}")
+            # 记录错误到Anki日志系统
         except Exception as e:
-            print(f"Error loading config file: {e}")
+            print(f"加载配置文件时出错: {e}")
         return {}
 
     def _save_config_to_file(self) -> None:
         """保存配置到JSON文件"""
         try:
-            # Ensure directory exists
+            # 验证配置数据
+            if not isinstance(self._config, dict):
+                raise ValueError("配置数据必须是字典类型")
+                
+            # 确保目录存在
             os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            
+            # 创建临时文件
+            temp_path = CONFIG_PATH + ".tmp"
+            with open(temp_path, "w", encoding="utf-8") as f:
                 json.dump(self._config, f, indent=4, ensure_ascii=False)
+                
+            # 原子性替换
+            if os.path.exists(temp_path):
+                os.replace(temp_path, CONFIG_PATH)
+                
+        except ValueError as e:  # JSON encoding error
+            print(f"配置序列化失败: {e}")
+        except OSError as e:
+            print(f"保存配置文件时出错: {e}")
         except Exception as e:
-            print(f"Error saving config file: {e}")
+            print(f"保存配置时发生意外错误: {e}")
 
     @property
     def config(self) -> Dict[str, Any]:
