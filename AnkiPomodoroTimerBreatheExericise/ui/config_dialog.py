@@ -12,6 +12,10 @@ from PyQt6.QtWidgets import (
     QComboBox,
 )
 from ..constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
+from ..constants import (
+    STATUSBAR_FORMAT_NAMES,
+    DEFAULT_STATUSBAR_FORMAT,
+)
 from ..config import save_config, get_config
 from ..timer_utils import get_pomodoro_timer
 
@@ -23,7 +27,7 @@ class ConfigDialog(QDialog):
         super().__init__(parent or mw)
 
         # Use our config system instead of Anki's
-        config = get_config()
+        self.config = get_config()  # Store config as instance attribute
 
         self.setWindowTitle("番茄钟 & 呼吸设置")
         self._main_layout = QVBoxLayout(self)
@@ -34,18 +38,15 @@ class ConfigDialog(QDialog):
         general_layout = QVBoxLayout()
 
         self.enable_checkbox = QCheckBox("启用番茄钟插件", self)
-        self.enable_checkbox.setChecked(config.get("enabled", True))
+        self.enable_checkbox.setChecked(self.config.get("enabled", True))
         general_layout.addWidget(self.enable_checkbox)
 
         # 显示选项布局
         display_layout = QVBoxLayout()
-        self.show_timer_checkbox = QCheckBox("在状态栏显示计时器", self)
-        self.show_timer_checkbox.setChecked(config.get("show_statusbar_timer", True))
         self.show_circular_timer_checkbox = QCheckBox("显示圆形计时器", self)
         self.show_circular_timer_checkbox.setChecked(
-            config.get("show_circular_timer", True)
+            self.config.get("show_circular_timer", True)
         )
-        display_layout.addWidget(self.show_timer_checkbox)
         display_layout.addWidget(self.show_circular_timer_checkbox)
 
         # 窗口位置选项
@@ -53,7 +54,7 @@ class ConfigDialog(QDialog):
         position_label = QLabel("计时器窗口位置:", self)
         self.position_combo = QComboBox(self)
         self.position_combo.addItems(["左上角", "右上角", "左下角", "右下角"])
-        self.position_combo.setCurrentText(config.get("timer_position", "左上角"))
+        self.position_combo.setCurrentText(self.config.get("timer_position", "左上角"))
         position_layout.addWidget(position_label)
         position_layout.addWidget(self.position_combo)
 
@@ -66,7 +67,7 @@ class ConfigDialog(QDialog):
         self.streak_spinbox = QSpinBox(self)
         self.streak_spinbox.setMinimum(1)
         self.streak_spinbox.setMaximum(10)
-        self.streak_spinbox.setValue(config.get("pomodoros_before_long_break", 4))
+        self.streak_spinbox.setValue(self.config.get("pomodoros_before_long_break", 4))
 
         streak_label_unit = QLabel("个番茄钟", self)
         streak_layout.addWidget(streak_label)
@@ -86,7 +87,7 @@ class ConfigDialog(QDialog):
         self.pomo_spinbox.setMinimum(1)
         self.pomo_spinbox.setMaximum(180)
         self.pomo_spinbox.setValue(
-            config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
+            self.config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
         )
         pomo_label_unit = QLabel("分钟", self)
         pomo_layout.addWidget(pomo_label)
@@ -101,7 +102,7 @@ class ConfigDialog(QDialog):
         self.max_break_spinbox.setMinimum(1)
         self.max_break_spinbox.setMaximum(120)
         self.max_break_spinbox.setValue(
-            config.get("max_break_duration", 30 * 60) // 60
+            self.config.get("max_break_duration", 30 * 60) // 60
         )  # 转换为分钟
         max_break_label_unit = QLabel("分钟", self)
         max_break_layout.addWidget(max_break_label)
@@ -110,7 +111,7 @@ class ConfigDialog(QDialog):
         general_layout.addLayout(max_break_layout)
 
         # 添加提示标签
-        max_break_hint = QLabel("超过此时间后，累计的连续番茄钟将归零", self)
+        max_break_hint = QLabel("超过此时间后，累计的番茄钟将归零", self)
         max_break_hint.setStyleSheet("font-style: italic; color: grey;")
         general_layout.addWidget(max_break_hint)
 
@@ -128,7 +129,7 @@ class ConfigDialog(QDialog):
         self.cycles_spinbox.setMinimum(0)
         self.cycles_spinbox.setMaximum(50)
         self.cycles_spinbox.setValue(
-            config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
+            self.config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
         )
         cycles_layout.addWidget(cycles_label)
         cycles_layout.addWidget(self.cycles_spinbox)
@@ -154,13 +155,13 @@ class ConfigDialog(QDialog):
 
             # Checkbox to enable/disable the phase
             chk = QCheckBox(f"{phase['label']}", self)
-            chk.setChecked(config.get(f"{key}_enabled", phase["default_enabled"]))
+            chk.setChecked(self.config.get(f"{key}_enabled", phase["default_enabled"]))
 
             # Spinbox for phase duration
             spn = QSpinBox(self)
             spn.setMinimum(0)
             spn.setMaximum(60)
-            spn.setValue(config.get(f"{key}_duration", phase["default_duration"]))
+            spn.setValue(self.config.get(f"{key}_duration", phase["default_duration"]))
             phase_layout.addWidget(QLabel("秒", self))
 
             # Enable/disable spinbox based on checkbox state
@@ -198,6 +199,29 @@ class ConfigDialog(QDialog):
         # Set initial estimated time based on loaded config
         self._update_estimated_time()
 
+        # 添加状态栏显示格式选择
+        self.statusbar_format_group = QGroupBox("状态栏显示设置")
+        self.statusbar_format_layout = QVBoxLayout()
+
+        self.statusbar_format_combo = QComboBox()
+        for format_key, format_name in STATUSBAR_FORMAT_NAMES.items():
+            self.statusbar_format_combo.addItem(format_name, format_key)
+
+        # 设置当前选中的格式
+        current_format = self.config.get("statusbar_format", DEFAULT_STATUSBAR_FORMAT)
+        index = self.statusbar_format_combo.findData(current_format)
+        if index >= 0:
+            self.statusbar_format_combo.setCurrentIndex(index)
+
+        self.statusbar_format_layout.addWidget(QLabel("选择状态栏显示格式："))
+        self.statusbar_format_layout.addWidget(self.statusbar_format_combo)
+        self.statusbar_format_group.setLayout(self.statusbar_format_layout)
+
+        # 将状态栏设置添加到主布局
+        self._main_layout.insertWidget(
+            2, self.statusbar_format_group
+        )  # Use _main_layout instead of layout()
+
     def _update_estimated_time(self):
         """Calculates and updates the estimated breathing time label."""
         try:
@@ -230,7 +254,46 @@ class ConfigDialog(QDialog):
 
         # Save general settings
         config["enabled"] = self.enable_checkbox.isChecked()
-        config["show_statusbar_timer"] = self.show_timer_checkbox.isChecked()
+        config["show_circular_timer"] = self.show_circular_timer_checkbox.isChecked()
+        config["timer_position"] = self.position_combo.currentText()
+        config["pomodoro_minutes"] = self.pomo_spinbox.value()
+        config["breathing_cycles"] = self.cycles_spinbox.value()
+        config["max_break_duration"] = self.max_break_spinbox.value() * 60
+        config["pomodoros_before_long_break"] = self.streak_spinbox.value()
+        config["statusbar_format"] = self.statusbar_format_combo.currentData()
+
+        # Save phase settings
+        for key, widgets in self.phase_widgets.items():
+            config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
+            config[f"{key}_duration"] = widgets["spinbox"].value()
+
+        save_config()
+        print("Configuration saved.")
+
+        # 立即更新显示
+        timer = get_pomodoro_timer()
+        if timer:
+            timer.update_display()
+
+        # Apply changes immediately
+        if not config["enabled"] and timer and timer.isActive():
+            print("Plugin disabled, stopping active Pomodoro timer.")
+            timer.stop_timer()
+        elif (
+            config["enabled"]
+            and mw.state == "review"
+            and timer
+            and not timer.isActive()
+        ):
+            print("Plugin enabled while in review, starting timer.")
+            timer.start_timer(config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES))
+
+        super().accept()
+
+    def save_config(self):
+        """保存配置到文件"""
+        config = get_config()
+        config["enabled"] = self.enable_checkbox.isChecked()
         config["show_circular_timer"] = self.show_circular_timer_checkbox.isChecked()
         config["timer_position"] = self.position_combo.currentText()
         config["pomodoro_minutes"] = self.pomo_spinbox.value()

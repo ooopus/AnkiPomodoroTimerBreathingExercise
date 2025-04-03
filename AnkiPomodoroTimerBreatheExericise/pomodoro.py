@@ -4,7 +4,6 @@ from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QWidget
 from .timer_utils import set_pomodoro_timer, get_timer_label
 
-# from .constants import STATUSBAR_DEFAULT_TEXT
 from .ui.circular_timer import setup_circular_timer
 
 
@@ -71,7 +70,7 @@ class PomodoroTimer(QTimer):
         print(f"Pomodoro timer started for {minutes} minutes.")
         self.update_display()
         self.start(1000)  # Tick every second
-        show_timer_in_statusbar(config.get("show_statusbar_timer", True))
+        show_timer_in_statusbar(config.get("statusbar_format", True))
 
     def stop_timer(self, stop_break_timer=False):
         """Stops the Pomodoro timer and resets the display.
@@ -114,6 +113,10 @@ class PomodoroTimer(QTimer):
     def update_timer(self):
         if self.remaining_seconds > 0:
             self.remaining_seconds -= 1
+            # 更新当天番茄钟总计时长
+            self.config["daily_pomodoro_seconds"] = (
+                self.config.get("daily_pomodoro_seconds", 0) + 1
+            )
             self.update_display()
         else:
             from .hooks import on_pomodoro_finished
@@ -133,11 +136,12 @@ class PomodoroTimer(QTimer):
     def update_display(self):
         def _update():
             from .ui import show_timer_in_statusbar
+            from .config import save_config
             from .constants import (
-                STATUSBAR_FORMAT,
                 STATUSBAR_FILLED_TOMATO,
                 STATUSBAR_EMPTY_TOMATO,
                 STATUSBAR_BREAK_WARNING,
+                STATUSBAR_FORMATS,
             )
 
             label = get_timer_label()
@@ -153,35 +157,62 @@ class PomodoroTimer(QTimer):
                 # 获取休息时间信息
                 break_mins, break_secs = divmod(self.remaining_break_seconds, 60)
 
-                # 根据计时器状态显示不同的信息
-                if self.break_timer.isActive() and self.remaining_break_seconds > 0:
-                    # 休息时间显示
-                    label.setText(
-                        STATUSBAR_FORMAT.format(
-                            icon=STATUSBAR_BREAK_WARNING,
-                            mins=break_mins,
-                            secs=break_secs,
-                            progress=progress,
-                        )
-                    )
-                elif self.remaining_seconds > 0:
-                    # 番茄钟进行中的显示逻辑
-                    Pomodoro_Mins, Pomodoro_Secs = divmod(self.remaining_seconds, 60)
-
-                    # Always show Pomodoro time when timer is active
-                    label.setText(
-                        STATUSBAR_FORMAT.format(
-                            icon=STATUSBAR_FILLED_TOMATO,
-                            mins=Pomodoro_Mins,
-                            secs=Pomodoro_Secs,
-                            progress=progress,
-                        )
-                    )
+                # 检查是否需要重置每日计时
+                last_date = self.config.get("last_date", "")
+                today = time.strftime("%Y-%m-%d")
+                if last_date != today:
+                    self.config["daily_pomodoro_seconds"] = 0
+                    self.config["last_date"] = today
+                    save_config()
                 else:
-                    # 空闲状态显示
-                    from .constants import STATUSBAR_DEFAULT_TEXT
+                    daily_total_seconds = self.config.get("daily_pomodoro_seconds", 0)
+                    daily_mins, daily_secs = divmod(daily_total_seconds, 60)
+                    
+                # 根据配置中的状态栏格式显示信息
+                statusbar_format = self.config.get(
+                    "statusbar_format", "ICON_TIME_PROGRESS_WITH_TOTAL_TIME"
+                )
+                format_str = getattr(
+                    STATUSBAR_FORMATS,
+                    statusbar_format,
+                    STATUSBAR_FORMATS.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME,
+                )
 
-                    label.setText(f"{STATUSBAR_DEFAULT_TEXT} {progress}")
+                # 根据计时器状态设置不同的图标
+                if self.break_timer.isActive() and self.remaining_break_seconds > 0:
+                    icon = STATUSBAR_BREAK_WARNING
+                    mins, secs = break_mins, break_secs
+                elif self.remaining_seconds > 0:
+                    icon = STATUSBAR_FILLED_TOMATO
+                    mins, secs = divmod(self.remaining_seconds, 60)
+                else:
+                    icon = STATUSBAR_EMPTY_TOMATO
+                    mins, secs = 0, 0
+
+                # 根据格式字符串动态生成显示内容
+                try:
+                    label.setText(
+                        format_str.format(
+                            icon=icon,
+                            mins=mins,
+                            secs=secs,
+                            progress=progress,
+                            daily_mins=daily_mins,
+                            daily_secs=daily_secs,
+                        )
+                    )
+                except KeyError:
+                    # 如果格式字符串中有不支持的变量，使用默认格式
+                    label.setText(
+                        STATUSBAR_FORMATS.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME.format(
+                            icon=icon,
+                            mins=mins,
+                            secs=secs,
+                            progress=progress,
+                            daily_mins=daily_mins,
+                            daily_secs=daily_secs,
+                        )
+                    )
 
                 show_timer_in_statusbar(True)
 

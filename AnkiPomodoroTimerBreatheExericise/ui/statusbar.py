@@ -18,7 +18,8 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
     if (
         not show
         or not config.get("enabled", True)
-        or not config.get("show_statusbar_timer", True)
+        or not config.get("statusbar_format", True)
+        or config.get("statusbar_format") == "NONE"
     ):
         if label:
 

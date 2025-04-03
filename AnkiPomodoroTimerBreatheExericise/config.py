@@ -6,11 +6,11 @@ from .constants import (
     PHASES,
     DEFAULT_POMODORO_MINUTES,
     DEFAULT_BREATHING_CYCLES,
-    DEFAULT_SHOW_STATUSBAR_TIMER,
     DEFAULT_SHOW_CIRCULAR_TIMER,
     DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
     DEFAULT_LONG_BREAK_MINUTES,
     DEFAULT_MAX_BREAK_DURATION,
+    DEFAULT_STATUSBAR_FORMAT,
 )
 
 # Update CONFIG_PATH to use Anki's addon folder
@@ -55,25 +55,26 @@ class AddonState:
         """加载配置并设置默认值"""
         config = self._load_config_from_file()
 
-        # 设置默认值部分保持不变
         if "pomodoro_minutes" not in config:
             config["pomodoro_minutes"] = DEFAULT_POMODORO_MINUTES
         if "breathing_cycles" not in config:
             config["breathing_cycles"] = DEFAULT_BREATHING_CYCLES
         if "enabled" not in config:
             config["enabled"] = True
-        if "show_statusbar_timer" not in config:
-            config["show_statusbar_timer"] = DEFAULT_SHOW_STATUSBAR_TIMER
         if "show_circular_timer" not in config:
             config["show_circular_timer"] = DEFAULT_SHOW_CIRCULAR_TIMER
         if "completed_pomodoros" not in config:
             config["completed_pomodoros"] = 0
+        if "daily_pomodoro_seconds" not in config:
+            config["daily_pomodoro_seconds"] = 0
         if "pomodoros_before_long_break" not in config:
             config["pomodoros_before_long_break"] = DEFAULT_POMODOROS_BEFORE_LONG_BREAK
         if "long_break_minutes" not in config:
             config["long_break_minutes"] = DEFAULT_LONG_BREAK_MINUTES
         if "max_break_duration" not in config:
             config["max_break_duration"] = DEFAULT_MAX_BREAK_DURATION * 60  # 转换为秒
+        if "statusbar_format" not in config:
+            config["statusbar_format"] = DEFAULT_STATUSBAR_FORMAT
 
         # 对每个呼吸阶段做同样处理
         for phase in PHASES:
@@ -93,8 +94,8 @@ class AddonState:
                 config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
             )
             config["enabled"] = bool(config.get("enabled", True))
-            config["show_statusbar_timer"] = bool(
-                config.get("show_statusbar_timer", DEFAULT_SHOW_STATUSBAR_TIMER)
+            config["statusbar_format"] = str(
+                config.get("statusbar_format", DEFAULT_STATUSBAR_FORMAT)
             )
             config["show_circular_timer"] = bool(
                 config.get("show_circular_timer", DEFAULT_SHOW_CIRCULAR_TIMER)
@@ -124,7 +125,7 @@ class AddonState:
                 "pomodoro_minutes": DEFAULT_POMODORO_MINUTES,
                 "breathing_cycles": DEFAULT_BREATHING_CYCLES,
                 "enabled": True,
-                "show_statusbar_timer": DEFAULT_SHOW_STATUSBAR_TIMER,
+                "statusbar_format": DEFAULT_STATUSBAR_FORMAT,
                 "show_circular_timer": DEFAULT_SHOW_CIRCULAR_TIMER,
                 "completed_pomodoros": 0,
                 "pomodoros_before_long_break": DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
