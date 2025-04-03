@@ -4,9 +4,9 @@ from aqt import mw, gui_hooks
 
 from PyQt6.QtGui import QAction
 
-from .timer_utils import get_pomodoro_timer, get_timer_label
+from .timer_utils import get_pomodoro_timer
 from .hooks import on_reviewer_did_start, on_state_did_change
-from .ui import ConfigDialog, show_timer_in_statusbar
+from .ui import ConfigDialog
 
 
 def show_config_dialog():
@@ -33,7 +33,7 @@ def setup_plugin():
     else:
         from aqt.utils import tooltip
 
-        tooltip("警告: 无法添加番茄钟菜单项 (未找到menuTools)。", period=3000)
+        
 
 
 def cleanup_plugin():

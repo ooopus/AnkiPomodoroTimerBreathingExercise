@@ -4,7 +4,7 @@ from typing import Union
 
 from aqt.utils import tooltip
 from ..config import get_config
-from ..timer_utils import get_pomodoro_timer, get_timer_label, set_timer_label
+from ..timer_utils import get_timer_label, set_timer_label
 from ..constants import STATUSBAR_DEFAULT_TEXT
 
 
@@ -28,7 +28,7 @@ def remove_widget():
 def show_timer_in_statusbar(show: Union[bool, None]) -> None:
     """Adds or removes the timer label from the Anki status bar."""
     config = get_config()
-    timer = get_pomodoro_timer()
+    # timer = get_pomodoro_timer()
     label = get_timer_label()
 
     if show is None:
