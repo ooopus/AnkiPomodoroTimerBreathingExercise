@@ -47,7 +47,9 @@ class CircularTimer(QWidget):
 
         # Draw remaining time text
         font = painter.font()
-        font.setPointSize(min(self.width(), self.height()) // 5)  # Auto-adjust font size
+        font.setPointSize(
+            min(self.width(), self.height()) // 5
+        )  # Auto-adjust font size
         font.setBold(True)  # Bold text
         painter.setFont(font)
 

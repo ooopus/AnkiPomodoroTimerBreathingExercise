@@ -25,7 +25,6 @@ class ConfigDialog(QDialog):
 
         self.setWindowTitle("番茄钟 & 呼吸设置")
         self._main_layout = QVBoxLayout(self)
-        self.phase_widgets = {}  # Store phase widgets {key: {"checkbox": QCheckBox, "spinbox": QSpinBox}}
 
         # Initialize settings components
         self.general_settings = GeneralSettings(self.config)
@@ -33,24 +32,6 @@ class ConfigDialog(QDialog):
 
         # Add general settings component
         self._main_layout.addWidget(self.general_settings.create_ui(self))
-
-        # Add breathing exercises component
-        self._main_layout.addWidget(self.breathing_settings.create_ui(self))
-
-        # --- Dialog Buttons (Save/Cancel) ---
-        button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Save
-            | QDialogButtonBox.StandardButton.Cancel,
-            self,
-        )
-        button_box.accepted.connect(self.accept)
-        button_box.rejected.connect(self.reject)
-        self._main_layout.addWidget(button_box)
-
-        self.setLayout(self._main_layout)
-
-        # Set initial estimated time based on loaded config
-        self._update_estimated_time()
 
         # Add status bar format selection
         self.statusbar_format_group = QGroupBox("状态栏显示设置")
@@ -71,9 +52,31 @@ class ConfigDialog(QDialog):
         self.statusbar_format_group.setLayout(self.statusbar_format_layout)
 
         # Add status bar settings to main layout
-        self._main_layout.insertWidget(
-            2, self.statusbar_format_group
-        )  # Use _main_layout instead of layout()
+        self._main_layout.addWidget(self.statusbar_format_group)
+
+        # Add breathing exercises component
+        self._main_layout.addWidget(self.breathing_settings.create_ui(self))
+
+        # --- Dialog Buttons (Save/Cancel) ---
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Save
+            | QDialogButtonBox.StandardButton.Cancel,
+            self,
+        )
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        self._main_layout.addWidget(button_box)
+
+        self.setLayout(self._main_layout)
+
+        # Set initial estimated time based on loaded config
+        self._update_estimated_time()
+
+        # Connect breathing settings changes to update estimated time
+        for phase in self.breathing_settings.phase_widgets.values():
+            phase["checkbox"].toggled.connect(self._update_estimated_time)
+            phase["spinbox"].valueChanged.connect(self._update_estimated_time)
+        self.breathing_settings.widgets["cycles"].valueChanged.connect(self._update_estimated_time)
 
     def _update_estimated_time(self):
         """Calculates and updates the estimated breathing time label."""
@@ -112,22 +115,14 @@ class ConfigDialog(QDialog):
         try:
             self.config = get_config()
 
-            # Save all UI control values to config
             # Get values from component classes
             general_values = self.general_settings.get_values()
             breathing_values = self.breathing_settings.get_values()
 
             # Update config with component values
-            self.config["enabled"] = general_values["enabled"]
-            self.config["show_circular_timer"] = general_values["show_circular_timer"]
-            self.config["timer_position"] = general_values["timer_position"]
-            self.config["breathing_cycles"] = breathing_values["breathing_cycles"]
+            self.config.update(general_values)
+            self.config.update(breathing_values)
             self.config["statusbar_format"] = self.statusbar_format_combo.currentData()
-
-            # Save breathing phase settings
-            for key, widgets in self.phase_widgets.items():
-                self.config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
-                self.config[f"{key}_duration"] = widgets["spinbox"].value()
 
             save_config()
             tooltip("配置已保存")

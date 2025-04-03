@@ -21,6 +21,7 @@ def remove_widget():
                 set_timer_label(None)
                 # Force garbage collection
                 import gc
+
                 gc.collect()
         except Exception as e:
             tooltip(f"Error removing timer widget: {e}")
@@ -46,6 +47,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
         return
 
     if not label:
+
         def add_widget():
             new_label = QLabel(STATUSBAR_DEFAULT_TEXT)
             try:

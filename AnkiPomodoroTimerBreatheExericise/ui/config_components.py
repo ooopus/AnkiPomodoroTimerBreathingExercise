@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QGroupBox,
     QComboBox,
 )
-from ..constants import PHASES, DEFAULT_BREATHING_CYCLES
+from ..constants import PHASES, DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES
 
 
 class GeneralSettings:
@@ -47,10 +47,61 @@ class GeneralSettings:
         position_layout.addWidget(position_label)
         position_layout.addWidget(self.widgets["position"])
 
+        # Pomodoro streak settings
+        streak_layout = QHBoxLayout()
+        streak_label = QLabel("连胜上限:", parent)
+        self.widgets["streak"] = QSpinBox(parent)
+        self.widgets["streak"].setMinimum(1)
+        self.widgets["streak"].setMaximum(10)
+        self.widgets["streak"].setValue(self.config.get("pomodoros_before_long_break", 4))
+        streak_label_unit = QLabel("个番茄钟", parent)
+        streak_layout.addWidget(streak_label)
+        streak_layout.addWidget(self.widgets["streak"])
+        streak_layout.addWidget(streak_label_unit)
+
+        # Pomodoro duration
+        pomo_layout = QHBoxLayout()
+        pomo_label = QLabel("番茄钟时长:", parent)
+        self.widgets["pomodoro"] = QSpinBox(parent)
+        self.widgets["pomodoro"].setMinimum(1)
+        self.widgets["pomodoro"].setMaximum(180)
+        self.widgets["pomodoro"].setValue(
+            self.config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
+        )
+        pomo_label_unit = QLabel("分钟", parent)
+        pomo_layout.addWidget(pomo_label)
+        pomo_layout.addWidget(self.widgets["pomodoro"])
+        pomo_layout.addWidget(pomo_label_unit)
+
+        # Max break duration
+        max_break_layout = QHBoxLayout()
+        max_break_label = QLabel("最大间隔时间:", parent)
+        self.widgets["max_break"] = QSpinBox(parent)
+        self.widgets["max_break"].setMinimum(1)
+        self.widgets["max_break"].setMaximum(120)
+        self.widgets["max_break"].setValue(
+            self.config.get("max_break_duration", 30 * 60) // 60
+        )
+        max_break_label_unit = QLabel("分钟", parent)
+        max_break_layout.addWidget(max_break_label)
+        max_break_layout.addWidget(self.widgets["max_break"])
+        max_break_layout.addWidget(max_break_label_unit)
+
+        # Add all layouts
         layout.addLayout(display_layout)
         layout.addLayout(position_layout)
+        layout.addLayout(streak_layout)
+        layout.addLayout(pomo_layout)
+        layout.addLayout(max_break_layout)
 
-        # Other general settings...
+        # Add hint labels
+        streak_hint = QLabel("连续完成指定数量的番茄钟后，将进行长休息", parent)
+        streak_hint.setStyleSheet("font-style: italic; color: grey;")
+        layout.addWidget(streak_hint)
+
+        max_break_hint = QLabel("超过此时间后，累计的番茄钟将归零", parent)
+        max_break_hint.setStyleSheet("font-style: italic; color: grey;")
+        layout.addWidget(max_break_hint)
 
         group.setLayout(layout)
         return group
@@ -61,6 +112,9 @@ class GeneralSettings:
             "enabled": self.widgets["enable"].isChecked(),
             "show_circular_timer": self.widgets["show_timer"].isChecked(),
             "timer_position": self.widgets["position"].currentText(),
+            "pomodoros_before_long_break": self.widgets["streak"].value(),
+            "pomodoro_minutes": self.widgets["pomodoro"].value(),
+            "max_break_duration": self.widgets["max_break"].value() * 60,  # Convert to seconds
         }
 
 
