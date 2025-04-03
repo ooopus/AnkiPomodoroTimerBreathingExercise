@@ -27,14 +27,14 @@ class ConfigDialog(QDialog):
         self._main_layout = QVBoxLayout(self)
         self.phase_widgets = {}  # Store phase widgets {key: {"checkbox": QCheckBox, "spinbox": QSpinBox}}
 
-        # 初始化设置组件
+        # Initialize settings components
         self.general_settings = GeneralSettings(self.config)
         self.breathing_settings = BreathingSettings(self.config)
 
-        # 添加常规设置组件
+        # Add general settings component
         self._main_layout.addWidget(self.general_settings.create_ui(self))
 
-        # 添加呼吸训练设置组件
+        # Add breathing exercises component
         self._main_layout.addWidget(self.breathing_settings.create_ui(self))
 
         # --- Dialog Buttons (Save/Cancel) ---
@@ -52,7 +52,7 @@ class ConfigDialog(QDialog):
         # Set initial estimated time based on loaded config
         self._update_estimated_time()
 
-        # 添加状态栏显示格式选择
+        # Add status bar format selection
         self.statusbar_format_group = QGroupBox("状态栏显示设置")
         self.statusbar_format_layout = QVBoxLayout()
 
@@ -60,7 +60,7 @@ class ConfigDialog(QDialog):
         for format_key, format_name in STATUSBAR_FORMAT_NAMES.items():
             self.statusbar_format_combo.addItem(format_name, format_key)
 
-        # 设置当前选中的格式
+        # Set currently selected format
         current_format = self.config.get("statusbar_format", DEFAULT_STATUSBAR_FORMAT)
         index = self.statusbar_format_combo.findData(current_format)
         if index >= 0:
@@ -70,7 +70,7 @@ class ConfigDialog(QDialog):
         self.statusbar_format_layout.addWidget(self.statusbar_format_combo)
         self.statusbar_format_group.setLayout(self.statusbar_format_layout)
 
-        # 将状态栏设置添加到主布局
+        # Add status bar settings to main layout
         self._main_layout.insertWidget(
             2, self.statusbar_format_group
         )  # Use _main_layout instead of layout()
@@ -112,7 +112,7 @@ class ConfigDialog(QDialog):
         try:
             self.config = get_config()
 
-            # 保存所有UI控件的值到配置
+            # Save all UI control values to config
             # Get values from component classes
             general_values = self.general_settings.get_values()
             breathing_values = self.breathing_settings.get_values()
@@ -124,7 +124,7 @@ class ConfigDialog(QDialog):
             self.config["breathing_cycles"] = breathing_values["breathing_cycles"]
             self.config["statusbar_format"] = self.statusbar_format_combo.currentData()
 
-            # 保存呼吸阶段设置
+            # Save breathing phase settings
             for key, widgets in self.phase_widgets.items():
                 self.config[f"{key}_enabled"] = widgets["checkbox"].isChecked()
                 self.config[f"{key}_duration"] = widgets["spinbox"].value()
@@ -132,7 +132,7 @@ class ConfigDialog(QDialog):
             save_config()
             tooltip("配置已保存")
 
-            # 立即更新显示
+            # Update display immediately
             timer = get_pomodoro_timer()
             if timer:
                 timer.update_display()

@@ -12,11 +12,12 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import QTimer
 from PyQt6.QtGui import QPainter, QColor
+from aqt.utils import tooltip
 from .constants import PHASES
 from .config import get_config  # Changed from direct config import
 
 
-# --- 呼吸训练动画 Widget ---
+# --- Breathing Animation Widget ---
 class BreathingAnimationWidget(QWidget):
     """Displays the expanding/contracting circle animation for breathing."""
 
@@ -125,7 +126,7 @@ class BreathingAnimationWidget(QWidget):
         painter.drawEllipse(center, current_radius, current_radius)
 
 
-# --- 呼吸训练逻辑 (基于循环次数) ---
+# --- Breathing Logic (Cycle-based) ---
 class BreathingDialog(QDialog):
     """Dialog window for the guided breathing exercise based on cycles."""
 
@@ -186,7 +187,7 @@ class BreathingDialog(QDialog):
         self.cycle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.cycle_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")
 
-        self.skip_button = QPushButton("跳过训练", self)  # Changed label slightly
+        self.skip_button = QPushButton("Skip Exercise", self)  # Changed label slightly
 
         layout.addWidget(self.instruction_label)
         layout.addWidget(self.cycle_label)
@@ -245,6 +246,11 @@ class BreathingDialog(QDialog):
             self._pending_single_shot = QTimer.singleShot(
                 duration * 1000, self._advance_to_next_phase
             )
+            if self._pending_single_shot is not None:
+                try:
+                    self._pending_single_shot.stop()  # Try to stop single shot timer
+                except AttributeError:
+                    tooltip("Failed to stop single shot timer")
         else:
             # If duration is 0, advance immediately (with a tiny delay for event loop)
             self._pending_single_shot = QTimer.singleShot(

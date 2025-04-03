@@ -8,6 +8,24 @@ from ..timer_utils import get_pomodoro_timer, get_timer_label, set_timer_label
 from ..constants import STATUSBAR_DEFAULT_TEXT
 
 
+def remove_widget():
+    """Removes the timer widget from status bar"""
+    label = get_timer_label()
+    if label:
+        try:
+            status_bar = mw.statusBar()
+            if status_bar is not None:
+                status_bar.removeWidget(label)
+                label.setParent(None)  # Remove from parent
+                label.deleteLater()
+                set_timer_label(None)
+                # Force garbage collection
+                import gc
+                gc.collect()
+        except Exception as e:
+            tooltip(f"Error removing timer widget: {e}")
+
+
 def show_timer_in_statusbar(show: Union[bool, None]) -> None:
     """Adds or removes the timer label from the Anki status bar."""
     config = get_config()
@@ -24,24 +42,10 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
         or config.get("statusbar_format") == "NONE"
     ):
         if label:
-
-            def remove_widget():
-                current_label = get_timer_label()
-                status_bar = mw.statusBar()
-                if current_label is not None and status_bar is not None:
-                    try:
-                        status_bar.removeWidget(current_label)
-                        current_label.deleteLater()
-                        set_timer_label(None)
-                        status_bar.deleteLater()
-                    except Exception as e:
-                        tooltip(f"Error removing timer widget: {e}")
-
             mw.progress.timer(0, remove_widget, False)
         return
 
     if not label:
-
         def add_widget():
             new_label = QLabel(STATUSBAR_DEFAULT_TEXT)
             try:

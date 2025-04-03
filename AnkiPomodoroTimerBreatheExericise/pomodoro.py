@@ -55,9 +55,9 @@ class PomodoroTimer(QTimer):
 
             tooltip("检测到长时间空闲，番茄钟计数已重置。", period=3000)
 
-        # 处理圆形计时器的显示逻辑
+        # Handle circular timer display logic
         if config.get("show_circular_timer", True):
-            # 如果计时器不存在或其父窗口已被关闭，则创建新的计时器
+            # Create new timer if it doesn't exist or its parent window is closed
             parent_widget = (
                 self.circular_timer.parent() if self.circular_timer else None
             )
@@ -81,25 +81,26 @@ class PomodoroTimer(QTimer):
         show_timer_in_statusbar(config.get("statusbar_format", True))
 
     def stop_timer(self, stop_break_timer=False):
-        """Stops the Pomodoro timer and resets the display.
-        Args:
-            stop_break_timer (bool): 是否同时停止休息计时器
-        """
+        """Stops the Pomodoro timer and resets the display."""
         if self.isActive():
             from aqt.utils import tooltip
 
             tooltip("番茄钟计时器已停止。", period=3000)
             self.stop()
+            self.timeout.disconnect()  # Need to disconnect signal
             if stop_break_timer:
                 self.break_timer.stop()
+                self.break_timer.timeout.disconnect()  # Need to disconnect break timer signal
 
-        # 确保在主线程执行UI更新
+        # Ensure UI updates run in main thread
         def _clear_display():
-            self.remaining_seconds = 0
-            self.total_seconds = 0
-            self.update_display()
             if self.circular_timer:
-                self.circular_timer.set_progress(0, 1)
+                parent = self.circular_timer.parent()
+                if parent and isinstance(parent, QWidget):
+                    parent.close()
+                self.circular_timer.setParent(None)  # Need to remove parent-child relationship
+                self.circular_timer.deleteLater()
+                self.circular_timer = None
 
         mw.progress.timer(10, _clear_display, False)
 
@@ -118,18 +119,18 @@ class PomodoroTimer(QTimer):
 
             tooltip("休息计时器已停止。", period=3000)
             self.break_timer.stop()
-            # 强制立即更新显示
+            # Force immediate display update
             mw.progress.timer(10, lambda: self.update_display(), False)
-            self.update_display()  # 更新显示以清除休息时间
+            self.update_display()  # Update display to clear break time
 
     def update_timer(self):
         if self.remaining_seconds > 0:
             self.remaining_seconds -= 1
-            # 仅在秒数变化时更新显示
-            if self.remaining_seconds % 5 == 0:  # 每5秒更新一次显示
+            # Only update display when seconds change
+            if self.remaining_seconds % 5 == 0:  # Update display every 5 seconds
                 self.update_display()
 
-            # 更新当天番茄钟总计时长
+            # Update total pomodoro time for today
             if mw and mw.state == "review":
                 self.config["daily_pomodoro_seconds"] = (
                     self.config.get("daily_pomodoro_seconds", 0) + 1
@@ -142,14 +143,14 @@ class PomodoroTimer(QTimer):
             tooltip("番茄钟计时器已完成。", period=3000)
             self.stop()
 
-            # 设置最后完成时间并启动休息计时器
+            # Set last completion time and start break timer
             current_time = time.time()
             self.config["last_pomodoro_time"] = current_time
             max_break_duration = self.config.get("max_break_duration", 30 * 60)
             self.remaining_break_seconds = max_break_duration
             self.break_timer.start(1000)
 
-            # 立即更新显示
+            # Update display immediately
             self.update_display()
             on_pomodoro_finished()
 
@@ -166,7 +167,7 @@ class PomodoroTimer(QTimer):
 
             label = get_timer_label()
             if label:
-                # 构建进度显示
+                # Build progress display
                 completed = self.config.get("completed_pomodoros", 0)
                 target = self.config.get("pomodoros_before_long_break", 4)
                 progress = (
@@ -174,13 +175,13 @@ class PomodoroTimer(QTimer):
                     + STATUSBAR_EMPTY_TOMATO * (target - completed)
                 )
 
-                # 获取休息时间信息
+                # Get break time information
                 break_mins, break_secs = divmod(self.remaining_break_seconds, 60)
 
-                # 初始化每日计时变量
+                # Initialize daily timer variables
                 daily_mins, daily_secs = 0, 0
 
-                # 检查是否需要重置每日计时
+                # Check if daily timer needs reset
                 last_date = self.config.get("last_date", "")
                 today = time.strftime("%Y-%m-%d")
                 if last_date != today:
@@ -188,11 +189,11 @@ class PomodoroTimer(QTimer):
                     self.config["last_date"] = today
                     save_config()
 
-                # 无论是否重置，都计算每日时间
+                # Calculate daily time regardless of reset
                 daily_total_seconds = self.config.get("daily_pomodoro_seconds", 0)
                 daily_mins, daily_secs = divmod(daily_total_seconds, 60)
 
-                # 根据配置中的状态栏格式显示信息
+                # Display information according to status bar format in config
                 statusbar_format = self.config.get(
                     "statusbar_format", "ICON_TIME_PROGRESS_WITH_TOTAL_TIME"
                 )
@@ -202,7 +203,7 @@ class PomodoroTimer(QTimer):
                     STATUSBAR_FORMATS.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME,
                 )
 
-                # 根据计时器状态设置不同的图标
+                # Set different icons based on timer state
                 if self.break_timer.isActive() and self.remaining_break_seconds > 0:
                     icon = STATUSBAR_BREAK_WARNING
                     mins, secs = break_mins, break_secs
@@ -213,7 +214,7 @@ class PomodoroTimer(QTimer):
                     icon = STATUSBAR_EMPTY_TOMATO
                     mins, secs = 0, 0
 
-                # 根据格式字符串动态生成显示内容
+                # Dynamically generate display content based on format string
                 try:
                     label.setText(
                         format_str.format(
@@ -226,7 +227,7 @@ class PomodoroTimer(QTimer):
                         )
                     )
                 except KeyError:
-                    # 如果格式字符串中有不支持的变量，使用默认格式
+                    # Use default format if unsupported variables in format string
                     label.setText(
                         STATUSBAR_FORMATS.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME.format(
                             icon=icon,
@@ -240,7 +241,7 @@ class PomodoroTimer(QTimer):
 
                 show_timer_in_statusbar(True)
 
-            # 更新圆形计时器
+            # Update circular timer
             if self.circular_timer:
                 if self.remaining_seconds > 0:
                     self.circular_timer.set_progress(
@@ -261,5 +262,5 @@ class PomodoroTimer(QTimer):
                 else:
                     self.circular_timer.set_progress(0, 1)  # Reset when idle
 
-        # 确保在主线程执行UI更新
+        # Ensure UI updates run in main thread
         mw.progress.timer(10, _update, False)

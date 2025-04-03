@@ -44,7 +44,20 @@ def setup_plugin():
         show_timer_in_statusbar(False)
 
 
-# --- 启动插件 ---
+def cleanup_plugin():
+    """Clean up resources when plugin is unloaded"""
+    from .ui.statusbar import remove_widget
+    from .timer_utils import get_pomodoro_timer
+    
+    timer = get_pomodoro_timer()
+    if timer:
+        timer.stop_timer(True)
+    
+    remove_widget()
+
+gui_hooks.main_window_did_init.append(cleanup_plugin)
+
+# ---Startup---
 # This code runs when Anki loads the addon
 if __name__ != "__main__":
     # Use mw.progress.timer to ensure setup runs after Anki is fully initialized
