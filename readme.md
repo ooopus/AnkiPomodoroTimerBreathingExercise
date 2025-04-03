@@ -78,10 +78,8 @@
 - Python 3.9
 - aqt >= 25.0
 
-```markdown
-# 番茄钟 & 呼吸训练 Anki 插件
+### 项目结构
 ```
-
 AnkiPomodoroTimerBreatheExericise/
 ├── init .py          # 插件入口
 ├── breathing.py         # 呼吸训练核心
@@ -95,3 +93,4 @@ AnkiPomodoroTimerBreatheExericise/
     ├── circular_timer.py
     ├── config_dialog.py
     └── statusbar.py
+```
