@@ -157,6 +157,9 @@ class PomodoroTimer(QTimer):
                 # 获取休息时间信息
                 break_mins, break_secs = divmod(self.remaining_break_seconds, 60)
 
+                # 初始化每日计时变量
+                daily_mins, daily_secs = 0, 0
+
                 # 检查是否需要重置每日计时
                 last_date = self.config.get("last_date", "")
                 today = time.strftime("%Y-%m-%d")
@@ -164,10 +167,11 @@ class PomodoroTimer(QTimer):
                     self.config["daily_pomodoro_seconds"] = 0
                     self.config["last_date"] = today
                     save_config()
-                else:
-                    daily_total_seconds = self.config.get("daily_pomodoro_seconds", 0)
-                    daily_mins, daily_secs = divmod(daily_total_seconds, 60)
                     
+                # 无论是否重置，都计算每日时间
+                daily_total_seconds = self.config.get("daily_pomodoro_seconds", 0)
+                daily_mins, daily_secs = divmod(daily_total_seconds, 60)
+
                 # 根据配置中的状态栏格式显示信息
                 statusbar_format = self.config.get(
                     "statusbar_format", "ICON_TIME_PROGRESS_WITH_TOTAL_TIME"
