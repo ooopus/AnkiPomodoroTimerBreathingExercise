@@ -77,3 +77,21 @@
 ### 环境要求
 - Python 3.9
 - aqt >= 25.0
+
+```markdown
+# 番茄钟 & 呼吸训练 Anki 插件
+```
+
+AnkiPomodoroTimerBreatheExericise/
+├── init .py          # 插件入口
+├── breathing.py         # 呼吸训练核心
+├── config.py           # 配置管理
+├── constants.py        # 常量定义
+├── hooks.py           # Anki钩子
+├── pomodoro.py        # 番茄钟核心
+├── timer_utils.py     # 计时器工具
+└── ui/                # 用户界面
+    ├── init .py
+    ├── circular_timer.py
+    ├── config_dialog.py
+    └── statusbar.py
