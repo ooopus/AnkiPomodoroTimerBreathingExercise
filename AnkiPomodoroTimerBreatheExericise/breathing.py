@@ -183,7 +183,11 @@ class BreathingDialog(QDialog):
 
         # Cycle Counter Label
         self.cycle_label = QLabel(
-            f"循环: {self.completed_cycles + 1} / {self.target_cycles}", self
+            _("循环: {current} / {total}").format(
+                current=self.completed_cycles + 1,
+                total=self.target_cycles
+            ),
+            self
         )
         self.cycle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.cycle_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")
@@ -218,8 +222,11 @@ class BreathingDialog(QDialog):
         if just_completed_cycle:
             self.completed_cycles += 1
             self.cycle_label.setText(
-                f"循环: {min(self.completed_cycles + 1, self.target_cycles)} / {self.target_cycles}"
-            )  # Update label, cap first number
+                _("循环: {current} / {total}").format(
+                    current=min(self.completed_cycles + 1, self.target_cycles),
+                    total=self.target_cycles
+                )
+            )
 
             # Check if target cycles are reached
             if self.completed_cycles >= self.target_cycles:
@@ -238,7 +245,10 @@ class BreathingDialog(QDialog):
         self.animation_widget.set_phase(anim_phase_key, duration)
         # Ensure cycle label reflects the *current* cycle number
         self.cycle_label.setText(
-            f"循环: {self.completed_cycles + 1} / {self.target_cycles}"
+            _("循环: {current} / {total}").format(
+                current=self.completed_cycles + 1,
+                total=self.target_cycles
+            )
         )
 
         # Schedule the next call to _advance_to_next_phase after the current phase duration

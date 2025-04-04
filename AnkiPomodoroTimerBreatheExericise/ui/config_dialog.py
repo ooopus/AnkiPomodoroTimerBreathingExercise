@@ -24,7 +24,7 @@ class ConfigDialog(QDialog):
         # Use our config system instead of Anki's
         self.config = get_config()  # Store config as instance attribute
 
-        self.setWindowTitle("番茄钟 & 呼吸设置")
+        self.setWindowTitle(_("番茄钟/呼吸训练设置"))
         self._main_layout = QVBoxLayout(self)
 
         # Initialize settings components
@@ -95,20 +95,20 @@ class ConfigDialog(QDialog):
 
             if not any_phase_active or target_cycles <= 0:
                 self.breathing_settings.widgets["estimated_time"].setText(
-                    "预计时间: --:-- (无启用阶段或循环)"
+                    _("预计时间: --:-- (未启用任何阶段或目标周期数为0)")
                 )
                 return
 
             total_seconds = single_cycle_duration * target_cycles
             mins, secs = divmod(total_seconds, 60)
             self.breathing_settings.widgets["estimated_time"].setText(
-                f"预计时间: {mins:02d}:{secs:02d}"
+                _("预计时间: {mins:02d}:{secs:02d}").format(mins=mins, secs=secs)
             )
 
         except Exception as e:
             tooltip(f"Error updating estimated time: {e}")
             self.breathing_settings.widgets["estimated_time"].setText(
-                "预计时间: 计算错误"
+                _("预计时间: 计算错误")
             )
 
     def accept(self):
@@ -135,7 +135,4 @@ class ConfigDialog(QDialog):
 
             super().accept()
         except Exception as e:
-            from aqt.utils import showWarning
-
-            tooltip(f"Error saving configuration: {e}")
-            showWarning("配置保存失败", self, f"保存配置时发生错误: {str(e)}")
+            tooltip(_("保存配置时出错: {}").format(e))

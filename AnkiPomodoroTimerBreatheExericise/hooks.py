@@ -10,11 +10,7 @@ from .config import get_config, save_config
 from .timer_utils import get_pomodoro_timer
 from .pomodoro import PomodoroTimer
 
-import gettext
-import os
-localedir = os.path.join(os.path.dirname(__file__), './locales')
-translation = gettext.translation('messages', localedir, fallback=True)
-_ = translation.gettext
+from .translator import _
 
 # --- Anki 钩子函数 ---
 
@@ -68,7 +64,11 @@ def on_pomodoro_finished():
     if completed >= target:
         long_break_mins = config.get("long_break_minutes", 15)
         tooltip(
-            f"恭喜完成{target}个番茄钟！建议休息{long_break_mins}分钟。", period=5000
+            _("恭喜完成{target}个番茄钟！建议休息{minutes}分钟。").format(
+                target=target, 
+                minutes=long_break_mins
+            ), 
+            period=5000
         )
         config["completed_pomodoros"] = 0
     else:
@@ -87,9 +87,6 @@ def _after_pomodoro_finish_tasks():
     # Return to deck browser
     if mw.state == "review":
         mw.moveToState("deckBrowser")
-
-    # 删除这行，因为我们需要保持休息时间显示
-    # show_timer_in_statusbar(False)
 
     # Show breathing dialog after a short delay
     QTimer.singleShot(200, show_breathing_dialog)  # Delay allows state change to settle

@@ -78,19 +78,90 @@
 - Python 3.9
 - aqt >= 25.0
 
-### 项目结构
+### 国际化 (i18n)
+
+#### 翻译文件结构
+```
+locales/
+├── en_US/
+│   └── LC_MESSAGES/
+│       ├── messages.mo
+│       └── messages.po
+└── zh_CN/
+    └── LC_MESSAGES/
+        ├── messages.mo
+        └── messages.po
+```
+
+#### 翻译工作流程
+
+1. 提取需要翻译的字符串：
+```bash
+cd AnkiPomodoroTimerBreatheExericise
+pybabel extract -F babel.cfg -o locales/messages.pot .
+```
+
+2. 初始化新语言（如果是第一次添加该语言）：
+```bash
+pybabel init -i locales/messages.pot -d locales -l <语言代码>
+```
+例如：`pybabel init -i locales/messages.pot -d locales -l zh_CN`
+
+3. 更新现有翻译文件：
+```bash
+pybabel update -i locales/messages.pot -d locales
+```
+
+4. 编辑 .po 文件添加翻译内容
+- 编辑 `locales/<语言代码>/LC_MESSAGES/messages.po`
+- 为每个 msgid 添加对应的 msgstr 翻译
+
+5. 编译翻译文件：
+```bash
+pybabel compile -d locales
+```
+
+#### 添加新的翻译字符串
+
+1. 在代码中使用 `_()` 函数包装需要翻译的字符串：
+```python
+from .translator import _
+message = _("需要翻译的文本")
+```
+
+2. 重复上述工作流程步骤 1-5
+
+#### 支持的语言
+- 英语 (en_US)
+- 简体中文 (zh_CN)
+
+#### 贡献翻译
+1. Fork 本仓库
+2. 按照上述工作流程添加新语言或改进现有翻译
+3. 提交 Pull Request
+
+### 开发指南
+
+#### 目录结构
 ```
 AnkiPomodoroTimerBreatheExericise/
-├── init .py          # 插件入口
-├── breathing.py         # 呼吸训练核心
+├── __init__.py          # 插件入口
+├── babel.cfg            # Babel 配置文件
+├── breathing.py         # 呼吸训练相关
 ├── config.py           # 配置管理
 ├── constants.py        # 常量定义
-├── hooks.py           # Anki钩子
-├── pomodoro.py        # 番茄钟核心
-├── timer_utils.py     # 计时器工具
-└── ui/                # 用户界面
-    ├── init .py
-    ├── circular_timer.py
-    ├── config_dialog.py
-    └── statusbar.py
+├── hooks.py            # Anki 钩子函数
+├── locales/            # 翻译文件
+├── pomodoro.py         # 番茄钟功能
+├── timer_utils.py      # 计时器工具
+├── translator.py       # 翻译器
+└── ui/                 # 用户界面
 ```
+
+#### 代码风格
+- 使用 Python 类型注解
+- 遵循 PEP 8 规范
+- 所有用户可见的字符串都需要使用 `_()` 包装以支持翻译
+
+### 问题反馈
+如果你发现任何问题或有改进建议，请在 GitHub 仓库提交 Issue。

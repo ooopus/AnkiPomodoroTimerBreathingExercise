@@ -76,7 +76,7 @@ class PomodoroTimer(QTimer):
         self.remaining_seconds = self.total_seconds
         from aqt.utils import tooltip
 
-        tooltip(f"番茄钟计时器已启动，时长: {minutes} 分钟。", period=3000)
+        tooltip(_("番茄钟计时器已启动，时长: {} 分钟。").format(minutes), period=3000)
         self.update_display()
         self.start(1000)  # Tick every second
         show_timer_in_statusbar(config.get("statusbar_format", True))

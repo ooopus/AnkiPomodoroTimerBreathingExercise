@@ -5,21 +5,21 @@ from .translator import _
 PHASES = [
     {
         "key": "inhale",
-        "label": "吸气",
+        "label": _("吸气"),
         "default_duration": 4,
         "default_enabled": True,
         "anim_phase": "INHALE",
     },
     {
         "key": "hold",
-        "label": "屏住",
+        "label": _("屏住"),
         "default_duration": 4,
         "default_enabled": False,
         "anim_phase": "HOLD",
     },
     {
         "key": "exhale",
-        "label": "呼气",
+        "label": _("呼气"),
         "default_duration": 6,
         "default_enabled": True,
         "anim_phase": "EXHALE",
@@ -54,8 +54,7 @@ class STATUSBAR_FORMATS:
     ICON_COUNTDOWN_PROGRESS = (
         "{icon} {mins:02d}:{secs:02d} {progress}"  # 图标+时间+进度
     )
-    ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME = "{icon} {mins:02d}:{secs:02d} {progress} 累计使用：{daily_mins:02d}:{daily_secs:02d}"  # 全部信息
-
+    ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME = "{icon} {mins:02d}:{secs:02d} {progress} " + _("累计使用：") + "{daily_mins:02d}:{daily_secs:02d}"  # 全部信息
 
 # 状态栏显示格式选项的显示名称
 STATUSBAR_FORMAT_NAMES = {
