@@ -8,11 +8,7 @@ from .timer_utils import get_pomodoro_timer
 from .hooks import on_reviewer_did_start, on_state_did_change
 from .ui import ConfigDialog
 
-import gettext
-import os
-localedir = os.path.join(os.path.dirname(__file__), './locales')
-translation = gettext.translation('messages', localedir, fallback=True)
-_ = translation.gettext
+from .translator import _
 
 def show_config_dialog():
     """Creates and shows the configuration dialog."""
