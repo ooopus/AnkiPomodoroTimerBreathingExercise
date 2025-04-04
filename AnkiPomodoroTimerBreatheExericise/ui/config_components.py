@@ -12,6 +12,7 @@ from ..constants import PHASES, DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUT
 
 from ..translator import _
 
+
 class GeneralSettings:
     """Handles UI components and logic for general settings"""
 
@@ -41,7 +42,9 @@ class GeneralSettings:
         position_layout = QHBoxLayout()
         position_label = QLabel(_("计时器窗口位置:"), parent)
         self.widgets["position"] = QComboBox(parent)
-        self.widgets["position"].addItems([_("左上角"), _("右上角"), _("左下角"), _("右下角")])
+        self.widgets["position"].addItems(
+            [_("左上角"), _("右上角"), _("左下角"), _("右下角")]
+        )
         self.widgets["position"].setCurrentText(
             self.config.get("timer_position", "左上角")
         )
@@ -54,7 +57,9 @@ class GeneralSettings:
         self.widgets["streak"] = QSpinBox(parent)
         self.widgets["streak"].setMinimum(1)
         self.widgets["streak"].setMaximum(10)
-        self.widgets["streak"].setValue(self.config.get("pomodoros_before_long_break", 4))
+        self.widgets["streak"].setValue(
+            self.config.get("pomodoros_before_long_break", 4)
+        )
         streak_label_unit = QLabel(_("个番茄钟"), parent)
         streak_layout.addWidget(streak_label)
         streak_layout.addWidget(self.widgets["streak"])
@@ -92,7 +97,6 @@ class GeneralSettings:
         streak_hint = QLabel(_("连续完成指定数量的番茄钟后，将进行长休息"), parent)
         streak_hint.setStyleSheet("font-style: italic; color: grey;")
 
-
         max_break_hint = QLabel(_("超过休息时间上限后，累计的番茄钟将归零"), parent)
         max_break_hint.setStyleSheet("font-style: italic; color: grey;")
 
@@ -116,7 +120,8 @@ class GeneralSettings:
             "timer_position": self.widgets["position"].currentText(),
             "pomodoros_before_long_break": self.widgets["streak"].value(),
             "pomodoro_minutes": self.widgets["pomodoro"].value(),
-            "max_break_duration": self.widgets["max_break"].value() * 60,  # Convert to seconds
+            "max_break_duration": self.widgets["max_break"].value()
+            * 60,  # Convert to seconds
         }
 
 

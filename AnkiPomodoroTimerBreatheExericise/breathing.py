@@ -1,22 +1,25 @@
-from aqt import mw
-import time
-from PyQt6.QtCore import Qt, QPointF
-from PyQt6.QtGui import QBrush
-from PyQt6.QtWidgets import (
+from aqt import (
+    mw,
     QWidget,
     QDialog,
     QLabel,
     QSizePolicy,
     QVBoxLayout,
     QPushButton,
+    Qt,
+    QPointF,
+    QBrush,
+    QTimer,
+    QPainter,
+    QColor,
 )
-from PyQt6.QtCore import QTimer
-from PyQt6.QtGui import QPainter, QColor
+import time
 from aqt.utils import tooltip
 from .constants import PHASES
 from .config import get_config  # Changed from direct config import
 
 from .translator import _
+
 
 # --- Breathing Animation Widget ---
 class BreathingAnimationWidget(QWidget):
@@ -184,10 +187,9 @@ class BreathingDialog(QDialog):
         # Cycle Counter Label
         self.cycle_label = QLabel(
             _("循环: {current} / {total}").format(
-                current=self.completed_cycles + 1,
-                total=self.target_cycles
+                current=self.completed_cycles + 1, total=self.target_cycles
             ),
-            self
+            self,
         )
         self.cycle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.cycle_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")
@@ -224,7 +226,7 @@ class BreathingDialog(QDialog):
             self.cycle_label.setText(
                 _("循环: {current} / {total}").format(
                     current=min(self.completed_cycles + 1, self.target_cycles),
-                    total=self.target_cycles
+                    total=self.target_cycles,
                 )
             )
 
@@ -246,8 +248,7 @@ class BreathingDialog(QDialog):
         # Ensure cycle label reflects the *current* cycle number
         self.cycle_label.setText(
             _("循环: {current} / {total}").format(
-                current=self.completed_cycles + 1,
-                total=self.target_cycles
+                current=self.completed_cycles + 1, total=self.target_cycles
             )
         )
 

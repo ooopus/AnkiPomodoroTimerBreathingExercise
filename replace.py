@@ -4,7 +4,9 @@ import argparse
 import logging
 
 # 配置日志记录
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # 定义要查找和替换的模式
 # 使用正则表达式捕获函数名、括号、字符串内容以及其他参数
@@ -26,17 +28,20 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # _(\2\3\2)          : 将捕获的引号和内容包裹在 _() 中
 # \4                 : 第四个捕获组 (逗号和后面的参数，如果存在)
 # )                  : 添加结束括号
-PATTERN = re.compile(r'(tooltip|QLabel|QAction|QGroupBox)\(\s*(["\'])((?:(?!\2).)*)\2(\s*,\s*.*?)?\s*\)')
-REPLACEMENT = r'\1(_(\2\3\2)\4)'
+PATTERN = re.compile(
+    r'(tooltip|QLabel|QAction|QGroupBox)\(\s*(["\'])((?:(?!\2).)*)\2(\s*,\s*.*?)?\s*\)'
+)
+REPLACEMENT = r"\1(_(\2\3\2)\4)"
 
 # 另一种写法，可能更清晰地分离参数捕获
 # PATTERN = re.compile(r'(tooltip|QLabel)\(\s*(["\'])((?:(?!\2).)*)\2(\s*(?:,.*)?)(\))')
 # REPLACEMENT = r'\1(_(\2\3\2)\4\5' # \4 包含逗号和参数, \5 是右括号
 
+
 def process_file(filepath):
     """处理单个文件，查找并替换模式"""
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             original_content = f.read()
     except Exception as e:
         logging.error(f"无法读取文件 {filepath}: {e}")
@@ -47,7 +52,7 @@ def process_file(filepath):
     if num_replacements > 0:
         logging.info(f"正在修改文件: {filepath} ({num_replacements} 个替换)")
         try:
-            with open(filepath, 'w', encoding='utf-8') as f:
+            with open(filepath, "w", encoding="utf-8") as f:
                 f.write(modified_content)
         except Exception as e:
             logging.error(f"无法写入文件 {filepath}: {e}")
@@ -68,11 +73,11 @@ def process_directory(root_dir):
 
     for subdir, _, files in os.walk(root_dir):
         for filename in files:
-            if filename.lower().endswith('.py'):
+            if filename.lower().endswith(".py"):
                 file_count += 1
                 filepath = os.path.join(subdir, filename)
                 process_file(filepath)
-                processed_count +=1 # 无论是否修改都计数
+                processed_count += 1  # 无论是否修改都计数
 
     logging.info(f"处理完成。共检查 {processed_count} 个 .py 文件。")
 
@@ -80,23 +85,20 @@ def process_directory(root_dir):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="递归地将特定函数调用中的字符串参数用 _() 包裹起来，用于 i18n。",
-        epilog="示例: python replace_script.py /path/to/your/project"
+        epilog="示例: python replace_script.py /path/to/your/project",
     )
-    parser.add_argument(
-        "directory",
-        help="需要处理的根目录路径。"
-    )
+    parser.add_argument("directory", help="需要处理的根目录路径。")
 
     args = parser.parse_args()
 
     # 在开始前再次提醒备份
-    print("="*50)
+    print("=" * 50)
     print("警告：此脚本将直接修改您指定目录下的 .py 文件。")
     print("请确保您已经备份了相关代码！")
-    print("="*50)
+    print("=" * 50)
     confirm = input(f"您确定要处理目录 '{args.directory}' 吗？(yes/no): ")
 
-    if confirm.lower() == 'yes':
+    if confirm.lower() == "yes":
         process_directory(args.directory)
     else:
         print("操作已取消。")

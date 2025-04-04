@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Dict, Any, Optional
-from PyQt6.QtWidgets import QLabel
+from aqt import QLabel
 from aqt.utils import tooltip
 from .constants import (
     PHASES,

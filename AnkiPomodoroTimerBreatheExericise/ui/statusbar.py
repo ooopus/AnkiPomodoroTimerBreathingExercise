@@ -1,5 +1,4 @@
-from aqt import mw
-from PyQt6.QtWidgets import QLabel
+from aqt import mw, QLabel
 from typing import Union
 
 from aqt.utils import tooltip
@@ -20,6 +19,7 @@ def remove_widget():
                 label.deleteLater()
                 set_timer_label(None)
                 import gc
+
                 label.destroyed.connect(lambda: gc.collect())
         except Exception as e:
             tooltip(f"Error removing timer widget: {e}")

@@ -1,5 +1,5 @@
-from aqt import mw
-from PyQt6.QtWidgets import (
+from aqt import (
+    mw,
     QVBoxLayout,
     QDialogButtonBox,
     QLabel,
@@ -12,8 +12,8 @@ from ..config import save_config, get_config
 from ..constants import STATUSBAR_FORMAT_NAMES, DEFAULT_STATUSBAR_FORMAT
 from ..timer_utils import get_pomodoro_timer
 from .config_components import GeneralSettings, BreathingSettings
-
 from ..translator import _
+
 
 class ConfigDialog(QDialog):
     """Configuration dialog for Pomodoro and Breathing settings."""
@@ -77,7 +77,9 @@ class ConfigDialog(QDialog):
         for phase in self.breathing_settings.phase_widgets.values():
             phase["checkbox"].toggled.connect(self._update_estimated_time)
             phase["spinbox"].valueChanged.connect(self._update_estimated_time)
-        self.breathing_settings.widgets["cycles"].valueChanged.connect(self._update_estimated_time)
+        self.breathing_settings.widgets["cycles"].valueChanged.connect(
+            self._update_estimated_time
+        )
 
     def _update_estimated_time(self):
         """Calculates and updates the estimated breathing time label."""
@@ -130,6 +132,7 @@ class ConfigDialog(QDialog):
 
             # Update display immediately
             timer = get_pomodoro_timer()
+
             if timer:
                 timer.update_display()
 

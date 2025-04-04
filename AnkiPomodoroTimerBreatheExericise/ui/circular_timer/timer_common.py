@@ -2,91 +2,10 @@
 
 from PyQt6.QtWidgets import QWidget, QDialog, QApplication
 from PyQt6.QtCore import Qt, QPointF, pyqtSignal
-from PyQt6.QtGui import QColor, QPalette, QResizeEvent
-import sys # Needed for standalone app
-
-# --- Determine Environment and Setup Mocks ---
-_anki_context = False
-try:
-    # Attempt to import Anki modules
-    from aqt import mw, theme
-    # Attempt to import config *relative to the addon structure*
-    # If timer_common.py is in the root of your addon, use:
-    # from .config import get_config
-    # If it's in a subfolder 'timer', use:
-    # from ..config import get_config
-    # Assuming it's in the root for now:
-    try:
-        from ...config import get_config # Use relative import
-    except ImportError:
-        print("Running standalone or config.py not found relative to timer_common.py.")
-        # Fallback to basic mock if relative import fails
-        def get_config():
-            print("WARNING: Using basic mock get_config() in timer_common.")
-            return {"timer_position": "右上角", "enabled": True, "timer_style": "gradient"} # Add style default
-
-    _anki_context = True
-    print("Running in Anki context (detected by timer_common.py).")
-
-except ImportError:
-    print("Running outside Anki. Using mock objects (defined in timer_common.py).")
-
-    # --- Mocks for Standalone Execution ---
-    class MockThemeManager:
-        night_mode = False # Set True for dark mode testing
-
-    class MockTheme:
-        theme_manager = MockThemeManager()
-
-    class MockPm:
-        night_mode = MockThemeManager.night_mode
-
-    class MockMw:
-        pm = MockPm()
-        app = None
-
-    mw = MockMw()
-    theme = MockTheme()
-
-    # Define get_config mock ONLY if not running in Anki
-    def get_config():
-        # Simulate config for standalone testing
-        return {"timer_position": "右上角", "enabled": True, "timer_style": "gradient"} # Default style
-
-
-# --- Single `is_dark_mode` Function (Common) ---
-def is_dark_mode() -> bool:
-    """Checks if dark mode is active, handling both Anki and standalone contexts."""
-    if _anki_context:
-        try:
-            if hasattr(theme, 'theme_manager') and isinstance(theme.theme_manager.night_mode, bool):
-                return theme.theme_manager.night_mode
-            elif hasattr(mw, 'pm') and hasattr(mw.pm, 'night_mode') and isinstance(mw.pm.night_mode, bool):
-                return mw.pm.night_mode
-        except Exception:
-            pass
-    else:
-        if (hasattr(theme, 'theme_manager') and
-            hasattr(theme.theme_manager, 'night_mode') and
-            isinstance(theme.theme_manager.night_mode, bool)):
-            return theme.theme_manager.night_mode
-        elif (hasattr(mw, 'pm') and
-              hasattr(mw.pm, 'night_mode') and
-              isinstance(mw.pm.night_mode, bool)):
-            return mw.pm.night_mode
-
-    try:
-        app = QApplication.instance()
-        if app and hasattr(app, 'palette'):
-            if isinstance(app, QApplication):
-                palette = app.palette()
-                if hasattr(palette, 'color'):
-                    window_color = palette.color(QPalette.ColorRole.Window)
-                    if hasattr(window_color, 'value'):
-                        return window_color.value() < 128
-    except Exception:
-        pass
-    return False
+from PyQt6.QtGui import QColor, QResizeEvent
+from aqt import mw
+from ...config import get_config
+import sys  # Needed for standalone app
 
 # --- Constants (Common) ---
 # Define all potential colors here
@@ -95,8 +14,8 @@ BG_COLOR_START_LIGHT = QColor(230, 230, 230, 200)
 BG_COLOR_END_LIGHT = QColor(200, 200, 200, 220)
 PROGRESS_COLOR_START_LIGHT = QColor(0, 150, 255)
 PROGRESS_COLOR_END_LIGHT = QColor(0, 100, 200)
-TEXT_COLOR_START_LIGHT = QColor(50, 50, 50)     # Used by gradient style
-TEXT_COLOR_END_LIGHT = QColor(80, 80, 80)      # Used by gradient style
+TEXT_COLOR_START_LIGHT = QColor(50, 50, 50)  # Used by gradient style
+TEXT_COLOR_END_LIGHT = QColor(80, 80, 80)  # Used by gradient style
 SHADOW_COLOR_LIGHT = QColor(0, 0, 0, 40)
 
 # Dark Mode Colors (Night Mode)
@@ -118,18 +37,20 @@ class TimerWindow(QDialog):
     def __init__(self, timer_widget_class: type[QWidget], parent=None):
         super().__init__(parent)
 
-        use_frameless = True # Default to frameless
-        if _anki_context and use_frameless:
+        use_frameless = True  # Default to frameless
+        if use_frameless:
             self.setWindowFlags(
-                Qt.WindowType.Tool |
-                Qt.WindowType.WindowStaysOnTopHint |
-                Qt.WindowType.FramelessWindowHint
+                Qt.WindowType.Tool
+                | Qt.WindowType.WindowStaysOnTopHint
+                | Qt.WindowType.FramelessWindowHint
             )
             self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
             self._offset = QPointF()
         else:
-            self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint)
-            self._offset = None # No dragging if not frameless
+            self.setWindowFlags(
+                Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint
+            )
+            self._offset = None  # No dragging if not frameless
 
         self.setWindowTitle("番茄钟计时器")
         self.setMinimumSize(100, 100)
@@ -146,7 +67,7 @@ class TimerWindow(QDialog):
             return
         margin = 20
         screen_rect = screen.availableGeometry()
-        config = get_config() # Assumes get_config is available
+        config = get_config()  # Assumes get_config is available
         position = config.get("timer_position", "右上角")
         window_width, window_height = self.width(), self.height()
         x, y = margin, margin
@@ -163,13 +84,16 @@ class TimerWindow(QDialog):
         # Logic is identical
         dialog_w, dialog_h = self.width(), self.height()
         margin = 0 if (self.windowFlags() & Qt.WindowType.FramelessWindowHint) else 5
-        widget_size = max(self.timer_widget.minimumSize().width(), min(dialog_w, dialog_h) - 2 * margin)
+        widget_size = max(
+            self.timer_widget.minimumSize().width(),
+            min(dialog_w, dialog_h) - 2 * margin,
+        )
         # Ensure timer_widget exists before setting size
-        if hasattr(self, 'timer_widget') and self.timer_widget:
-             self.timer_widget.setFixedSize(widget_size, widget_size)
-             widget_x = (dialog_w - widget_size) // 2
-             widget_y = (dialog_h - widget_size) // 2
-             self.timer_widget.move(widget_x, widget_y)
+        if hasattr(self, "timer_widget") and self.timer_widget:
+            self.timer_widget.setFixedSize(widget_size, widget_size)
+            widget_x = (dialog_w - widget_size) // 2
+            widget_y = (dialog_h - widget_size) // 2
+            self.timer_widget.move(widget_x, widget_y)
 
     def resizeEvent(self, event: QResizeEvent):
         # Logic is identical
@@ -206,12 +130,14 @@ class TimerWindow(QDialog):
 
 # --- Setup Function (Common - Modified) ---
 _timer_window_instance = None
+
+
 # Modified to accept the specific CircularTimer class to use
 def setup_circular_timer(timer_widget_class: type[QWidget], force_new=False):
     """创建或显示独立的计时器窗口 (使用指定的计时器样式类)."""
     global _timer_window_instance
 
-    config = get_config() # Assumes get_config is available
+    config = get_config()  # Assumes get_config is available
     if not config.get("enabled", True):
         if _timer_window_instance:
             _timer_window_instance.close()
@@ -221,10 +147,10 @@ def setup_circular_timer(timer_widget_class: type[QWidget], force_new=False):
     # Check if the existing window was created with the *same* timer class
     # If the style changed, we need a new window.
     style_changed = False
-    if _timer_window_instance and hasattr(_timer_window_instance, 'timer_widget'):
+    if _timer_window_instance and hasattr(_timer_window_instance, "timer_widget"):
         if not isinstance(_timer_window_instance.timer_widget, timer_widget_class):
             style_changed = True
-            force_new = True # Force recreation if style is different
+            force_new = True  # Force recreation if style is different
 
     if _timer_window_instance and not force_new:
         _timer_window_instance._position_window()
@@ -233,17 +159,21 @@ def setup_circular_timer(timer_widget_class: type[QWidget], force_new=False):
         _timer_window_instance.activateWindow()
     else:
         if _timer_window_instance and (force_new or style_changed):
-             print(f"Closing existing timer window (force_new={force_new}, style_changed={style_changed})")
-             _timer_window_instance.close()
-             # Ensure instance is None before creating new one
-             # The on_closed signal might take a moment, set explicitly
-             _timer_window_instance = None
+            print(
+                f"Closing existing timer window (force_new={force_new}, style_changed={style_changed})"
+            )
+            _timer_window_instance.close()
+            # Ensure instance is None before creating new one
+            # The on_closed signal might take a moment, set explicitly
+            _timer_window_instance = None
 
-
-        print(f"Creating new TimerWindow with widget class: {timer_widget_class.__name__}")
-        parent_mw = mw if _anki_context else None
+        print(
+            f"Creating new TimerWindow with widget class: {timer_widget_class.__name__}"
+        )
         # Pass the specific timer widget class to TimerWindow
-        _timer_window_instance = TimerWindow(timer_widget_class=timer_widget_class, parent=parent_mw)
+        _timer_window_instance = TimerWindow(
+            timer_widget_class=timer_widget_class, parent=mw
+        )
         _timer_window_instance.show()
 
         # Define nested function for clarity (identical logic)
@@ -256,11 +186,11 @@ def setup_circular_timer(timer_widget_class: type[QWidget], force_new=False):
             print("Signal 'closed' received. Setting _timer_window_instance to None.")
             _timer_window_instance = None
 
-
         _timer_window_instance.closed.connect(on_closed)
 
     # Return the actual timer widget *inside* the window
     return _timer_window_instance.timer_widget if _timer_window_instance else None
+
 
 # --- Basic Standalone Runner Function (Helper) ---
 def run_standalone_test(timer_widget_class: type[QWidget]):
@@ -272,16 +202,18 @@ def run_standalone_test(timer_widget_class: type[QWidget]):
     # print(f"Standalone Test - Dark Mode: {is_dark_mode()}")
     # ----------------------------------------------------------
 
-    timer_widget = setup_circular_timer(timer_widget_class=timer_widget_class, force_new=True)
+    timer_widget = setup_circular_timer(
+        timer_widget_class=timer_widget_class, force_new=True
+    )
 
     if timer_widget:
         total_duration = 120
         current_time = total_duration
 
-        from PyQt6.QtCore import QTimer # Import QTimer locally for test
+        from PyQt6.QtCore import QTimer  # Import QTimer locally for test
 
         def update_timer_test():
-            nonlocal current_time, timer_widget # Use nonlocal
+            nonlocal current_time, timer_widget  # Use nonlocal
             # Check if the window (and thus the widget) still exists
             if _timer_window_instance and _timer_window_instance.isVisible():
                 current_time -= 1
@@ -292,16 +224,9 @@ def run_standalone_test(timer_widget_class: type[QWidget]):
                 timer_widget.set_progress(current_time, total_duration)
 
                 QTimer.singleShot(1000, update_timer_test)
-            else:
-                print("Timer window closed or not visible, stopping test updates.")
-                # Optionally exit the app when the window closes
-                # QApplication.instance().quit()
-
 
         # Start the test timer updates
         update_timer_test()
-        print(f"Standalone test running with {timer_widget_class.__name__}...")
         sys.exit(app.exec())
     else:
-        print("Timer widget could not be created (likely disabled in config).")
         sys.exit(1)

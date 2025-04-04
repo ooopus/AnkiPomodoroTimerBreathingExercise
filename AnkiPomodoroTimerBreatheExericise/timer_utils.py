@@ -1,5 +1,5 @@
 from typing import Optional
-from PyQt6.QtWidgets import QLabel
+from aqt import QLabel, QTimer
 
 
 class TimerState:
@@ -8,7 +8,7 @@ class TimerState:
         self._timer_label = None
 
     @property
-    def pomodoro_timer(self):
+    def pomodoro_timer(self) -> Optional[QTimer]:
         return self._pomodoro_timer
 
     @pomodoro_timer.setter

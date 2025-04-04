@@ -1,12 +1,11 @@
 import time
-from aqt import mw
-from PyQt6.QtCore import QTimer
-from PyQt6.QtWidgets import QWidget
+from aqt import mw, QTimer, QWidget
 from .timer_utils import set_pomodoro_timer, get_timer_label
 
 from .ui.circular_timer import setup_circular_timer
 
 from .translator import _
+
 
 class PomodoroTimer(QTimer):
     def __init__(self, parent=None):
@@ -98,7 +97,9 @@ class PomodoroTimer(QTimer):
                 parent = self.circular_timer.parent()
                 if parent and isinstance(parent, QWidget):
                     parent.close()
-                self.circular_timer.setParent(None)  # Need to remove parent-child relationship
+                self.circular_timer.setParent(
+                    None
+                )  # Need to remove parent-child relationship
                 self.circular_timer.deleteLater()
                 self.circular_timer = None
 

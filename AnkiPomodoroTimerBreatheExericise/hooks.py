@@ -1,7 +1,7 @@
-from aqt import mw
+from aqt import mw, QTimer, QDialog
 from aqt.utils import tooltip
-from PyQt6.QtCore import QTimer
-from PyQt6.QtWidgets import QDialog
+
+from .ui.circular_timer import setup_circular_timer
 
 # from flask.sansio.scaffold import F
 from .constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
@@ -65,10 +65,9 @@ def on_pomodoro_finished():
         long_break_mins = config.get("long_break_minutes", 15)
         tooltip(
             _("恭喜完成{target}个番茄钟！建议休息{minutes}分钟。").format(
-                target=target, 
-                minutes=long_break_mins
-            ), 
-            period=5000
+                target=target, minutes=long_break_mins
+            ),
+            period=5000,
         )
         config["completed_pomodoros"] = 0
     else:
@@ -78,6 +77,13 @@ def on_pomodoro_finished():
 
     # Ensure we are on the main thread before changing state or showing dialog
     mw.progress.timer(100, lambda: _after_pomodoro_finish_tasks(), False)
+
+
+def on_theme_change():
+    """Called when the theme changes."""
+    circular_timer = setup_circular_timer()
+    if circular_timer:
+        circular_timer.update_theme()
 
 
 def _after_pomodoro_finish_tasks():

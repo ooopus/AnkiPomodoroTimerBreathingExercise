@@ -2,87 +2,20 @@
 
 from PyQt6.QtWidgets import QWidget, QDialog, QApplication
 from PyQt6.QtCore import Qt, QRectF, QPointF, pyqtSignal
-from PyQt6.QtGui import (
-    QPainter, QColor, QPen, QLinearGradient, QRadialGradient, QBrush, QFont,
-    QPaintEvent, QResizeEvent, QPalette
+from aqt import (
+    mw,
+    theme,
+    QPainter,
+    QColor,
+    QPen,
+    QLinearGradient,
+    QRadialGradient,
+    QBrush,
+    QFont,
+    QPaintEvent,
+    QResizeEvent,
 )
-
-# --- Determine Environment and Setup Mocks ---
-
-_anki_context = False
-try:
-    from aqt import mw, theme
-    from ..config import get_config
-    _anki_context = True
-except ImportError:
-
-    # --- Mocks for Standalone Execution ---
-    class MockThemeManager:
-        # Simulate night mode state for testing
-        night_mode = False # Set to True to simulate night mode outside Anki
-
-    class MockTheme:
-        # Define theme_manager directly for Pyright
-        theme_manager = MockThemeManager()
-
-    class MockPm:
-        night_mode = MockThemeManager.night_mode # Keep consistent
-
-    class MockMw:
-        pm = MockPm()
-        # Add dummy 'app' attribute if TimerWindow checks for it
-        app = None # Or a mock QApplication if needed for deep checks
-
-    mw = MockMw()
-    theme = MockTheme() # Assign the mock theme module
-
-    def get_config():
-        return {"timer_position": "右上角", "enabled": True}
-
-
-# --- Single `is_dark_mode` Function ---
-def is_dark_mode() -> bool:
-    """Checks if dark mode is active, handling both Anki and standalone contexts."""
-    if _anki_context:
-        # Running in Anki
-        try:
-            if hasattr(theme, 'theme_manager') and isinstance(theme.theme_manager.night_mode, bool): # Anki 2.1.50+
-                return theme.theme_manager.night_mode
-            elif hasattr(mw, 'pm') and hasattr(mw.pm, 'night_mode') and isinstance(mw.pm.night_mode, bool): # Older versions
-                return mw.pm.night_mode
-        except Exception:
-             # Safety net in case of unexpected errors in Anki environment
-             pass # Fall through to palette check or default
-
-    else:
-        # Running standalone - use the mock setup
-        if (hasattr(theme, 'theme_manager') and 
-            hasattr(theme.theme_manager, 'night_mode') and 
-            isinstance(theme.theme_manager.night_mode, bool)):
-            return theme.theme_manager.night_mode
-        elif (hasattr(mw, 'pm') and 
-              hasattr(mw.pm, 'night_mode') and 
-              isinstance(mw.pm.night_mode, bool)):
-            return mw.pm.night_mode
-
-    # Fallback: Check palette background (less reliable but a last resort)
-    try:
-        app = QApplication.instance()
-        # Ensure app exists and has the palette method
-        if app and hasattr(app, 'palette'):
-            # Cast QCoreApplication to QApplication to access palette
-            if isinstance(app, QApplication):
-                palette = app.palette()
-            if hasattr(palette, 'color'):
-                window_color = palette.color(QPalette.ColorRole.Window)
-                if hasattr(window_color, 'value'):
-                    return window_color.value() < 128
-    except Exception:
-        # Handle cases where QApplication might not be fully initialized or palette fails
-        pass
-
-    # Default if all checks fail
-    return False
+from ..config import get_config
 
 # --- Constants (Unchanged) ---
 # Light Mode Colors
@@ -104,10 +37,10 @@ TEXT_COLOR_END_DARK = QColor(240, 240, 240)
 SHADOW_COLOR_DARK = QColor(0, 0, 0, 70)
 
 
-# --- Improved CircularTimer (Unchanged Internally, uses corrected is_dark_mode) ---
+# --- Improved CircularTimer ---
+
 
 class CircularTimer(QWidget):
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumSize(50, 50)
@@ -115,7 +48,7 @@ class CircularTimer(QWidget):
         self._remaining_time = "00:00"
 
         # --- Detect Theme and Select Colors ---
-        self._dark_mode = is_dark_mode() # Use the single, robust function
+        self._dark_mode = theme.theme_manager.night_mode
         self._load_colors()
 
         # --- Pre-create Painter Resources ---
@@ -127,7 +60,7 @@ class CircularTimer(QWidget):
 
         # Text pens - color comes from brush gradient
         self._text_pen = QPen()
-        self._shadow_pen = QPen(self._shadow_color) # Shadow color is fixed per theme
+        self._shadow_pen = QPen(self._shadow_color)  # Shadow color is fixed per theme
         self._shadow_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
 
         # Brushes (Gradients defined/updated later)
@@ -162,8 +95,8 @@ class CircularTimer(QWidget):
             self._shadow_color = SHADOW_COLOR_LIGHT
 
         # Update pen colors that are set directly
-        if hasattr(self, '_shadow_pen'): # Check if pen exists (during init)
-             self._shadow_pen.setColor(self._shadow_color)
+        if hasattr(self, "_shadow_pen"):  # Check if pen exists (during init)
+            self._shadow_pen.setColor(self._shadow_color)
 
     def set_progress(self, current_seconds, total_seconds):
         """Set the progress of the timer."""
@@ -176,7 +109,10 @@ class CircularTimer(QWidget):
         mins, secs = divmod(display_seconds, 60)
         new_time = f"{mins:02d}:{secs:02d}"
 
-        if self._progress != getattr(self, "_last_progress", -1) or self._remaining_time != new_time:
+        if (
+            self._progress != getattr(self, "_last_progress", -1)
+            or self._remaining_time != new_time
+        ):
             self._remaining_time = new_time
             self._last_progress = self._progress
             self.update()
@@ -199,6 +135,12 @@ class CircularTimer(QWidget):
 
         font_size = max(6, int(size * 0.18))
         self._text_font.setPointSize(font_size)
+
+    def update_theme(self):
+        """Update the theme of the timer. Always caused by Anki theme change."""
+        self._dark_mode = theme.theme_manager.get_night_mode()
+        self._load_colors()
+        self.update()
 
     def resizeEvent(self, event: QResizeEvent):
         """Handle widget resize."""
@@ -248,10 +190,16 @@ class CircularTimer(QWidget):
         painter.setFont(self._text_font)
 
         # 3a. Draw Shadow Text
-        shadow_rect = rect.adjusted(self._shadow_offset, self._shadow_offset,
-                                    self._shadow_offset, self._shadow_offset)
+        shadow_rect = rect.adjusted(
+            self._shadow_offset,
+            self._shadow_offset,
+            self._shadow_offset,
+            self._shadow_offset,
+        )
         painter.setPen(self._shadow_pen)
-        painter.drawText(shadow_rect, Qt.AlignmentFlag.AlignCenter, self._remaining_time)
+        painter.drawText(
+            shadow_rect, Qt.AlignmentFlag.AlignCenter, self._remaining_time
+        )
 
         # 3b. Draw Main Text with Gradient
         text_gradient = QLinearGradient(rect.topLeft(), rect.bottomLeft())
@@ -266,28 +214,31 @@ class CircularTimer(QWidget):
 
 # --- TimerWindow (Container Dialog - Fixes for Ruff E701) ---
 
+
 class TimerWindow(QDialog):
     closed = pyqtSignal()
 
-    def __init__(self, parent=None): # parent is usually mw
+    def __init__(self, parent=None):  # parent is usually mw
         super().__init__(parent)
 
         # Use _anki_context flag set earlier
-        use_frameless = True # Default to frameless
+        use_frameless = True  # Default to frameless
 
-        if _anki_context and use_frameless:
-             self.setWindowFlags(
-                 Qt.WindowType.Tool |
-                 Qt.WindowType.WindowStaysOnTopHint |
-                 Qt.WindowType.FramelessWindowHint
-             )
-             self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-             # Enable dragging for frameless
-             self._offset = QPointF() # Initialize for type checking
-        else: # Fallback or testing
-            self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint)
+        if use_frameless:
+            self.setWindowFlags(
+                Qt.WindowType.Tool
+                | Qt.WindowType.WindowStaysOnTopHint
+                | Qt.WindowType.FramelessWindowHint
+            )
+            self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+            # Enable dragging for frameless
+            self._offset = QPointF()  # Initialize for type checking
+        else:  # Fallback or testing
+            self.setWindowFlags(
+                Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint
+            )
             # Disable dragging if not frameless
-            self._offset = None # Explicitly set to None
+            self._offset = None  # Explicitly set to None
 
         self.setWindowTitle("番茄钟计时器")
         self.setMinimumSize(100, 100)
@@ -299,7 +250,7 @@ class TimerWindow(QDialog):
     def _position_window(self):
         screen = QApplication.primaryScreen()
         if not screen:
-            return # Ruff Fix: Added return for clarity
+            return  # Ruff Fix: Added return for clarity
         margin = 20
         screen_rect = screen.availableGeometry()
         config = get_config()
@@ -308,7 +259,7 @@ class TimerWindow(QDialog):
         x, y = margin, margin
         if position == "右上角":
             x = screen_rect.width() - window_width - margin
-            y = margin # Ruff Fix: Keep y assignment for clarity if needed elsewhere
+            y = margin  # Ruff Fix: Keep y assignment for clarity if needed elsewhere
         elif position == "左下角":
             # x = margin # x is already margin
             y = screen_rect.height() - window_height - margin
@@ -324,11 +275,13 @@ class TimerWindow(QDialog):
         # Ruff Fix: Use ternary operator for conciseness if preferred, or keep if/else
         # margin = 0 if (self.windowFlags() & Qt.WindowType.FramelessWindowHint) else 5
         if self.windowFlags() & Qt.WindowType.FramelessWindowHint:
-             margin = 0
+            margin = 0
         else:
-             margin = 5
+            margin = 5
 
-        widget_size = max(self.timer_widget.minimumSize().width(), widget_size - 2 * margin)
+        widget_size = max(
+            self.timer_widget.minimumSize().width(), widget_size - 2 * margin
+        )
         self.timer_widget.setFixedSize(widget_size, widget_size)
         widget_x = (dialog_w - widget_size) // 2
         widget_y = (dialog_h - widget_size) // 2
@@ -343,37 +296,39 @@ class TimerWindow(QDialog):
         # Check if dragging is enabled (_offset is not None) and it's the left button
         if self._offset is not None and event.button() == Qt.MouseButton.LeftButton:
             # Calculate the offset from the window's top-left corner
-            self._offset = event.globalPosition() - QPointF(self.pos())  # Convert pos() to QPointF
+            self._offset = event.globalPosition() - QPointF(
+                self.pos()
+            )  # Convert pos() to QPointF
             event.accept()
         else:
             # Ensure base class handler is called if not dragging
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-         # Check if dragging is active (_offset is not None) and left button is pressed
+        # Check if dragging is active (_offset is not None) and left button is pressed
         if self._offset is not None and event.buttons() & Qt.MouseButton.LeftButton:
             # Move the window based on the stored offset
             new_pos = event.globalPosition() - self._offset
             self.move(new_pos.toPoint())  # Convert QPointF back to QPoint for move
             event.accept()
         else:
-             # Pass event to base class if not dragging
-             super().mouseMoveEvent(event)
+            # Pass event to base class if not dragging
+            super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
         # Check if it was the left button being released while dragging was possible
         if self._offset is not None and event.button() == Qt.MouseButton.LeftButton:
-             # Reset offset when mouse is released (or mark dragging as finished)
-             # Keeping self._offset as a QPointF allows re-pressing without re-init
-             # If you want to signify "not currently dragging", you might reset differently,
-             # but the mousePressEvent logic handles re-init correctly.
-             # For clarity that *this specific drag* finished, we don't strictly need to reset _offset here
-             # unless _offset being non-None implies "currently dragging".
-             # Let's keep it simple: offset stores the drag start diff.
+            # Reset offset when mouse is released (or mark dragging as finished)
+            # Keeping self._offset as a QPointF allows re-pressing without re-init
+            # If you want to signify "not currently dragging", you might reset differently,
+            # but the mousePressEvent logic handles re-init correctly.
+            # For clarity that *this specific drag* finished, we don't strictly need to reset _offset here
+            # unless _offset being non-None implies "currently dragging".
+            # Let's keep it simple: offset stores the drag start diff.
             event.accept()
         else:
-             # Pass event to base class
-             super().mouseReleaseEvent(event)
+            # Pass event to base class
+            super().mouseReleaseEvent(event)
 
     # --- Close Event (Unchanged) ---
     def closeEvent(self, event):
@@ -381,8 +336,10 @@ class TimerWindow(QDialog):
         super().closeEvent(event)
 
 
-# --- Setup Function (Fixes for Ruff E701) ---
+# --- Setup Function ---
 _timer_window_instance = None
+
+
 def setup_circular_timer(force_new=False):
     """创建或显示独立的计时器窗口"""
     global _timer_window_instance
@@ -392,10 +349,10 @@ def setup_circular_timer(force_new=False):
         if _timer_window_instance:
             _timer_window_instance.close()
             _timer_window_instance = None
-        return None # Explicitly return None if disabled
+        return None  # Explicitly return None if disabled
 
     if _timer_window_instance and not force_new:
-        _timer_window_instance._position_window() # Reposition based on current config
+        _timer_window_instance._position_window()  # Reposition based on current config
         _timer_window_instance.show()
         _timer_window_instance.raise_()
         _timer_window_instance.activateWindow()
@@ -405,9 +362,7 @@ def setup_circular_timer(force_new=False):
             # _timer_window_instance should become None via on_closed or set here
             _timer_window_instance = None
 
-        # Pass mw as parent if in Anki context
-        parent_mw = mw if _anki_context else None
-        _timer_window_instance = TimerWindow(parent_mw)
+        _timer_window_instance = TimerWindow(mw)
         _timer_window_instance.show()
 
         # Define nested function for clarity

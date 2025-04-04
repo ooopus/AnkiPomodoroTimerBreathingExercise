@@ -40,7 +40,7 @@ DEFAULT_STATUSBAR_FORMAT = "ICON_TIME_PROGRESS_WITH_TOTAL_TIME"  # 默认状态�
 # 状态栏显示相关常量
 STATUSBAR_FILLED_TOMATO = "🍅"  # 已完成的番茄
 STATUSBAR_EMPTY_TOMATO = "⭕"  # 未完成的番茄
-STATUSBAR_BREAK_WARNING = _("⚠️距离连胜重置还有：" ) # 中断警告
+STATUSBAR_BREAK_WARNING = _("⚠️距离连胜重置还有：")  # 中断警告
 STATUSBAR_DEFAULT_TEXT = f"{STATUSBAR_FILLED_TOMATO} --:--"
 STATUSBAR_FORMAT = "{icon} {mins:02d}:{secs:02d} {progress}"  # 番茄状态显示格式
 
@@ -54,11 +54,18 @@ class STATUSBAR_FORMATS:
     ICON_COUNTDOWN_PROGRESS = (
         "{icon} {mins:02d}:{secs:02d} {progress}"  # 图标+时间+进度
     )
-    ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME = "{icon} {mins:02d}:{secs:02d} {progress} " + _("累计使用：") + "{daily_mins:02d}:{daily_secs:02d}"  # 全部信息
+    ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME = (
+        "{icon} {mins:02d}:{secs:02d} {progress} "
+        + _("累计使用：")
+        + "{daily_mins:02d}:{daily_secs:02d}"
+    )  # 全部信息
+
 
 # 状态栏显示格式选项的显示名称
 STATUSBAR_FORMAT_NAMES = {
-    "NONE": _("不显示",),
+    "NONE": _(
+        "不显示",
+    ),
     "ICON": _("仅显示图标"),
     "COUNTDOWN": _("仅显示倒计时"),
     "PROGRESS": _("仅显示进度"),
