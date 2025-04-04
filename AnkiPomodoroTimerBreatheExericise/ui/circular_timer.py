@@ -14,9 +14,7 @@ try:
     from aqt import mw, theme
     from ..config import get_config
     _anki_context = True
-    print("Running in Anki context.")
 except ImportError:
-    print("Running outside Anki or config not found. Using mock objects.")
 
     # --- Mocks for Standalone Execution ---
     class MockThemeManager:

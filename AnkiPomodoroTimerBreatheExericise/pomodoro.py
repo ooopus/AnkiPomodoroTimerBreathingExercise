@@ -6,11 +6,7 @@ from .timer_utils import set_pomodoro_timer, get_timer_label
 
 from .ui.circular_timer import setup_circular_timer
 
-import gettext
-import os
-localedir = os.path.join(os.path.dirname(__file__), './locales')
-translation = gettext.translation('messages', localedir, fallback=True)
-_ = translation.gettext
+from .translator import _
 
 class PomodoroTimer(QTimer):
     def __init__(self, parent=None):

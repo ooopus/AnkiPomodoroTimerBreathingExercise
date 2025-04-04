@@ -1,8 +1,4 @@
-import gettext
-import os
-localedir = os.path.join(os.path.dirname(__file__), './locales')
-translation = gettext.translation('messages', localedir, fallback=True)
-_ = translation.gettext
+from .translator import _
 
 # 呼吸阶段定义
 

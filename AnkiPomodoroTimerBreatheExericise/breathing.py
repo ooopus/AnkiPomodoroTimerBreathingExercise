@@ -16,11 +16,7 @@ from aqt.utils import tooltip
 from .constants import PHASES
 from .config import get_config  # Changed from direct config import
 
-import gettext
-import os
-localedir = os.path.join(os.path.dirname(__file__), './locales')
-translation = gettext.translation('messages', localedir, fallback=True)
-_ = translation.gettext
+from .translator import _
 
 # --- Breathing Animation Widget ---
 class BreathingAnimationWidget(QWidget):

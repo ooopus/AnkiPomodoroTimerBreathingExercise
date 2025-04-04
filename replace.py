@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # _(\2\3\2)          : 将捕获的引号和内容包裹在 _() 中
 # \4                 : 第四个捕获组 (逗号和后面的参数，如果存在)
 # )                  : 添加结束括号
-PATTERN = re.compile(r'(tooltip|QLabel|QAction)\(\s*(["\'])((?:(?!\2).)*)\2(\s*,\s*.*?)?\s*\)')
+PATTERN = re.compile(r'(tooltip|QLabel|QAction|QGroupBox)\(\s*(["\'])((?:(?!\2).)*)\2(\s*,\s*.*?)?\s*\)')
 REPLACEMENT = r'\1(_(\2\3\2)\4)'
 
 # 另一种写法，可能更清晰地分离参数捕获

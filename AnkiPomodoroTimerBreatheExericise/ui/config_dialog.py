@@ -13,11 +13,7 @@ from ..constants import STATUSBAR_FORMAT_NAMES, DEFAULT_STATUSBAR_FORMAT
 from ..timer_utils import get_pomodoro_timer
 from .config_components import GeneralSettings, BreathingSettings
 
-import gettext
-import os
-localedir = os.path.join(os.path.dirname(__file__), '../locales')
-translation = gettext.translation('messages', localedir, fallback=True)
-_ = translation.gettext
+from ..translator import _
 
 class ConfigDialog(QDialog):
     """Configuration dialog for Pomodoro and Breathing settings."""
@@ -39,7 +35,7 @@ class ConfigDialog(QDialog):
         self._main_layout.addWidget(self.general_settings.create_ui(self))
 
         # Add status bar format selection
-        self.statusbar_format_group = QGroupBox("状态栏显示设置")
+        self.statusbar_format_group = QGroupBox(_("状态栏显示设置"))
         self.statusbar_format_layout = QVBoxLayout()
 
         self.statusbar_format_combo = QComboBox()

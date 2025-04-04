@@ -27,7 +27,7 @@ def setup_plugin():
     gui_hooks.state_did_change.append(on_state_did_change)
 
     # Add menu item
-    action = QAction("番茄钟 & 呼吸设置...", mw)  # "Pomodoro & Breathing Settings..."
+    action = QAction(_("番茄钟 & 呼吸设置..."), mw)  # "Pomodoro & Breathing Settings..."
     action.triggered.connect(show_config_dialog)
     if hasattr(mw, "form") and hasattr(mw.form, "menuTools"):
         mw.form.menuTools.addAction(action)

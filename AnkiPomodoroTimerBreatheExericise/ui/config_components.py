@@ -10,11 +10,7 @@ from PyQt6.QtWidgets import (
 )
 from ..constants import PHASES, DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES
 
-import gettext
-import os
-localedir = os.path.join(os.path.dirname(__file__), '../locales')
-translation = gettext.translation('messages', localedir, fallback=True)
-_ = translation.gettext
+from ..translator import _
 
 class GeneralSettings:
     """Handles UI components and logic for general settings"""
@@ -25,7 +21,7 @@ class GeneralSettings:
 
     def create_ui(self, parent):
         """Creates UI components for general settings section"""
-        group = QGroupBox("常规设置")
+        group = QGroupBox(_("常规设置"))
         layout = QVBoxLayout()
 
         # Enable plugin checkbox
@@ -80,7 +76,7 @@ class GeneralSettings:
 
         # Max break duration
         max_break_layout = QHBoxLayout()
-        max_break_label = QLabel(_("最大间隔时间:"), parent)
+        max_break_label = QLabel(_("休息时间上限:"), parent)
         self.widgets["max_break"] = QSpinBox(parent)
         self.widgets["max_break"].setMinimum(1)
         self.widgets["max_break"].setMaximum(120)
@@ -92,20 +88,21 @@ class GeneralSettings:
         max_break_layout.addWidget(self.widgets["max_break"])
         max_break_layout.addWidget(max_break_label_unit)
 
+        # Add hint labels
+        streak_hint = QLabel(_("连续完成指定数量的番茄钟后，将进行长休息"), parent)
+        streak_hint.setStyleSheet("font-style: italic; color: grey;")
+
+
+        max_break_hint = QLabel(_("超过休息时间上限后，累计的番茄钟将归零"), parent)
+        max_break_hint.setStyleSheet("font-style: italic; color: grey;")
+
         # Add all layouts
         layout.addLayout(display_layout)
         layout.addLayout(position_layout)
         layout.addLayout(streak_layout)
+        layout.addWidget(streak_hint)
         layout.addLayout(pomo_layout)
         layout.addLayout(max_break_layout)
-
-        # Add hint labels
-        streak_hint = QLabel(_("连续完成指定数量的番茄钟后，将进行长休息"), parent)
-        streak_hint.setStyleSheet("font-style: italic; color: grey;")
-        layout.addWidget(streak_hint)
-
-        max_break_hint = QLabel(_("超过此时间后，累计的番茄钟将归零"), parent)
-        max_break_hint.setStyleSheet("font-style: italic; color: grey;")
         layout.addWidget(max_break_hint)
 
         group.setLayout(layout)
@@ -133,7 +130,7 @@ class BreathingSettings:
 
     def create_ui(self, parent):
         """Creates UI components for breathing exercises section"""
-        group = QGroupBox("呼吸训练设置")
+        group = QGroupBox(_("呼吸训练设置"))
         layout = QVBoxLayout()
 
         # Breathing cycles count
