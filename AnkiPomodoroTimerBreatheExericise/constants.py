@@ -56,7 +56,7 @@ class STATUSBAR_FORMATS:
     )
     ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME = (
         "{icon} {mins:02d}:{secs:02d} {progress} "
-        + _("累计使用：")
+        + _("今日累计使用：")
         + "{daily_mins:02d}:{daily_secs:02d}"
     )  # 全部信息
 
