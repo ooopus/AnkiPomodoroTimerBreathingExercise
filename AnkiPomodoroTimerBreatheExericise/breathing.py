@@ -14,10 +14,8 @@ from aqt import (
     QColor,
 )
 import time
-from aqt.utils import tooltip
 from .constants import PHASES
-from .config import get_config  # Changed from direct config import
-
+from .state import get_app_state
 from .translator import _
 
 
@@ -140,18 +138,22 @@ class BreathingDialog(QDialog):
         self.setModal(True)
         self.target_cycles = max(1, target_cycles)  # Ensure at least one cycle
         self.completed_cycles = 0
-        # Timer used via singleShot to trigger phase changes
-        self._phase_advance_timer = QTimer(self)
-        self._pending_single_shot = None  # Keep track if needed
+        self._phase_timer = QTimer(self)
+        self._phase_timer.setSingleShot(True) # 仍然是单次触发，但拥有实例
+        self._phase_timer.timeout.connect(self._advance_to_next_phase)
+
+        # Use AppState
+        app_state = get_app_state()
+        config = app_state.config
 
         # --- Dynamically build active phases from config ---
         self.active_phases = []
         for phase_def in PHASES:
             key = phase_def["key"]
-            is_enabled = get_config().get(
+            is_enabled = config.get(
                 f"{key}_enabled", phase_def["default_enabled"]
             )
-            duration = get_config().get(
+            duration = config.get(
                 f"{key}_duration", phase_def["default_duration"]
             )
             if is_enabled:
@@ -164,14 +166,10 @@ class BreathingDialog(QDialog):
                 )
 
         if not self.active_phases:
-            # This case should be prevented by the check in show_breathing_dialog
-            # Schedule closing after the constructor finishes
             QTimer.singleShot(0, self.reject)
             return
 
-        self.current_phase_index = (
-            -1
-        )  # Start at -1 so first call to update sets index 0
+        self.current_phase_index = -1
 
         # --- UI Elements ---
         layout = QVBoxLayout()
@@ -184,7 +182,6 @@ class BreathingDialog(QDialog):
             "font-size: 20px; font-weight: bold; margin-top: 10px;"
         )
 
-        # Cycle Counter Label
         self.cycle_label = QLabel(
             _("循环: {current} / {total}").format(
                 current=self.completed_cycles + 1, total=self.target_cycles
@@ -194,25 +191,23 @@ class BreathingDialog(QDialog):
         self.cycle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.cycle_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")
 
-        self.skip_button = QPushButton("Skip Exercise", self)  # Changed label slightly
+        self.skip_button = QPushButton(_("跳过训练"), self)
 
         layout.addWidget(self.instruction_label)
         layout.addWidget(self.cycle_label)
         layout.addWidget(self.skip_button)
         self.setLayout(layout)
 
-        # Resize dialog to be reasonable
         self.resize(300, 350)
 
         # --- Connections ---
-        self.skip_button.clicked.connect(self.reject)  # Skip closes the dialog
+        self.skip_button.clicked.connect(self.reject)
 
         # --- Start the process ---
-        self._advance_to_next_phase()  # Start the first phase
+        self._advance_to_next_phase()
 
     def _advance_to_next_phase(self):
         """Handles logic for moving to the next phase or completing the exercise."""
-        self._pending_single_shot = None  # Clear flag
 
         # Determine next phase index and if a cycle was just completed
         next_phase_index = (self.current_phase_index + 1) % len(self.active_phases)
@@ -232,10 +227,9 @@ class BreathingDialog(QDialog):
 
             # Check if target cycles are reached
             if self.completed_cycles >= self.target_cycles:
-                self.accept()  # Finish successfully
-                return  # Stop processing
+                self.accept()
+                return
 
-        # Set the index for the *upcoming* phase
         self.current_phase_index = next_phase_index
         current_phase_data = self.active_phases[self.current_phase_index]
         duration = current_phase_data["duration"]
@@ -245,40 +239,22 @@ class BreathingDialog(QDialog):
         # Update UI for the current phase
         self.instruction_label.setText(f"{label} ({duration}s)")
         self.animation_widget.set_phase(anim_phase_key, duration)
-        # Ensure cycle label reflects the *current* cycle number
         self.cycle_label.setText(
             _("循环: {current} / {total}").format(
                 current=self.completed_cycles + 1, total=self.target_cycles
             )
         )
 
-        # Schedule the next call to _advance_to_next_phase after the current phase duration
         if duration > 0:
-            # Use singleShot to call this method again after the delay
-            self._pending_single_shot = QTimer.singleShot(
-                duration * 1000, self._advance_to_next_phase
-            )
-            if self._pending_single_shot is not None:
-                try:
-                    self._pending_single_shot.stop()  # Try to stop single shot timer
-                except AttributeError:
-                    tooltip(_("Failed to stop single shot timer"))
+            self._phase_timer.start(duration * 1000)
         else:
             # If duration is 0, advance immediately (with a tiny delay for event loop)
-            self._pending_single_shot = QTimer.singleShot(
-                10, self._advance_to_next_phase
-            )
+            self._phase_timer.start(10)
 
     def stop_all_timers(self):
-        """Stops the animation and any pending phase advancement."""
+        """Stops the animation and phase advancement timer."""
         self.animation_widget.stop_animation()
-        # Attempt to cancel the pending singleShot if it exists and hasn't fired
-        # QTimer.singleShot returns None, so we can't easily cancel it.
-        # Stopping the underlying timer might work if the singleShot hasn't triggered yet.
-        self._phase_advance_timer.stop()  # Stop the timer used for singleShot
-        # It's usually sufficient that the dialog closing prevents further execution.
 
-    # Override closing methods to ensure timers are stopped
     def closeEvent(self, event):
         """Called when the dialog is closed (e.g., by window manager)."""
         self.stop_all_timers()

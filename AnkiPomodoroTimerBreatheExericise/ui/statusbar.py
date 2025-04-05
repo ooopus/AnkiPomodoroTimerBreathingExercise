@@ -2,14 +2,15 @@ from aqt import mw, QLabel
 from typing import Union
 
 from aqt.utils import tooltip
-from ..config import get_config
-from ..timer_utils import get_timer_label, set_timer_label
+from ..state import get_app_state
 from ..constants import STATUSBAR_DEFAULT_TEXT
 
 
 def remove_widget():
     """Removes the timer widget from status bar"""
-    label = get_timer_label()
+    # Use AppState to get label
+    app_state = get_app_state()
+    label = app_state.timer_label
     if label:
         try:
             status_bar = mw.statusBar()
@@ -17,7 +18,8 @@ def remove_widget():
                 status_bar.removeWidget(label)
                 label.setParent(None)
                 label.deleteLater()
-                set_timer_label(None)
+                # Use AppState to set label
+                app_state.timer_label = None 
                 import gc
 
                 label.destroyed.connect(lambda: gc.collect())
@@ -27,9 +29,10 @@ def remove_widget():
 
 def show_timer_in_statusbar(show: Union[bool, None]) -> None:
     """Adds or removes the timer label from the Anki status bar."""
-    config = get_config()
-    # timer = get_pomodoro_timer()
-    label = get_timer_label()
+    # Use AppState
+    app_state = get_app_state()
+    config = app_state.config 
+    label = app_state.timer_label
 
     if show is None:
         show = False
@@ -53,7 +56,8 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
                 if status_bar is not None:
                     status_bar.addPermanentWidget(new_label, 0)
                     new_label.show()
-                    set_timer_label(new_label)
+                    # Use AppState to set label
+                    app_state.timer_label = new_label
             except Exception as e:
                 tooltip(f"Error adding timer widget: {e}")
 

@@ -8,9 +8,8 @@ from aqt import (
     QComboBox,
 )
 from aqt.utils import tooltip
-from ..config import save_config, get_config
+from ..state import save_config, get_config, get_pomodoro_timer
 from ..constants import STATUSBAR_FORMAT_NAMES, DEFAULT_STATUSBAR_FORMAT
-from ..timer_utils import get_pomodoro_timer
 from .config_components import GeneralSettings, BreathingSettings
 from ..translator import _
 

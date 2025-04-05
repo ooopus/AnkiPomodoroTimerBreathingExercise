@@ -2,7 +2,7 @@
 
 from aqt import mw, gui_hooks, QAction
 
-from .timer_utils import get_pomodoro_timer
+from .state import get_pomodoro_timer
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
 from .ui import ConfigDialog
 from .translator import _

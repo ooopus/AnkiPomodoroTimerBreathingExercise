@@ -1,13 +1,12 @@
 from aqt import mw, QTimer, QDialog
 from aqt.utils import tooltip
 
-from .ui.circular_timer import setup_circular_timer
+from .ui.circular_timer import _timer_window_instance
 
 # from flask.sansio.scaffold import F
 from .constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
 from .breathing import BreathingDialog
-from .config import get_config, save_config
-from .timer_utils import get_pomodoro_timer
+from .state import get_config, save_config, get_pomodoro_timer
 from .pomodoro import PomodoroTimer
 
 from .translator import _
@@ -81,10 +80,8 @@ def on_pomodoro_finished():
 
 def on_theme_change():
     """Called when the theme changes."""
-    circular_timer = setup_circular_timer()
-    if circular_timer:
-        circular_timer.update_theme()
-
+    if _timer_window_instance and _timer_window_instance.timer_widget:
+        _timer_window_instance.timer_widget.update_theme()
 
 def _after_pomodoro_finish_tasks():
     """Actions to perform after the Pomodoro finishes (runs on main thread)."""

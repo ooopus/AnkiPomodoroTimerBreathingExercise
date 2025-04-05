@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QWidget, QDialog, QApplication
 from PyQt6.QtCore import Qt, QPointF, pyqtSignal
 from PyQt6.QtGui import QColor, QResizeEvent
 from aqt import mw
-from ...config import get_config
+from ...state import get_app_state
 import sys  # Needed for standalone app
 
 # --- Constants (Common) ---
@@ -67,7 +67,9 @@ class TimerWindow(QDialog):
             return
         margin = 20
         screen_rect = screen.availableGeometry()
-        config = get_config()  # Assumes get_config is available
+        # Use AppState
+        app_state = get_app_state()
+        config = app_state.config
         position = config.get("timer_position", "右上角")
         window_width, window_height = self.width(), self.height()
         x, y = margin, margin
@@ -137,7 +139,9 @@ def setup_circular_timer(timer_widget_class: type[QWidget], force_new=False):
     """创建或显示独立的计时器窗口 (使用指定的计时器样式类)."""
     global _timer_window_instance
 
-    config = get_config()  # Assumes get_config is available
+    # Use AppState
+    app_state = get_app_state()
+    config = app_state.config
     if not config.get("enabled", True):
         if _timer_window_instance:
             _timer_window_instance.close()
