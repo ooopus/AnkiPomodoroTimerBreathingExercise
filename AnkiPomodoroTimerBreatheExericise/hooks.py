@@ -1,15 +1,13 @@
-from aqt import mw, QTimer, QDialog
+from aqt import QDialog, QTimer, mw
 from aqt.utils import tooltip
 
-from .ui.circular_timer import _timer_window_instance
-
-# from flask.sansio.scaffold import F
-from .constants import PHASES, DEFAULT_POMODORO_MINUTES, DEFAULT_BREATHING_CYCLES
 from .breathing import BreathingDialog
-from .state import get_config, save_config, get_pomodoro_timer
-from .pomodoro import PomodoroTimer
 
+from .constants import DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES, PHASES
+from .pomodoro import PomodoroTimer
+from .state import get_config, get_pomodoro_timer, save_config
 from .translator import _
+from .ui.circular_timer import _timer_window_instance
 
 # --- Anki 钩子函数 ---
 

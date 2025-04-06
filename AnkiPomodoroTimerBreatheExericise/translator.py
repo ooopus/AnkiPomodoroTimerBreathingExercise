@@ -1,5 +1,6 @@
 import gettext
 import os
+
 from aqt import QLocale
 
 # from aqt.utils import tooltip

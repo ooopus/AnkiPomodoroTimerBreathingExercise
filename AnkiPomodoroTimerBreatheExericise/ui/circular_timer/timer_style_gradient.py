@@ -1,38 +1,38 @@
 # -*- coding: utf-8 -*-
 
 from aqt import (
-    theme,
-    QWidget,
-    Qt,
-    QRectF,
-    QPointF,
-    QPainter,
-    QPen,
-    QLinearGradient,
-    QRadialGradient,
     QBrush,
     QFont,
+    QLinearGradient,
+    QPainter,
     QPaintEvent,
+    QPen,
+    QPointF,
+    QRadialGradient,
+    QRectF,
     QResizeEvent,
+    Qt,
+    QWidget,
+    theme,
 )
 
 # Import common elements NEEDED by this style
 from .timer_common import (
+    BG_COLOR_END_DARK,
+    BG_COLOR_END_LIGHT,
+    BG_COLOR_START_DARK,
     # Import specific colors used by this style
     BG_COLOR_START_LIGHT,
-    BG_COLOR_END_LIGHT,
-    PROGRESS_COLOR_START_LIGHT,
-    PROGRESS_COLOR_END_LIGHT,
-    TEXT_COLOR_START_LIGHT,
-    TEXT_COLOR_END_LIGHT,  # Gradient text colors
-    SHADOW_COLOR_LIGHT,
-    BG_COLOR_START_DARK,
-    BG_COLOR_END_DARK,
-    PROGRESS_COLOR_START_DARK,
     PROGRESS_COLOR_END_DARK,
-    TEXT_COLOR_START_DARK,
-    TEXT_COLOR_END_DARK,  # Gradient text colors
+    PROGRESS_COLOR_END_LIGHT,
+    PROGRESS_COLOR_START_DARK,
+    PROGRESS_COLOR_START_LIGHT,
     SHADOW_COLOR_DARK,
+    SHADOW_COLOR_LIGHT,
+    TEXT_COLOR_END_DARK,  # Gradient text colors
+    TEXT_COLOR_END_LIGHT,  # Gradient text colors
+    TEXT_COLOR_START_DARK,
+    TEXT_COLOR_START_LIGHT,
 )
 
 

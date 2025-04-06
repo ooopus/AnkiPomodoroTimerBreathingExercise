@@ -1,11 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from PyQt6.QtWidgets import QWidget, QDialog, QApplication
-from PyQt6.QtCore import Qt, QPointF, pyqtSignal
-from PyQt6.QtGui import QColor, QResizeEvent
-from aqt import mw
-from ...state import get_app_state
 import sys  # Needed for standalone app
+
+from aqt import (
+    QApplication,
+    QColor,
+    QDialog,
+    QPointF,
+    QResizeEvent,
+    Qt,
+    QWidget,
+    mw,
+    pyqtSignal,
+)
+
+from ...state import get_app_state
 
 # --- Constants (Common) ---
 # Define all potential colors here

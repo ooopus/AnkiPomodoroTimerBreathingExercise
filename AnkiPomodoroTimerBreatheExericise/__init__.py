@@ -1,11 +1,11 @@
 # __init__.py (插件主文件 - PyQt6 & Cycle-based Breathing)
 
-from aqt import mw, gui_hooks, QAction
+from aqt import QAction, gui_hooks, mw
 
-from .state import get_pomodoro_timer
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
-from .ui import ConfigDialog
+from .state import get_pomodoro_timer
 from .translator import _
+from .ui import ConfigDialog
 
 
 def show_config_dialog():

@@ -1,20 +1,24 @@
-# -*- coding: utf-8 -*-
-
-from PyQt6.QtWidgets import QWidget, QDialog, QApplication
-from PyQt6.QtCore import Qt, QRectF, QPointF, pyqtSignal
 from aqt import (
-    mw,
-    theme,
-    QPainter,
-    QColor,
-    QPen,
-    QLinearGradient,
-    QRadialGradient,
+    QApplication,
     QBrush,
+    QColor,
+    QDialog,
     QFont,
+    QLinearGradient,
+    QPainter,
     QPaintEvent,
+    QPen,
+    QPointF,
+    QRadialGradient,
+    QRectF,
     QResizeEvent,
+    Qt,
+    QWidget,
+    mw,
+    pyqtSignal,
+    theme,
 )
+
 from ..state import get_app_state
 
 # --- Constants (Unchanged) ---
@@ -212,7 +216,7 @@ class CircularTimer(QWidget):
         painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, self._remaining_time)
 
 
-# --- TimerWindow (Container Dialog - Fixes for Ruff E701) ---
+# --- TimerWindow (Container Dialog) ---
 
 
 class TimerWindow(QDialog):
@@ -221,7 +225,6 @@ class TimerWindow(QDialog):
     def __init__(self, parent=None):  # parent is usually mw
         super().__init__(parent)
 
-        # Use _anki_context flag set earlier
         use_frameless = True  # Default to frameless
 
         if use_frameless:
@@ -250,7 +253,7 @@ class TimerWindow(QDialog):
     def _position_window(self):
         screen = QApplication.primaryScreen()
         if not screen:
-            return  # Ruff Fix: Added return for clarity
+            return
         margin = 20
         screen_rect = screen.availableGeometry()
         config = get_app_state().config
@@ -259,14 +262,11 @@ class TimerWindow(QDialog):
         x, y = margin, margin
         if position == "右上角":
             x = screen_rect.width() - window_width - margin
-            y = margin  # Ruff Fix: Keep y assignment for clarity if needed elsewhere
         elif position == "左下角":
-            # x = margin # x is already margin
             y = screen_rect.height() - window_height - margin
         elif position == "右下角":
             x = screen_rect.width() - window_width - margin
             y = screen_rect.height() - window_height - margin
-        # Implicit 'else' covers "左上角" (x=margin, y=margin)
         self.move(x, y)
 
     def _center_timer_widget(self):
@@ -346,32 +346,48 @@ def setup_circular_timer(force_new=False):
 
     config = get_app_state().config
     if not config.get("enabled", True):
-        if _timer_window_instance:
-            _timer_window_instance.close()
-            _timer_window_instance = None
-        return None  # Explicitly return None if disabled
+        _cleanup_timer_window()
+        return None
 
     if _timer_window_instance and not force_new:
-        _timer_window_instance._position_window()  # Reposition based on current config
-        _timer_window_instance.show()
-        _timer_window_instance.raise_()
-        _timer_window_instance.activateWindow()
+        _update_existing_window()
     else:
-        if _timer_window_instance and force_new:
-            _timer_window_instance.close()
-            # _timer_window_instance should become None via on_closed or set here
-            _timer_window_instance = None
+        _create_new_window(force_new)
 
-        _timer_window_instance = TimerWindow(mw)
-        _timer_window_instance.show()
+    return _timer_window_instance.timer_widget if _timer_window_instance else None
 
-        # Define nested function for clarity
-        def on_closed():
-            global _timer_window_instance
-            _timer_window_instance = None
-            # print("Timer window closed.") # Debugging
 
-        _timer_window_instance.closed.connect(on_closed)
+def _cleanup_timer_window():
+    """清理计时器窗口实例"""
+    global _timer_window_instance
+    if _timer_window_instance:
+        _timer_window_instance.close()
+        _timer_window_instance = None
+
+
+def _update_existing_window():
+    """更新现有窗口的位置和状态"""
+    _timer_window_instance._position_window()
+    _timer_window_instance.show()
+    _timer_window_instance.raise_()
+    _timer_window_instance.activateWindow()
+
+
+def _create_new_window(force_new):
+    """创建新的计时器窗口"""
+    global _timer_window_instance
+
+    if _timer_window_instance and force_new:
+        _cleanup_timer_window()
+
+    _timer_window_instance = TimerWindow(mw)
+    _timer_window_instance.show()
+
+    def on_closed():
+        global _timer_window_instance
+        _timer_window_instance = None
+
+    _timer_window_instance.closed.connect(on_closed)
 
     # Ensure we return the widget even if reusing the window
     return _timer_window_instance.timer_widget

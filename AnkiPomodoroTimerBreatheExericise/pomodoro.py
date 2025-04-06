@@ -1,17 +1,18 @@
 import time
-from aqt import mw, QTimer, QWidget
-from .state import get_app_state
 
-from .ui.circular_timer import setup_circular_timer
-from .ui import show_timer_in_statusbar  # Import show_timer_in_statusbar directly
+from aqt import QTimer, QWidget, mw
+from aqt.utils import tooltip
+
 from .constants import (
-    STATUSBAR_FILLED_TOMATO,
-    STATUSBAR_EMPTY_TOMATO,
     STATUSBAR_BREAK_WARNING,
+    STATUSBAR_EMPTY_TOMATO,
+    STATUSBAR_FILLED_TOMATO,
     STATUSBAR_FORMATS,
 )
-
+from .state import get_app_state
 from .translator import _
+from .ui import show_timer_in_statusbar
+from .ui.circular_timer import setup_circular_timer
 
 
 class PomodoroTimer(QTimer):
@@ -34,13 +35,9 @@ class PomodoroTimer(QTimer):
         config = app_state.config  # Use local var for config in this scope
 
         if not config.get("enabled", True):
-            from aqt.utils import tooltip
-
             tooltip(_("番茄钟计时器已被禁用。"), period=3000)
             return
         if minutes <= 0:
-            from aqt.utils import tooltip
-
             tooltip(f"无效的番茄钟时长: {minutes} 分钟。计时器未启动。", period=3000)
             return
 
@@ -54,7 +51,6 @@ class PomodoroTimer(QTimer):
             and (current_time - last_pomodoro_time) > max_break_duration
         ):
             app_state.update_config_value("completed_pomodoros", 0)
-            from aqt.utils import tooltip
 
             tooltip(_("检测到长时间空闲，连胜中断。"), period=3000)
 
@@ -76,7 +72,6 @@ class PomodoroTimer(QTimer):
 
         self.total_seconds = minutes * 60
         self.remaining_seconds = self.total_seconds
-        from aqt.utils import tooltip
 
         tooltip(_("番茄钟计时器已启动，时长: {} 分钟。").format(minutes), period=3000)
         self.update_display()
@@ -86,8 +81,6 @@ class PomodoroTimer(QTimer):
     def stop_timer(self, stop_break_timer=False):
         """Stops the Pomodoro timer and resets the display."""
         if self.isActive():
-            from aqt.utils import tooltip
-
             tooltip(_("番茄钟计时器已停止。"), period=3000)
             self.stop()
 
@@ -121,7 +114,6 @@ class PomodoroTimer(QTimer):
         """停止休息时间计时器"""
         if self.break_timer.isActive():
             app_state = get_app_state()  # Get state to update completion
-            from aqt.utils import tooltip
 
             tooltip(_("连胜中断"), period=3000)
             self.break_timer.stop()
@@ -150,7 +142,6 @@ class PomodoroTimer(QTimer):
 
         else:
             from .hooks import on_pomodoro_finished
-            from aqt.utils import tooltip
 
             tooltip(_("本次番茄钟结束"), period=3000)
             self.stop()

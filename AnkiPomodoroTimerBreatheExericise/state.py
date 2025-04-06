@@ -1,19 +1,19 @@
 import json
 import os
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
-from aqt import QTimer, QLabel
+from aqt import QLabel, QTimer
 from aqt.utils import tooltip
 
 from .constants import (
-    PHASES,
-    DEFAULT_POMODORO_MINUTES,
     DEFAULT_BREATHING_CYCLES,
-    DEFAULT_SHOW_CIRCULAR_TIMER,
-    DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
     DEFAULT_LONG_BREAK_MINUTES,
     DEFAULT_MAX_BREAK_DURATION,
+    DEFAULT_POMODORO_MINUTES,
+    DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
+    DEFAULT_SHOW_CIRCULAR_TIMER,
     DEFAULT_STATUSBAR_FORMAT,
+    PHASES,
 )
 
 # Configuration file path within the addon folder

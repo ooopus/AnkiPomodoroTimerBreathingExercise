@@ -1,17 +1,18 @@
 from aqt import (
-    mw,
-    QVBoxLayout,
-    QDialogButtonBox,
-    QLabel,
-    QDialog,
-    QGroupBox,
     QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QGroupBox,
+    QLabel,
+    QVBoxLayout,
+    mw,
 )
 from aqt.utils import tooltip
-from ..state import save_config, get_config, get_pomodoro_timer
-from ..constants import STATUSBAR_FORMAT_NAMES, DEFAULT_STATUSBAR_FORMAT
-from .config_components import GeneralSettings, BreathingSettings
+
+from ..constants import DEFAULT_STATUSBAR_FORMAT, STATUSBAR_FORMAT_NAMES
+from ..state import get_config, get_pomodoro_timer, save_config
 from ..translator import _
+from .config_components import BreathingSettings, GeneralSettings
 
 
 class ConfigDialog(QDialog):

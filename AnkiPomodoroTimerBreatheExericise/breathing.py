@@ -1,19 +1,21 @@
+import time
+
 from aqt import (
-    mw,
-    QWidget,
+    QBrush,
+    QColor,
     QDialog,
     QLabel,
-    QSizePolicy,
-    QVBoxLayout,
-    QPushButton,
-    Qt,
-    QPointF,
-    QBrush,
-    QTimer,
     QPainter,
-    QColor,
+    QPointF,
+    QPushButton,
+    QSizePolicy,
+    Qt,
+    QTimer,
+    QVBoxLayout,
+    QWidget,
+    mw,
 )
-import time
+
 from .constants import PHASES
 from .state import get_app_state
 from .translator import _

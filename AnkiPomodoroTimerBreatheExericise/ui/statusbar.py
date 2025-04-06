@@ -1,9 +1,10 @@
-from aqt import mw, QLabel
 from typing import Union
 
+from aqt import QLabel, mw
 from aqt.utils import tooltip
-from ..state import get_app_state
+
 from ..constants import STATUSBAR_DEFAULT_TEXT
+from ..state import get_app_state
 
 
 def remove_widget():

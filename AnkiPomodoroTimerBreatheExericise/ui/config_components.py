@@ -1,15 +1,15 @@
-from PyQt6.QtWidgets import (
-    QVBoxLayout,
-    QHBoxLayout,
-    QLabel,
+from aqt import (
     QCheckBox,
-    QSpinBox,
+    QComboBox,
     QFrame,
     QGroupBox,
-    QComboBox,
+    QHBoxLayout,
+    QLabel,
+    QSpinBox,
+    QVBoxLayout,
 )
-from ..constants import PHASES, DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES
 
+from ..constants import DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES, PHASES
 from ..translator import _
 
 

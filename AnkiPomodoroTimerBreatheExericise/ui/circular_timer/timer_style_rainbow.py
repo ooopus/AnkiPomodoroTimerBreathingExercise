@@ -1,36 +1,37 @@
 # -*- coding: utf-8 -*-
-from aqt import (
-    theme,
-    QWidget,
-    Qt,
-    QRectF,
-    QPointF,
-    QTimer,
-    QPainter,
-    QColor,
-    QPen,
-    QLinearGradient,
-    QRadialGradient,
-    QBrush,
-    QFont,
-    QPaintEvent,
-    QResizeEvent,
-)
 import time  # Added for time-based color cycling
+
+from aqt import (
+    QBrush,
+    QColor,
+    QFont,
+    QLinearGradient,
+    QPainter,
+    QPaintEvent,
+    QPen,
+    QPointF,
+    QRadialGradient,
+    QRectF,
+    QResizeEvent,
+    Qt,
+    QTimer,
+    QWidget,
+    theme,
+)
 
 # Import common elements NEEDED by this style
 from .timer_common import (
+    BG_COLOR_END_DARK,
+    BG_COLOR_END_LIGHT,
+    BG_COLOR_START_DARK,
     # Import specific colors used by this style (BG, Progress, Shadow)
     BG_COLOR_START_LIGHT,
-    BG_COLOR_END_LIGHT,
-    PROGRESS_COLOR_START_LIGHT,
-    PROGRESS_COLOR_END_LIGHT,
-    SHADOW_COLOR_LIGHT,
-    BG_COLOR_START_DARK,
-    BG_COLOR_END_DARK,
-    PROGRESS_COLOR_START_DARK,
     PROGRESS_COLOR_END_DARK,
+    PROGRESS_COLOR_END_LIGHT,
+    PROGRESS_COLOR_START_DARK,
+    PROGRESS_COLOR_START_LIGHT,
     SHADOW_COLOR_DARK,
+    SHADOW_COLOR_LIGHT,
 )
 
 
