@@ -19,7 +19,7 @@ def remove_widget():
                 label.setParent(None)
                 label.deleteLater()
                 # Use AppState to set label
-                app_state.timer_label = None 
+                app_state.timer_label = None
                 import gc
 
                 label.destroyed.connect(lambda: gc.collect())
@@ -31,7 +31,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
     """Adds or removes the timer label from the Anki status bar."""
     # Use AppState
     app_state = get_app_state()
-    config = app_state.config 
+    config = app_state.config
     label = app_state.timer_label
 
     if show is None:

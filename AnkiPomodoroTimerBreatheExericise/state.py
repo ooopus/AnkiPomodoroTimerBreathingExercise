@@ -66,7 +66,8 @@ class AppState:
             "daily_pomodoro_seconds": 0,
             "pomodoros_before_long_break": DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
             "long_break_minutes": DEFAULT_LONG_BREAK_MINUTES,
-            "max_break_duration": DEFAULT_MAX_BREAK_DURATION * 60,  # Convert minutes to seconds
+            "max_break_duration": DEFAULT_MAX_BREAK_DURATION
+            * 60,  # Convert minutes to seconds
             "statusbar_format": DEFAULT_STATUSBAR_FORMAT,
             "last_pomodoro_time": 0,
             "last_date": "",
@@ -92,7 +93,9 @@ class AppState:
             config["statusbar_format"] = str(config["statusbar_format"])
             config["show_circular_timer"] = bool(config["show_circular_timer"])
             config["completed_pomodoros"] = int(config["completed_pomodoros"])
-            config["pomodoros_before_long_break"] = int(config["pomodoros_before_long_break"])
+            config["pomodoros_before_long_break"] = int(
+                config["pomodoros_before_long_break"]
+            )
             config["long_break_minutes"] = int(config["long_break_minutes"])
             config["max_break_duration"] = int(config["max_break_duration"])
             config["daily_pomodoro_seconds"] = int(config["daily_pomodoro_seconds"])
@@ -100,11 +103,18 @@ class AppState:
             config["last_date"] = str(config.get("last_date", ""))
 
             for phase in PHASES:
-                config[f"{phase['key']}_duration"] = int(config[f"{phase['key']}_duration"])
-                config[f"{phase['key']}_enabled"] = bool(config[f"{phase['key']}_enabled"])
+                config[f"{phase['key']}_duration"] = int(
+                    config[f"{phase['key']}_duration"]
+                )
+                config[f"{phase['key']}_enabled"] = bool(
+                    config[f"{phase['key']}_enabled"]
+                )
 
         except (ValueError, TypeError) as e:
-            tooltip(f"Pomodoro Addon: Error validating config, resetting to defaults. Error: {e}", period=3000)
+            tooltip(
+                f"Pomodoro Addon: Error validating config, resetting to defaults. Error: {e}",
+                period=3000,
+            )
             # Reset to defaults
             config = {
                 "pomodoro_minutes": DEFAULT_POMODORO_MINUTES,
@@ -158,7 +168,9 @@ class AppState:
                 try:
                     os.remove(temp_path)
                 except Exception as remove_e:
-                    tooltip(f"Error cleaning up temporary file: {remove_e}", period=3000)
+                    tooltip(
+                        f"Error cleaning up temporary file: {remove_e}", period=3000
+                    )
             tooltip(f"Error saving configuration: {e}", period=3000)
 
     def update_config_value(self, key: str, value: Any) -> None:
@@ -203,29 +215,36 @@ def get_app_state() -> AppState:
 
 # --- Convenience Accessors ---
 
+
 def get_config() -> Dict[str, Any]:
     """Convenience function to get the configuration dictionary."""
     return get_app_state().config
+
 
 def save_config() -> None:
     """Convenience function to save the current configuration."""
     get_app_state().save_config()
 
+
 def update_config_value(key: str, value: Any) -> None:
     """Convenience function to update a specific config value."""
     get_app_state().update_config_value(key, value)
+
 
 def get_pomodoro_timer() -> Optional[QTimer]:
     """Convenience function to get the Pomodoro timer instance."""
     return get_app_state().pomodoro_timer
 
+
 def set_pomodoro_timer(timer: Optional[QTimer]) -> None:
     """Convenience function to set the Pomodoro timer instance."""
     get_app_state().pomodoro_timer = timer
 
+
 def get_timer_label() -> Optional[QLabel]:
     """Convenience function to get the timer label instance."""
     return get_app_state().timer_label
+
 
 def set_timer_label(label: Optional[QLabel]) -> None:
     """Convenience function to set the timer label instance."""

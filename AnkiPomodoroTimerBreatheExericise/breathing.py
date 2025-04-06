@@ -139,7 +139,7 @@ class BreathingDialog(QDialog):
         self.target_cycles = max(1, target_cycles)  # Ensure at least one cycle
         self.completed_cycles = 0
         self._phase_timer = QTimer(self)
-        self._phase_timer.setSingleShot(True) # 仍然是单次触发，但拥有实例
+        self._phase_timer.setSingleShot(True)  # 仍然是单次触发，但拥有实例
         self._phase_timer.timeout.connect(self._advance_to_next_phase)
 
         # Use AppState
@@ -150,12 +150,8 @@ class BreathingDialog(QDialog):
         self.active_phases = []
         for phase_def in PHASES:
             key = phase_def["key"]
-            is_enabled = config.get(
-                f"{key}_enabled", phase_def["default_enabled"]
-            )
-            duration = config.get(
-                f"{key}_duration", phase_def["default_duration"]
-            )
+            is_enabled = config.get(f"{key}_enabled", phase_def["default_enabled"])
+            duration = config.get(f"{key}_duration", phase_def["default_duration"])
             if is_enabled:
                 self.active_phases.append(
                     {

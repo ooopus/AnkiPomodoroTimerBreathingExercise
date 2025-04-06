@@ -72,3 +72,52 @@ STATUSBAR_FORMAT_NAMES = {
     "ICON_COUNTDOWN_PROGRESS": _("显示图标+倒计时+进度"),
     "ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME": _("显示图标+倒计时+进度+累计使用时间"),
 }
+
+# When pyqt chackable component is ready, use this class instead of STATUSBAR_FORMAT_NAMES
+# class STATUSBAR_FORMATS:
+#     class ICON:
+#         description = _("图标")
+#         format = "{icon}"
+#         order = 0
+#     class COUNTDOWN:
+#         description = _("倒计时")
+#         format = "{mins:02d}:{secs:02d}"
+#         order = 1
+#     class PROGRESS:
+#         description = _("进度")  # 🍅进度条
+#         format = "{progress}"
+#         order = 2
+#     class TOTAL_TIME:
+#         description = _("累计使用时间")
+#         format = _("今日累计使用：") + "{daily_mins:02d}:{daily_secs:02d}"
+#         order = 3
+#     # Get list of all formats
+#     @classmethod
+#     def get_all_formats(cls):
+#         """Get all format classes defined in STATUSBAR_FORMATS"""
+#         formats = []
+#         for attr_name in dir(cls):
+#             # Skip special methods and callables
+#             if attr_name.startswith('__') or callable(getattr(cls, attr_name)):
+#                 continue
+
+#             # Get the attribute
+#             attr = getattr(cls, attr_name)
+
+#             # Check if it's a class with required format attributes
+#             if hasattr(attr, 'format') and hasattr(attr, 'description'):
+#                 formats.append(attr)
+
+#         return formats
+
+#     # Sort formats by order
+#     @classmethod
+#     def generale_complete_format(cls, seletions):
+#         complete_format = ""
+#         for seletion in seletions:
+#             # Get format by name
+#             complete_format += getattr(cls, seletion).format
+#         # Rearrange format components according to order attribute
+#         return " ".join(
+#             sorted(complete_format.split(), key=lambda x: getattr(cls, x).order)
+#         )

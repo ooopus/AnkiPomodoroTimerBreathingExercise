@@ -83,6 +83,7 @@ def on_theme_change():
     if _timer_window_instance and _timer_window_instance.timer_widget:
         _timer_window_instance.timer_widget.update_theme()
 
+
 def _after_pomodoro_finish_tasks():
     """Actions to perform after the Pomodoro finishes (runs on main thread)."""
     # from .ui import show_timer_in_statusbar
