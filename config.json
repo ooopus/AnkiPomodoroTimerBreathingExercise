@@ -1,0 +1,171 @@
+{
+    "pomodoro_minutes": 1,
+    "breathing_cycles": 30,
+    "enabled": true,
+    "show_statusbar_timer": true,
+    "show_circular_timer": false,
+    "inhale_duration": 4,
+    "inhale_enabled": true,
+    "hold_duration": 4,
+    "hold_enabled": false,
+    "exhale_duration": 6,
+    "exhale_enabled": true,
+    "timer_position": "left_top",
+    "rest_minutes": 1,
+    "countdown_target_date": "2025-11-1",
+    "countdown_target_name": "岩土考试",
+    "consecutive_focus_days": 2,
+    "last_focus_date": "2025-04-07",
+    "show_countdown_info": true,
+    "auto_play_music": false,
+    "sound_effect_enabled": true,
+    "sound_effect_file": "翻书.mp3",
+    "pomodoro_minutes_2": 25,
+    "rest_minutes_2": 5,
+    "pomodoro_minutes_3": 50,
+    "rest_minutes_3": 10,
+    "active_timer_group": 0,
+    "statusbar_checkin_tasks": [
+        36,
+        35,
+        38,
+        40,
+        41
+    ],
+    "meditation_sessions": [
+        {
+            "audio_path": "",
+            "name": "20分钟躺平冥想重启大脑",
+            "url": "https://www.bilibili.com/video/BV1nm4y1t7t5?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "10分钟回复脑力终结拖延症",
+            "url": "https://www.bilibili.com/video/BV1yP411T77b?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "10分钟提升专注力放下焦虑",
+            "url": "https://www.bilibili.com/video/BV16Z4y187za?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "10分钟专注训练效率翻倍",
+            "url": "https://www.bilibili.com/video/BV1Re4y1r7Y8?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "坚持不到5分钟你就能睡着！15分钟助眠冥想 进入深度睡眠｜失眠焦虑必备",
+            "url": "https://www.bilibili.com/video/BV1Sw41187j4?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "10分钟缓解一切负面情绪 肯定自我激活最佳状态！｜顺毛冥想",
+            "url": "https://www.bilibili.com/video/BV1ip4y1N7pd?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "从此告别熬夜，爱上清晨12min冥想+拉伸，一次高效一整天",
+            "url": "https://www.bilibili.com/video/BV1tM411u7RS?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "睡前冥想引导 坚持不到5分钟就会睡着，摆脱精神内耗提高白天专注力",
+            "url": "https://www.bilibili.com/video/BV13V4y177qs?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "情绪不要\"忍\"13分钟排解负面情绪 自我肯定｜疗愈冥想",
+            "url": "https://www.bilibili.com/video/BV1eZ421t78h?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "放松解压、缓解焦虑8min 提高专注力开启最佳状态【考前必备】",
+            "url": "https://www.bilibili.com/video/BV1gi421U7YY?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "",
+            "name": "7分钟午休冥想，补足精力去除疲劳",
+            "url": "https://www.bilibili.com/video/BV1jb42177Jq?spm_id_from=333.788.videopod.sections&vd_source=37882f434a2ecf27b36fd69af34eb9a4"
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P1】20分钟躺平冥想重启大脑.MP3",
+            "emoji": "🐳",
+            "name": "【P1】20分钟躺平冥想重启大脑",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P2】10分钟回复脑力终结拖延症.MP3",
+            "emoji": "🏃‍♂️‍➡️",
+            "name": "【P2】10分钟回复脑力终结拖延症",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P3】10分钟提升专注力放下焦虑.MP3",
+            "emoji": "🥝",
+            "name": "【P3】10分钟提升专注力放下焦虑",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P4】10分钟专注训练效率翻倍.MP3",
+            "emoji": "📌",
+            "name": "【P4】10分钟专注训练效率翻倍",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P5】15分钟睡眠冥想，坚持不到5分钟你就睡着了！失眠焦虑患者必备.MP3",
+            "emoji": "🌙",
+            "name": "【P5】15分钟睡眠冥想，坚持不到5分钟你就睡着了！失眠焦虑患者必备",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P6】10分钟缓解一切负面情绪肯定自我激活最佳状态！｜顺毛冥想.MP3",
+            "emoji": "😝",
+            "name": "【P6】10分钟缓解一切负面情绪肯定自我激活最佳状态！｜顺毛冥想",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P7】从此告别熬夜，爱上清晨12min冥想+拉伸，一次高效一整天.MP3",
+            "emoji": "💤",
+            "name": "【P7】从此告别熬夜，爱上清晨12min冥想+拉伸，一次高效一整天",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P8】睡前冥想引导坚持不到5分钟就会睡着，摆脱精神内耗提高白天专注力.MP3",
+            "emoji": "🍍",
+            "name": "【P8】睡前冥想引导坚持不到5分钟就会睡着，摆脱精神内耗提高白天专注力",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/番了个茄_冥想音乐/范李猿-合集·告别焦虑，提升专注力，冥想入门练习/【P9】负面情绪不要“忍”13分钟排解负面情绪｜疗愈冥想.MP3",
+            "name": "【P9】负面情绪不要“忍”13分钟排解负面情绪｜疗愈冥想",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/佛教十三经/《四十二章经》[110516](ED2000.COM).mp3",
+            "name": "《四十二章经》[110516](ED2000.COM)",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/佛教十三经/金刚经_普通话朗读[111125](ED2000.COM).mp3",
+            "name": "金刚经_普通话朗读[111125](ED2000.COM)",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/佛教十三经/心经[111127](ED2000.COM).mp3",
+            "emoji": "🍎",
+            "name": "心经[111127](ED2000.COM)",
+            "url": ""
+        },
+        {
+            "audio_path": "D:/佛教十三经/药师经_据中华书局本录制(ED2000.COM).mp3",
+            "emoji": "💎",
+            "name": "药师经_据中华书局本录制(ED2000.COM)",
+            "url": ""
+        }
+    ],
+    "borderless_mode": false,
+    "statusbar_icon": "🍎",
+    "smart_timer_reminder": true,
+    "smart_timer_reminder_minutes": 1
+}
