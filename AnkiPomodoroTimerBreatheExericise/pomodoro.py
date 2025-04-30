@@ -100,7 +100,7 @@ class PomodoroTimer(QTimer):
                 # Also update status bar when stopping completely
                 self.update_display()
 
-        mw.progress.timer(10, _clear_display, False)
+        mw.progress.single_shot(10, _clear_display, False)
 
     def _update_break_time(self):
         """更新休息时间"""
@@ -287,4 +287,4 @@ class PomodoroTimer(QTimer):
 
         # Schedule the UI update in the main thread
         if mw and mw.isVisible():  # Only schedule if main window is visible
-            mw.progress.timer(10, _update_ui, False)
+            mw.progress.single_shot(10, _update_ui, False)

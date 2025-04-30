@@ -1,13 +1,13 @@
 # __init__.py (插件主文件 - PyQt6 & Cycle-based Breathing)
 
+import time
+
 from aqt import QAction, gui_hooks, mw
 
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
 from .state import get_app_state
 from .translator import _
 from .ui import ConfigDialog
-
-import time
 
 
 def show_config_dialog():
@@ -49,5 +49,4 @@ def setup_plugin():
 # ---Startup---
 # This code runs when Anki loads the addon
 if __name__ != "__main__":
-    # Use mw.progress.timer to ensure setup runs after Anki is fully initialized
-    mw.progress.timer(100, setup_plugin, False)  # Run once after 100ms delay
+    mw.progress.single_shot(100, setup_plugin, False)  # Run once after 100ms delay

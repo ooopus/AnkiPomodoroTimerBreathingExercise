@@ -2,7 +2,6 @@ from aqt import QDialog, QTimer, mw
 from aqt.utils import tooltip
 
 from .breathing import BreathingDialog
-
 from .constants import DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES, PHASES
 from .pomodoro import PomodoroTimer
 from .state import get_config, get_pomodoro_timer, save_config
@@ -32,7 +31,7 @@ def on_reviewer_did_start(_reviewer):
             pomo_minutes = config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
             timer.start_timer(pomo_minutes)
 
-    mw.progress.timer(100, _start_timer, False)
+    mw.progress.single_shot(100, _start_timer, False)
 
 
 def on_state_did_change(new_state: str, old_state: str):
@@ -73,7 +72,7 @@ def on_pomodoro_finished():
     save_config()
 
     # Ensure we are on the main thread before changing state or showing dialog
-    mw.progress.timer(100, lambda: _after_pomodoro_finish_tasks(), False)
+    mw.progress.single_shot(100, lambda: _after_pomodoro_finish_tasks(), False)
 
 
 def on_theme_change():

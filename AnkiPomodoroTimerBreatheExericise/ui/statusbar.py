@@ -45,7 +45,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
         or config.get("statusbar_format") == "NONE"
     ):
         if label:
-            mw.progress.timer(0, remove_widget, False)
+            mw.progress.single_shot(0, remove_widget, False)
         return
 
     if not label:
@@ -62,4 +62,4 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
             except Exception as e:
                 tooltip(f"Error adding timer widget: {e}")
 
-        mw.progress.timer(0, add_widget, False)
+        mw.progress.single_shot(0, add_widget, False)
