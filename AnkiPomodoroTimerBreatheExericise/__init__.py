@@ -3,9 +3,11 @@
 from aqt import QAction, gui_hooks, mw
 
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
-from .state import get_pomodoro_timer
+from .state import get_app_state
 from .translator import _
 from .ui import ConfigDialog
+
+import time
 
 
 def show_config_dialog():
@@ -14,20 +16,27 @@ def show_config_dialog():
     dialog.exec()
 
 
+def _check_and_reset_daily_timer(app_state):
+    """Checks if the date has changed and resets the daily timer if needed."""
+    config = app_state.config
+    last_date = config.get("last_date", "")
+    today = time.strftime("%Y-%m-%d")
+    if last_date != today:
+        app_state.update_config_value("daily_pomodoro_seconds", 0)
+        app_state.update_config_value("last_date", today)
+
+
 def setup_plugin():
     """Loads config, sets up hooks, and adds menu item."""
 
-    # Register hooks
-    # Note: Use reviewer_will_start_review is often better than did_show_question
-    # as it fires once per review session start. did_show_question fires per card.
-    # Let's stick with did_show_question for now as per original code, but consider changing.
+    app_state = get_app_state()
+    _check_and_reset_daily_timer(app_state)
+
     gui_hooks.reviewer_did_show_question.append(on_reviewer_did_start)
     gui_hooks.state_did_change.append(on_state_did_change)
     gui_hooks.theme_did_change.append(on_theme_change)
     # Add menu item
-    action = QAction(
-        _("番茄钟 & 呼吸设置..."), mw
-    )  # "Pomodoro & Breathing Settings..."
+    action = QAction(_("番茄钟 & 呼吸设置..."), mw)
     action.triggered.connect(show_config_dialog)
     if hasattr(mw, "form") and hasattr(mw.form, "menuTools"):
         mw.form.menuTools.addAction(action)
@@ -36,19 +45,6 @@ def setup_plugin():
 
         tooltip(_("警告: 无法添加番茄钟菜单项 (未找到menuTools)。"), period=3000)
 
-
-def cleanup_plugin():
-    """Clean up resources when plugin is unloaded"""
-    from .ui.statusbar import remove_widget
-
-    timer = get_pomodoro_timer()
-    if timer:
-        timer.stop_timer(True)
-
-    remove_widget()
-
-
-gui_hooks.main_window_did_init.append(cleanup_plugin)
 
 # ---Startup---
 # This code runs when Anki loads the addon

@@ -36,6 +36,7 @@ This is an Anki plugin that combines the Pomodoro Technique with breathing exerc
 ### Breathing Exercise Details
 
 Breathing exercise includes the following configurable phases:
+
 - Inhale (default 4 seconds)
 - Hold (default disabled)
 - Exhale (default 6 seconds)
@@ -56,6 +57,7 @@ Breathing exercise includes the following configurable phases:
 Access via "Tools" > "Pomodoro & Breathing Settings..."
 
 ### General Settings
+
 - Enable/Disable plugin
 - Show/Hide status bar timer
 - Show/Hide circular timer window
@@ -66,6 +68,7 @@ Access via "Tools" > "Pomodoro & Breathing Settings..."
 - Maximum break duration limit
 
 ### Breathing Exercise Settings
+
 - Number of cycles (0-50)
 - Enable/Disable each phase
 - Duration for each phase (0-60 seconds)
@@ -75,48 +78,52 @@ The settings interface displays estimated total training time in real-time.
 ## Development
 
 ### Requirements
+
 - Python 3.9
 - aqt >= 25.0
 
 ### Internationalization (i18n)
 
 #### Translation File Structure
+
 ```
 locales/
-├── en_US/
-│   └── LC_MESSAGES/
-│       ├── messages.mo
-│       └── messages.po
-└── zh_CN/
-    └── LC_MESSAGES/
-        ├── messages.mo
-        └── messages.po
+└── en_US/
+   └── LC_MESSAGES/
+       ├── messages.mo
+       └── messages.po
 ```
 
 #### Translation Workflow
 
 1. Extract strings for translation:
+
 ```bash
 cd AnkiPomodoroTimerBreatheExericise
 pybabel extract -F babel.cfg -o locales/messages.pot .
 ```
 
 2. Initialize new language (first time only):
+
 ```bash
 pybabel init -i locales/messages.pot -d locales -l <language_code>
 ```
+
 Example: `pybabel init -i locales/messages.pot -d locales -l zh_CN`
 
 3. Update existing translation files:
+
 ```bash
 pybabel update -i locales/messages.pot -d locales
 ```
 
 4. Edit translation content in .po files
+
 - Edit `locales/<language_code>/LC_MESSAGES/messages.po`
 - Add msgstr translations for each msgid
 
 5. Compile translation files:
+
 ```bash
 pybabel compile -d locales
 ```
@@ -124,6 +131,7 @@ pybabel compile -d locales
 #### Adding New Strings for Translation
 
 1. Wrap strings with `_()` function in code:
+
 ```python
 from .translator import _
 message = _("Text to translate")
@@ -132,10 +140,12 @@ message = _("Text to translate")
 2. Repeat workflow steps 1-5 above
 
 #### Supported Languages
+
 - English (en_US)
 - Simplified Chinese (zh_CN)
 
 #### Contributing Translations
+
 1. Fork this repository
 2. Add new language or improve existing translations following the workflow above
 3. Submit Pull Request
@@ -143,6 +153,7 @@ message = _("Text to translate")
 ### Development Guide
 
 #### Directory Structure
+
 ```
 AnkiPomodoroTimerBreatheExericise/
 ├── __init__.py          # Plugin entry
@@ -159,9 +170,11 @@ AnkiPomodoroTimerBreatheExericise/
 ```
 
 #### Code Style
+
 - Use Python type annotations
 - Follow PEP 8 guidelines
 - All user-visible strings must be wrapped with `_()` for translation support
 
 ### Issue Reporting
+
 If you find any issues or have suggestions for improvement, please submit an Issue on the GitHub repository.
