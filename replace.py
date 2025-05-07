@@ -41,7 +41,7 @@ REPLACEMENT = r"\1(_(\2\3\2)\4)"
 def process_file(filepath):
     """处理单个文件，查找并替换模式"""
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             original_content = f.read()
     except Exception as e:
         logging.error(f"无法读取文件 {filepath}: {e}")

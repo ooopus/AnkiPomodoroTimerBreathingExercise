@@ -1,12 +1,13 @@
 from aqt import QDialog, QTimer, mw
 from aqt.utils import tooltip
 
-from .breathing import BreathingDialog
-from .constants import DEFAULT_BREATHING_CYCLES, DEFAULT_POMODORO_MINUTES, PHASES
+from .breathing import start_breathing_exercise
+from .config import save_config
+from .constants import PHASES, Defaults
 from .pomodoro import PomodoroTimer
-from .state import get_config, get_pomodoro_timer, save_config
+from .state import get_config, get_pomodoro_timer
 from .translator import _
-from .ui.circular_timer import _timer_window_instance
+from .ui.CircularTimer.timer_common import _timer_window_instance
 
 # --- Anki 钩子函数 ---
 
@@ -28,7 +29,7 @@ def on_reviewer_did_start(_reviewer):
 
     def _start_timer():
         if not timer.isActive():
-            pomo_minutes = config.get("pomodoro_minutes", DEFAULT_POMODORO_MINUTES)
+            pomo_minutes = config.get("pomodoro_minutes", Defaults.POMODORO_MINUTES)
             timer.start_timer(pomo_minutes)
 
     mw.progress.single_shot(100, _start_timer, False)
@@ -38,12 +39,19 @@ def on_state_did_change(new_state: str, old_state: str):
     """Stops the Pomodoro timer when leaving the reviewer state."""
     timer: PomodoroTimer | None = get_pomodoro_timer()
     config = get_config()
-    if old_state == "review" and new_state != "review":
-        if timer and timer.isActive() and config.get("enabled", True):
-            tooltip(
-                f"Left reviewer state ({old_state} -> {new_state}). Stopping Pomodoro timer."
-            )
-            timer.stop_timer(stop_break_timer=False)
+    if (
+        not config.get("work_across_decks", False)  # Add this condition
+        and old_state == "review"
+        and new_state != "review"
+        and timer
+        and timer.isActive()
+        and config.get("enabled", True)
+    ):
+        tooltip(
+            f"Left reviewer state ({old_state} -> {new_state}). "
+            f"Stopping Pomodoro timer."
+        )
+        timer.stop_timer()
 
 
 def on_pomodoro_finished():
@@ -69,7 +77,7 @@ def on_pomodoro_finished():
     else:
         tooltip(_("番茄钟时间到！休息一下。"), period=3000)
 
-    save_config()
+    save_config(config)
 
     # Ensure we are on the main thread before changing state or showing dialog
     mw.progress.single_shot(100, lambda: _after_pomodoro_finish_tasks(), False)
@@ -94,7 +102,7 @@ def _after_pomodoro_finish_tasks():
 
 
 def show_breathing_dialog():
-    """Checks config and shows the BreathingDialog if appropriate."""
+    """Checks config and shows the breathing exercise if appropriate."""
     config = get_config()  # Use our config getter
     if not config.get("enabled", True):
         return
@@ -108,16 +116,15 @@ def show_breathing_dialog():
         return
 
     # Get configured number of cycles using our config system
-    target_cycles = config.get("breathing_cycles", DEFAULT_BREATHING_CYCLES)
+    target_cycles = config.get("breathing_cycles", Defaults.BREATHING_CYCLES)
     if target_cycles <= 0:
         tooltip(_("呼吸训练已跳过 (循环次数为 0)。"), period=3000)
         return
 
     # Ensure main window is visible before showing modal dialog
     if mw and mw.isVisible():
-        # Pass target_cycles to the dialog
-        dialog = BreathingDialog(target_cycles, mw)
-        result = dialog.exec()  # Show modally
+        # 使用重构后的函数启动呼吸训练
+        result = start_breathing_exercise(target_cycles, mw)
         if result == QDialog.DialogCode.Accepted:
             tooltip(_("呼吸训练完成！"), period=2000)  # "Breathing exercise complete!"
         else:

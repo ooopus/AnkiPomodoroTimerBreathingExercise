@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from aqt import (
     QBrush,
     QFont,
@@ -16,12 +14,10 @@ from aqt import (
     theme,
 )
 
-# Import common elements NEEDED by this style
-from .timer_common import (
+from .constants import (
     BG_COLOR_END_DARK,
     BG_COLOR_END_LIGHT,
     BG_COLOR_START_DARK,
-    # Import specific colors used by this style
     BG_COLOR_START_LIGHT,
     PROGRESS_COLOR_END_DARK,
     PROGRESS_COLOR_END_LIGHT,
@@ -29,16 +25,16 @@ from .timer_common import (
     PROGRESS_COLOR_START_LIGHT,
     SHADOW_COLOR_DARK,
     SHADOW_COLOR_LIGHT,
-    TEXT_COLOR_END_DARK,  # Gradient text colors
-    TEXT_COLOR_END_LIGHT,  # Gradient text colors
+    TEXT_COLOR_END_DARK,
+    TEXT_COLOR_END_LIGHT,
     TEXT_COLOR_START_DARK,
     TEXT_COLOR_START_LIGHT,
 )
 
 
-# --- Gradient Text CircularTimer ---
+# --- 默认圆形计时器 ---
 class CircularTimer(QWidget):
-    """Circular Timer implementation with Gradient Text."""
+    """默认圆形计时器实现，使用渐变文本。"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -46,55 +42,59 @@ class CircularTimer(QWidget):
         self._progress = 0.0
         self._remaining_time = "00:00"
 
+        # --- 检测主题并选择颜色 ---
         self._dark_mode = theme.theme_manager.night_mode
         self._load_colors()
-        self._load_colors()
 
-        # Pens and Brushes specific to this style
+        # --- 预创建绘图资源 ---
         self._bg_pen = QPen()
         self._bg_pen.setCapStyle(Qt.PenCapStyle.FlatCap)
+
         self._progress_pen = QPen()
         self._progress_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-        self._text_pen = QPen()  # Pen for gradient text (color comes from brush)
-        self._shadow_pen = QPen(self._shadow_color)
+
+        # 文本笔 - 颜色来自画刷渐变
+        self._text_pen = QPen()
+        self._shadow_pen = QPen(self._shadow_color)  # 阴影颜色根据主题固定
         self._shadow_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
 
+        # 画刷（渐变稍后定义/更新）
         self._bg_brush = QBrush()
         self._progress_brush = QBrush()
-        self._text_brush = QBrush()  # Brush for gradient text
+        self._text_brush = QBrush()
 
+        # 字体
         self._text_font = QFont()
         self._text_font.setBold(True)
 
+        # 初始更新大小相关资源
         self._update_dynamic_resources()
 
     def _load_colors(self):
-        """Load color variables based on detected theme."""
-        # Uses colors imported from timer_common
+        """根据检测到的主题加载颜色变量。"""
         if self._dark_mode:
             self._bg_start_color = BG_COLOR_START_DARK
             self._bg_end_color = BG_COLOR_END_DARK
             self._progress_start_color = PROGRESS_COLOR_START_DARK
             self._progress_end_color = PROGRESS_COLOR_END_DARK
-            self._text_start_color = TEXT_COLOR_START_DARK  # Specific to gradient
-            self._text_end_color = TEXT_COLOR_END_DARK  # Specific to gradient
+            self._text_start_color = TEXT_COLOR_START_DARK
+            self._text_end_color = TEXT_COLOR_END_DARK
             self._shadow_color = SHADOW_COLOR_DARK
         else:
             self._bg_start_color = BG_COLOR_START_LIGHT
             self._bg_end_color = BG_COLOR_END_LIGHT
             self._progress_start_color = PROGRESS_COLOR_START_LIGHT
             self._progress_end_color = PROGRESS_COLOR_END_LIGHT
-            self._text_start_color = TEXT_COLOR_START_LIGHT  # Specific to gradient
-            self._text_end_color = TEXT_COLOR_END_LIGHT  # Specific to gradient
+            self._text_start_color = TEXT_COLOR_START_LIGHT
+            self._text_end_color = TEXT_COLOR_END_LIGHT
             self._shadow_color = SHADOW_COLOR_LIGHT
 
-        # Update shadow pen color directly
-        if hasattr(self, "_shadow_pen"):
+        # 直接更新笔颜色
+        if hasattr(self, "_shadow_pen"):  # 检查笔是否存在（在初始化期间）
             self._shadow_pen.setColor(self._shadow_color)
 
     def set_progress(self, current_seconds, total_seconds):
-        """Set the progress of the timer."""
-        # Identical logic to other version
+        """设置计时器的进度。"""
         if total_seconds > 0:
             self._progress = max(0.0, min(1.0, 1.0 - (current_seconds / total_seconds)))
         else:
@@ -113,8 +113,7 @@ class CircularTimer(QWidget):
             self.update()
 
     def _update_dynamic_resources(self):
-        """Update resources that depend on the widget's size."""
-        # Identical logic to other version
+        """更新依赖于小部件大小的资源。"""
         width = self.width()
         height = self.height()
         size = min(width, height)
@@ -125,20 +124,26 @@ class CircularTimer(QWidget):
 
         self._bg_pen.setWidth(self._pen_width)
         self._progress_pen.setWidth(self._pen_width)
+
         self._text_pen.setWidth(1)
         self._shadow_pen.setWidth(1)
 
         font_size = max(6, int(size * 0.18))
         self._text_font.setPointSize(font_size)
 
+    def update_theme(self):
+        """更新计时器的主题。总是由Anki主题变化引起。"""
+        self._dark_mode = theme.theme_manager.night_mode
+        self._load_colors()
+        self.update()
+
     def resizeEvent(self, event: QResizeEvent):
-        """Handle widget resize."""
-        # Identical logic to other version
+        """处理小部件调整大小。"""
         super().resizeEvent(event)
         self._update_dynamic_resources()
 
     def paintEvent(self, event: QPaintEvent):
-        """Paint the circular timer using gradient text."""
+        """使用主题适当的颜色绘制圆形计时器。"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
@@ -146,36 +151,40 @@ class CircularTimer(QWidget):
         height = self.height()
         center = QPointF(width / 2.0, height / 2.0)
         radius = min(width, height) / 2.0 - self._padding
+
         rect = QRectF(center.x() - radius, center.y() - radius, 2 * radius, 2 * radius)
 
         if not rect.isValid() or radius <= 0:
             return
 
-        # --- 1. Draw Background (Uses common colors) ---
+        # --- 1. 绘制背景 ---
         bg_gradient = QRadialGradient(center, radius + self._pen_width)
         bg_gradient.setColorAt(0.8, self._bg_start_color)
         bg_gradient.setColorAt(1.0, self._bg_end_color)
         self._bg_brush = QBrush(bg_gradient)
+
         self._bg_pen.setBrush(self._bg_brush)
         painter.setPen(self._bg_pen)
         painter.drawEllipse(rect)
 
-        # --- 2. Draw Progress Arc (Uses common colors) ---
+        # --- 2. 绘制进度弧 ---
         if self._progress > 0:
             progress_gradient = QLinearGradient(rect.topLeft(), rect.bottomRight())
             progress_gradient.setColorAt(0, self._progress_start_color)
             progress_gradient.setColorAt(1, self._progress_end_color)
             self._progress_brush = QBrush(progress_gradient)
+
             self._progress_pen.setBrush(self._progress_brush)
             painter.setPen(self._progress_pen)
+
             start_angle = 90 * 16
             span_angle = -int(self._progress * 360 * 16)
             painter.drawArc(rect, start_angle, span_angle)
 
-        # --- 3. Draw Remaining Time Text (Gradient Style) ---
+        # --- 3. 绘制剩余时间文本 ---
         painter.setFont(self._text_font)
 
-        # 3a. Draw Shadow Text (Uses common shadow color)
+        # 3a. 绘制阴影文本
         shadow_rect = rect.adjusted(
             self._shadow_offset,
             self._shadow_offset,
@@ -187,11 +196,12 @@ class CircularTimer(QWidget):
             shadow_rect, Qt.AlignmentFlag.AlignCenter, self._remaining_time
         )
 
-        # 3b. Draw Main Text with Gradient (Uses gradient text colors)
+        # 3b. 使用渐变绘制主文本
         text_gradient = QLinearGradient(rect.topLeft(), rect.bottomLeft())
-        text_gradient.setColorAt(0, self._text_start_color)  # From common constants
-        text_gradient.setColorAt(1, self._text_end_color)  # From common constants
+        text_gradient.setColorAt(0, self._text_start_color)
+        text_gradient.setColorAt(1, self._text_end_color)
         self._text_brush = QBrush(text_gradient)
-        self._text_pen.setBrush(self._text_brush)  # Apply gradient via brush
+
+        self._text_pen.setBrush(self._text_brush)
         painter.setPen(self._text_pen)
         painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, self._remaining_time)

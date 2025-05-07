@@ -9,8 +9,9 @@ from aqt import (
 )
 from aqt.utils import tooltip
 
-from ..constants import DEFAULT_STATUSBAR_FORMAT, STATUSBAR_FORMAT_NAMES
-from ..state import get_config, get_pomodoro_timer, save_config
+from ..config.config import save_config
+from ..constants import STATUSBAR_FORMAT_NAMES, Defaults
+from ..state import get_config, get_pomodoro_timer
 from ..translator import _
 from .config_components import BreathingSettings, GeneralSettings
 
@@ -43,7 +44,7 @@ class ConfigDialog(QDialog):
             self.statusbar_format_combo.addItem(format_name, format_key)
 
         # Set currently selected format
-        current_format = self.config.get("statusbar_format", DEFAULT_STATUSBAR_FORMAT)
+        current_format = self.config.get("statusbar_format", Defaults.StatusBar.FORMAT)
         index = self.statusbar_format_combo.findData(current_format)
         if index >= 0:
             self.statusbar_format_combo.setCurrentIndex(index)
@@ -127,7 +128,7 @@ class ConfigDialog(QDialog):
             self.config.update(breathing_values)
             self.config["statusbar_format"] = self.statusbar_format_combo.currentData()
 
-            save_config()
+            save_config(self.config)
             tooltip(_("配置已保存"))
 
             # Update display immediately

@@ -1,28 +1,15 @@
-import json
-import os
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from aqt import QLabel, QTimer
 from aqt.utils import tooltip
 
-from .constants import (
-    DEFAULT_BREATHING_CYCLES,
-    DEFAULT_LONG_BREAK_MINUTES,
-    DEFAULT_MAX_BREAK_DURATION,
-    DEFAULT_POMODORO_MINUTES,
-    DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
-    DEFAULT_SHOW_CIRCULAR_TIMER,
-    DEFAULT_STATUSBAR_FORMAT,
-    PHASES,
-)
-
-# Configuration file path within the addon folder
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+from .config.config import get_default_config, load_config_from_file, save_config
+from .constants import PHASES
 
 
 class AppState:
     def __init__(self):
-        self._config: Optional[Dict[str, Any]] = None
+        self._config: Optional[dict[str, Any]] = None
         self._pomodoro_timer: Optional[QTimer] = None
         self._timer_label: Optional[QLabel] = None
         # Initialize config immediately
@@ -31,59 +18,21 @@ class AppState:
     # --- Configuration Management ---
 
     @property
-    def config(self) -> Dict[str, Any]:
+    def config(self) -> dict[str, Any]:
         """Gets the current configuration, loading if necessary."""
         if self._config is None:
             self._config = self._load_config()
         return self._config
 
-    def _load_config_from_file(self) -> Dict[str, Any]:
-        """Loads configuration from the JSON file."""
-        try:
-            if os.path.exists(CONFIG_PATH):
-                with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                    config_data = json.load(f)
-                    if not isinstance(config_data, dict):
-                        raise ValueError("Invalid config format")
-                    return config_data
-        except json.JSONDecodeError as e:
-            tooltip(f"Configuration file format error: {e}", period=3000)
-        except Exception as e:
-            tooltip(f"Error loading configuration file: {e}", period=3000)
-        return {}
+    def _load_config(self) -> dict[str, Any]:
+        """加载配置并设置缺失或无效值的默认值"""
+        config = load_config_from_file()
+        default_config = get_default_config()
 
-    def _load_config(self) -> Dict[str, Any]:
-        """Loads configuration and sets default values if missing or invalid."""
-        config = self._load_config_from_file()
-
-        # Set defaults for missing keys
-        defaults = {
-            "pomodoro_minutes": DEFAULT_POMODORO_MINUTES,
-            "breathing_cycles": DEFAULT_BREATHING_CYCLES,
-            "enabled": True,
-            "show_circular_timer": DEFAULT_SHOW_CIRCULAR_TIMER,
-            "completed_pomodoros": 0,
-            "daily_pomodoro_seconds": 0,
-            "pomodoros_before_long_break": DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
-            "long_break_minutes": DEFAULT_LONG_BREAK_MINUTES,
-            "max_break_duration": DEFAULT_MAX_BREAK_DURATION
-            * 60,  # Convert minutes to seconds
-            "statusbar_format": DEFAULT_STATUSBAR_FORMAT,
-            "last_pomodoro_time": 0,
-            "last_date": "",
-        }
-        for key, default_value in defaults.items():
+        # 设置缺失键的默认值
+        for key, default_value in default_config.items():
             if key not in config:
                 config[key] = default_value
-
-        # Set defaults for breathing phases
-        for phase in PHASES:
-            key_duration = f"{phase['key']}_duration"
-            key_enabled = f"{phase['key']}_enabled"
-            if key_duration not in config:
-                config[key_duration] = phase["default_duration"]
-            if key_enabled not in config:
-                config[key_enabled] = phase["default_enabled"]
 
         # Ensure correct types, reset to defaults on error
         try:
@@ -92,6 +41,7 @@ class AppState:
             config["enabled"] = bool(config["enabled"])
             config["statusbar_format"] = str(config["statusbar_format"])
             config["show_circular_timer"] = bool(config["show_circular_timer"])
+            config["circular_timer_style"] = str(config["circular_timer_style"])
             config["completed_pomodoros"] = int(config["completed_pomodoros"])
             config["pomodoros_before_long_break"] = int(
                 config["pomodoros_before_long_break"]
@@ -101,77 +51,52 @@ class AppState:
             config["daily_pomodoro_seconds"] = int(config["daily_pomodoro_seconds"])
             config["last_pomodoro_time"] = float(config.get("last_pomodoro_time", 0))
             config["last_date"] = str(config.get("last_date", ""))
+            config["work_across_decks"] = bool(config.get("work_across_decks", False))
 
+            # Ensure breathing phase keys exist and have correct types
             for phase in PHASES:
-                config[f"{phase['key']}_duration"] = int(
-                    config[f"{phase['key']}_duration"]
+                duration_key = f"{phase['key']}_duration"
+                enabled_key = f"{phase['key']}_enabled"
+                audio_key = (
+                    f"{phase['key']}_audio"  # Assuming audio key follows this pattern
                 )
-                config[f"{phase['key']}_enabled"] = bool(
-                    config[f"{phase['key']}_enabled"]
-                )
+
+                # Validate and cast types
+                try:
+                    config[duration_key] = int(config[duration_key])
+                except (ValueError, TypeError):
+                    config[duration_key] = phase["default_duration"]  # Reset on error
+
+                try:
+                    config[enabled_key] = bool(config[enabled_key])
+                except (ValueError, TypeError):
+                    config[enabled_key] = phase["default_enabled"]  # Reset on error
+
+                try:  # Validate audio path as string
+                    config[audio_key] = str(config[audio_key])
+                except (ValueError, TypeError):
+                    config[audio_key] = phase.get("default_audio", "")  # Reset on error
 
         except (ValueError, TypeError) as e:
             tooltip(
-                f"Pomodoro Addon: Error validating config, resetting to defaults. Error: {e}",
+                f"Pomodoro Addon: Error validating config, resetting to defaults. "
+                f"Error: {e}",
                 period=3000,
             )
-            # Reset to defaults
-            config = {
-                "pomodoro_minutes": DEFAULT_POMODORO_MINUTES,
-                "breathing_cycles": DEFAULT_BREATHING_CYCLES,
-                "enabled": True,
-                "statusbar_format": DEFAULT_STATUSBAR_FORMAT,
-                "show_circular_timer": DEFAULT_SHOW_CIRCULAR_TIMER,
-                "completed_pomodoros": 0,
-                "daily_pomodoro_seconds": 0,
-                "pomodoros_before_long_break": DEFAULT_POMODOROS_BEFORE_LONG_BREAK,
-                "long_break_minutes": DEFAULT_LONG_BREAK_MINUTES,
-                "max_break_duration": DEFAULT_MAX_BREAK_DURATION * 60,
-                "last_pomodoro_time": 0,
-                "last_date": "",
-            }
-            for phase in PHASES:
-                config[f"{phase['key']}_duration"] = phase["default_duration"]
-                config[f"{phase['key']}_enabled"] = phase["default_enabled"]
+            # 重置为默认值
+            config = default_config
             self._config = config
             self.save_config()  # Save the reset defaults
 
         return config
 
     def save_config(self) -> None:
-        """Saves the current configuration state to the JSON file atomically."""
+        """保存当前配置状态到JSON文件"""
         if self._config is None:
             tooltip("Cannot save config: No configuration loaded.", period=3000)
             return
 
-        try:
-            if not isinstance(self._config, dict):
-                raise ValueError("Configuration data must be a dictionary")
-
-            config_dir = os.path.dirname(CONFIG_PATH)
-            os.makedirs(config_dir, exist_ok=True)
-
-            # Use a unique temporary filename
-            temp_path = f"{CONFIG_PATH}.{os.getpid()}.tmp"
-
-            # Write to temporary file first
-            with open(temp_path, "w", encoding="utf-8") as f:
-                json.dump(self._config, f, indent=4, ensure_ascii=False)
-                f.flush()
-                os.fsync(f.fileno())  # Ensure write to disk
-
-            # Atomic replace
-            os.replace(temp_path, CONFIG_PATH)
-
-        except Exception as e:
-            if os.path.exists(temp_path):
-                try:
-                    os.remove(temp_path)
-                except Exception as remove_e:
-                    tooltip(
-                        f"Error cleaning up temporary file: {remove_e}", period=3000
-                    )
-            tooltip(f"Error saving configuration: {e}", period=3000)
+        save_config(self._config)
 
     def update_config_value(self, key: str, value: Any) -> None:
         """Updates a specific configuration value and saves the config."""
@@ -216,14 +141,9 @@ def get_app_state() -> AppState:
 # --- Convenience Accessors ---
 
 
-def get_config() -> Dict[str, Any]:
+def get_config() -> dict[str, Any]:
     """Convenience function to get the configuration dictionary."""
     return get_app_state().config
-
-
-def save_config() -> None:
-    """Convenience function to save the current configuration."""
-    get_app_state().save_config()
 
 
 def update_config_value(key: str, value: Any) -> None:
@@ -248,4 +168,4 @@ def get_timer_label() -> Optional[QLabel]:
 
 def set_timer_label(label: Optional[QLabel]) -> None:
     """Convenience function to set the timer label instance."""
-    get_app_state().timer_label
+    get_app_state().timer_label = label

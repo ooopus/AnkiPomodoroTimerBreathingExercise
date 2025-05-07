@@ -43,7 +43,7 @@ def setup_plugin():
     else:
         from aqt.utils import tooltip
 
-        tooltip(_("警告: 无法添加番茄钟菜单项 (未找到menuTools)。"), period=3000)
+        tooltip(_("警告: 无法添加番茄钟菜单项"), period=3000)
 
 
 # ---Startup---

@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 import sys  # Needed for standalone app
 
 from aqt import (
     QApplication,
-    QColor,
     QDialog,
+    QMouseEvent,
     QPointF,
     QResizeEvent,
     Qt,
@@ -15,26 +13,7 @@ from aqt import (
 )
 
 from ...state import get_app_state
-
-# --- Constants (Common) ---
-# Define all potential colors here
-# Light Mode Colors
-BG_COLOR_START_LIGHT = QColor(230, 230, 230, 200)
-BG_COLOR_END_LIGHT = QColor(200, 200, 200, 220)
-PROGRESS_COLOR_START_LIGHT = QColor(0, 150, 255)
-PROGRESS_COLOR_END_LIGHT = QColor(0, 100, 200)
-TEXT_COLOR_START_LIGHT = QColor(50, 50, 50)  # Used by gradient style
-TEXT_COLOR_END_LIGHT = QColor(80, 80, 80)  # Used by gradient style
-SHADOW_COLOR_LIGHT = QColor(0, 0, 0, 40)
-
-# Dark Mode Colors (Night Mode)
-BG_COLOR_START_DARK = QColor(70, 70, 80, 200)
-BG_COLOR_END_DARK = QColor(50, 50, 60, 220)
-PROGRESS_COLOR_START_DARK = QColor(20, 180, 255)
-PROGRESS_COLOR_END_DARK = QColor(10, 130, 220)
-TEXT_COLOR_START_DARK = QColor(220, 220, 220)  # Used by gradient style
-TEXT_COLOR_END_DARK = QColor(240, 240, 240)  # Used by gradient style
-SHADOW_COLOR_DARK = QColor(0, 0, 0, 70)
+from ...translator import _
 
 
 # --- TimerWindow (Container Dialog - Common) ---
@@ -79,14 +58,14 @@ class TimerWindow(QDialog):
         # Use AppState
         app_state = get_app_state()
         config = app_state.config
-        position = config.get("timer_position", "右上角")
+        position = config.get("timer_position", _("右上角"))
         window_width, window_height = self.width(), self.height()
         x, y = margin, margin
-        if position == "右上角":
+        if position == _("右上角"):
             x = screen_rect.width() - window_width - margin
-        elif position == "左下角":
+        elif position == _("左下角"):
             y = screen_rect.height() - window_height - margin
-        elif position == "右下角":
+        elif position == _("右下角"):
             x = screen_rect.width() - window_width - margin
             y = screen_rect.height() - window_height - margin
         self.move(x, y)
@@ -112,14 +91,14 @@ class TimerWindow(QDialog):
         self._center_timer_widget()
 
     # --- Frameless Window Dragging Methods (Identical) ---
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QMouseEvent):
         if self._offset is not None and event.button() == Qt.MouseButton.LeftButton:
             self._offset = event.globalPosition() - QPointF(self.pos())
             event.accept()
         else:
             super().mousePressEvent(event)
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QMouseEvent):
         if self._offset is not None and event.buttons() & Qt.MouseButton.LeftButton:
             new_pos = event.globalPosition() - self._offset
             self.move(new_pos.toPoint())
@@ -127,7 +106,7 @@ class TimerWindow(QDialog):
         else:
             super().mouseMoveEvent(event)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QMouseEvent):
         if self._offset is not None and event.button() == Qt.MouseButton.LeftButton:
             event.accept()
         else:
@@ -160,10 +139,13 @@ def setup_circular_timer(timer_widget_class: type[QWidget], force_new=False):
     # Check if the existing window was created with the *same* timer class
     # If the style changed, we need a new window.
     style_changed = False
-    if _timer_window_instance and hasattr(_timer_window_instance, "timer_widget"):
-        if not isinstance(_timer_window_instance.timer_widget, timer_widget_class):
-            style_changed = True
-            force_new = True  # Force recreation if style is different
+    if (
+        _timer_window_instance
+        and hasattr(_timer_window_instance, "timer_widget")
+        and not isinstance(_timer_window_instance.timer_widget, timer_widget_class)
+    ):
+        style_changed = True
+        force_new = True  # Force recreation if style is different
 
     if _timer_window_instance and not force_new:
         _timer_window_instance._position_window()
@@ -173,7 +155,8 @@ def setup_circular_timer(timer_widget_class: type[QWidget], force_new=False):
     else:
         if _timer_window_instance and (force_new or style_changed):
             print(
-                f"Closing existing timer window (force_new={force_new}, style_changed={style_changed})"
+                f"Closing existing timer window "
+                f"(force_new={force_new}, style_changed={style_changed})"
             )
             _timer_window_instance.close()
             # Ensure instance is None before creating new one

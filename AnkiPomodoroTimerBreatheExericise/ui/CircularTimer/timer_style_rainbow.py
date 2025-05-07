@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-import time  # Added for time-based color cycling
+import time
 
 from aqt import (
     QBrush,
@@ -19,12 +18,10 @@ from aqt import (
     theme,
 )
 
-# Import common elements NEEDED by this style
-from .timer_common import (
+from .constants import (
     BG_COLOR_END_DARK,
     BG_COLOR_END_LIGHT,
     BG_COLOR_START_DARK,
-    # Import specific colors used by this style (BG, Progress, Shadow)
     BG_COLOR_START_LIGHT,
     PROGRESS_COLOR_END_DARK,
     PROGRESS_COLOR_END_LIGHT,

@@ -3,7 +3,7 @@ from typing import Union
 from aqt import QLabel, mw
 from aqt.utils import tooltip
 
-from ..constants import STATUSBAR_DEFAULT_TEXT
+from ..constants import Defaults
 from ..state import get_app_state
 
 
@@ -51,7 +51,7 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
     if not label:
 
         def add_widget():
-            new_label = QLabel(STATUSBAR_DEFAULT_TEXT)
+            new_label = QLabel(Defaults.StatusBar.TEXT)
             try:
                 status_bar = mw.statusBar()
                 if status_bar is not None:
