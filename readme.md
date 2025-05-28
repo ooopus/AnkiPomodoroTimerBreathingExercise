@@ -1,3 +1,4 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ooopus/AnkiPomodoroTimerBreathingExericise)
 # Anki Pomodoro Timer & Breathing Exercise Plugin
 
 This is an Anki plugin that combines the Pomodoro Technique with breathing exercises to help you maintain focus and relaxation while studying.
