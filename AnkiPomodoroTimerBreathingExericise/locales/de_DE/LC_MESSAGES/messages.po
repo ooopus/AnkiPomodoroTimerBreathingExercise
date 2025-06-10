@@ -1,7 +1,7 @@
-# English (United States) translations for PROJECT.
+# Deutsch (Deutschland) translations for PROJECT.
 # Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# Diane Hemmen-Schüler <hemmen@mail.de>, 2025.
 #
 msgid ""
 msgstr ""
@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-05-06 20:26+0900\n"
 "PO-Revision-Date: 2025-06-10 21:15+0100\n"
-"Last-Translator: Diane Hemmen-Schüler <stenocrypt@gmail.com>\n"
+"Last-Translator: Diane Hemmen-Schüler <hemmen@mail.de>\n"
 "Language: de_DE\n"
 "Language-Team: de_DE <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
