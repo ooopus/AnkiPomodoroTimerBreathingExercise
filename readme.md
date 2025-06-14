@@ -1,4 +1,5 @@
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ooopus/AnkiPomodoroTimerBreathingExericise)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ooopus/AnkiPomodoroTimerBreathingExercise)
+
 # Anki Pomodoro Timer & Breathing Exercise Plugin
 
 This is an Anki plugin that combines the Pomodoro Technique with breathing exercises to help you maintain focus and relaxation while studying.
@@ -85,6 +86,8 @@ The settings interface displays estimated total training time in real-time.
 
 ### Internationalization (i18n)
 
+The plugin automatically uses your system language for translations. If a translation for your system language isn't available, it will fall back to English.
+
 #### Translation File Structure
 
 ```
@@ -97,33 +100,69 @@ locales/
 
 #### Translation Workflow
 
-1. Extract strings for translation:
+This section describes the process for managing translations. All commands should be run from the project root directory (`AnkiPomodoroTimerBreatheExercise`).
 
 ```bash
-cd AnkiPomodoroTimerBreatheExericise
+git clone https://github.com/ooopus/AnkiPomodoroTimerBreathingExercise
+```
+
+##### Prerequisites: Install Babel
+
+Ensure you have the Babel package installed. Run:
+
+```bash
+pip install babel
+pybabel --version  # Verify installation
+```
+
+##### Step 1: Extract Strings
+
+Extract all translatable strings from the source code into a template file (`messages.pot`). This command scans the project for strings wrapped in `_()` and collects them.
+
+```bash
+cd AnkiPomodoroTimerBreatheExercise
 pybabel extract -F babel.cfg -o locales/messages.pot .
 ```
 
-2. Initialize new language (first time only):
+##### Step 2: Initialize New Language
+
+Create a new translation file for a language that hasn't been added before. Replace `<language_code>` with the appropriate locale (e.g., `de_DE` for German, `fr_FR` for French).
 
 ```bash
 pybabel init -i locales/messages.pot -d locales -l <language_code>
 ```
 
-Example: `pybabel init -i locales/messages.pot -d locales -l zh_CN`
+Example for Simplified Chinese:
 
-3. Update existing translation files:
+```bash
+pybabel init -i locales/messages.pot -d locales -l zh_CN
+```
+
+##### Step 3: Update Existing Translations
+
+When new strings are added or existing ones are modified, update all translation files to include these changes. This command updates the PO files for all languages.
 
 ```bash
 pybabel update -i locales/messages.pot -d locales
 ```
 
-4. Edit translation content in .po files
+##### Step 4: Edit Translation Files
 
-- Edit `locales/<language_code>/LC_MESSAGES/messages.po`
-- Add msgstr translations for each msgid
+Translate the extracted strings by editing the PO file for your target language. Each `msgid` represents the original string, and you should provide the translation in the `msgstr` field.
 
-5. Compile translation files:
+- Open `locales/<language_code>/LC_MESSAGES/messages.po` in a text editor or PO editor
+- For each entry, add your translation between the quotes in the `msgstr` line
+
+Example:
+
+```
+msgid "开始"
+msgstr "Start"
+```
+
+##### Step 5: Compile Translations
+
+Compile the PO files into MO files, which are binary formats used by the application at runtime.
 
 ```bash
 pybabel compile -d locales
@@ -142,8 +181,9 @@ message = _("Text to translate")
 
 #### Supported Languages
 
+- 简体中文 (zh_CN)
 - English (en_US)
-- Simplified Chinese (zh_CN)
+- Deutsch (de_DE)
 
 #### Contributing Translations
 
@@ -156,7 +196,7 @@ message = _("Text to translate")
 #### Directory Structure
 
 ```
-AnkiPomodoroTimerBreatheExericise/
+AnkiPomodoroTimerBreatheExercise/
 ├── __init__.py          # Plugin entry
 ├── babel.cfg            # Babel configuration
 ├── breathing.py         # Breathing exercise related

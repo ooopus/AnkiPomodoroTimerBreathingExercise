@@ -10,7 +10,7 @@ lang = QLocale.system().name()  # like "zh_CN"
 
 localedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "locales"))
 translation = gettext.translation(
-    "messages", localedir, languages=[lang], fallback=True
+    "messages", localedir, languages=[lang, "en_US"], fallback=True
 )
 
 

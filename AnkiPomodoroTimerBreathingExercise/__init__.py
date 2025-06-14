@@ -5,7 +5,7 @@ import time
 from aqt import QAction, gui_hooks, mw
 
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
-from .state import get_app_state
+from .state import AppState, get_app_state
 from .translator import _
 from .ui import ConfigDialog
 
@@ -16,7 +16,7 @@ def show_config_dialog():
     dialog.exec()
 
 
-def _check_and_reset_daily_timer(app_state):
+def _check_and_reset_daily_timer(app_state: AppState):
     """Checks if the date has changed and resets the daily timer if needed."""
     config = app_state.config
     last_date = config.get("last_date", "")

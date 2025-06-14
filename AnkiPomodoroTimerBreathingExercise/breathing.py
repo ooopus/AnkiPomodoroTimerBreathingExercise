@@ -26,6 +26,16 @@ class BreathingController:
         # UI对话框
         self.dialog = None
 
+        # Initialize phase timer once for reuse
+        self._init_phase_timer()
+
+    def _init_phase_timer(self):
+        """Initialize phase timer once for reuse across sessions"""
+        if self._phase_timer is None:
+            self._phase_timer = QTimer(mw)
+            self._phase_timer.setSingleShot(True)
+            self._phase_timer.timeout.connect(self._advance_to_next_phase)
+
     def _load_active_phases(self):
         """从配置中加载活动的呼吸阶段"""
         app_state = get_app_state()
@@ -58,12 +68,10 @@ class BreathingController:
 
         self.audio_player = AudioPlayer(self.dialog)
 
-        # 创建阶段计时器
-        self._phase_timer = QTimer(mw)
-        self._phase_timer.setSingleShot(True)
-        self._phase_timer.timeout.connect(self._advance_to_next_phase)
+        # Ensure phase timer is properly initialized
+        self._init_phase_timer()
 
-        # 开始第一个阶段
+        # Start first phase
         self._advance_to_next_phase()
 
         # 显示对话框并返回结果

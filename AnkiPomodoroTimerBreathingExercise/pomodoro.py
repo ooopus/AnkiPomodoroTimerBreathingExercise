@@ -6,7 +6,7 @@ from aqt import QTimer, QWidget, mw
 from aqt.utils import tooltip
 
 from .constants import STATUSBAR_FORMATS, Defaults
-from .state import get_app_state
+from .state import AppState, get_app_state
 from .translator import _
 from .ui import show_timer_in_statusbar
 from .ui.circular_timer import setupCircularTimer
@@ -182,20 +182,25 @@ class PomodoroTimer(QTimer):
             self.state = TimerState.IDLE
 
         # 确保UI更新在主线程中运行
-        mw.progress.single_shot(10, self._clear_circular_timer, False)
+        mw.progress.single_shot(10, self.cleanup, False)
 
-    def _clear_circular_timer(self) -> None:
-        """清理圆形计时器资源"""
+    def cleanup(self) -> None:
+        """清理所有计时器资源"""
+        # 清理圆形计时器
         if self.circular_timer:
             parent = self.circular_timer.parent()
             if parent and isinstance(parent, QWidget):
                 parent.close()
-            # 确保正确清理
             self.circular_timer.setParent(None)
             self.circular_timer.deleteLater()
             self.circular_timer = None
-            # 停止时更新状态栏
-            self.update_display()
+
+        # 确保休息计时器停止
+        if self.break_timer.isActive():
+            self.break_timer.stop()
+
+        # 更新状态栏显示
+        self.update_display()
 
     def _update_break_time(self) -> None:
         """更新休息时间"""
@@ -203,19 +208,26 @@ class PomodoroTimer(QTimer):
             self.remaining_break_seconds -= 1
             self.update_display()
         else:
-            self.stop_break_timer()
+            self.stop_break_timer(reset_streak=True)
 
-    def stop_break_timer(self) -> None:
+    def start_break_timer(self, seconds: int):
+        """Start break timer that will reset streak if it expires"""
+        self.remaining_break_seconds = seconds
+        self.break_timer.start(1000)
+        self.state = TimerState.BREAK
+
+    def stop_break_timer(self, reset_streak=False) -> None:
         """停止休息时间计时器"""
         if self.break_timer.isActive():
-            app_state = get_app_state()
-
-            tooltip(_("连胜中断"), period=3000)
             self.break_timer.stop()
             self.remaining_break_seconds = 0  # 显式重置休息秒数
-            app_state.update_config_value(
-                "completed_pomodoros", 0
-            )  # 休息中断时重置连胜
+
+            if reset_streak:
+                app_state = get_app_state()
+                tooltip(_("连胜中断"), period=3000)
+                app_state.update_config_value(
+                    "completed_pomodoros", 0
+                )  # 休息中断时重置连胜
 
             # 强制立即更新显示
             self.state = TimerState.IDLE
@@ -229,7 +241,7 @@ class PomodoroTimer(QTimer):
         else:
             self._handle_timer_finished(app_state)
 
-    def _handle_active_timer(self, app_state: Any) -> None:
+    def _handle_active_timer(self, app_state: AppState) -> None:
         """处理活动计时器的更新
 
         Args:
@@ -246,7 +258,7 @@ class PomodoroTimer(QTimer):
 
         self.update_display()  # 每秒更新显示
 
-    def _handle_timer_finished(self, app_state: Any) -> None:
+    def _handle_timer_finished(self, app_state: AppState) -> None:
         """处理计时器完成事件
 
         Args:
@@ -256,10 +268,6 @@ class PomodoroTimer(QTimer):
 
         tooltip(_("本次番茄钟结束"), period=3000)
         self.stop()
-
-        # 首先增加完成计数
-        completed_count = app_state.config.get("completed_pomodoros", 0) + 1
-        app_state.update_config_value("completed_pomodoros", completed_count)
 
         # 通过AppState设置最后完成时间并启动休息计时器
         current_time = time.time()
@@ -273,7 +281,7 @@ class PomodoroTimer(QTimer):
         self.update_display()
         on_pomodoro_finished()  # 状态更新后调用钩子
 
-    def _check_and_reset_daily_timer(self, app_state: Any) -> None:
+    def _check_and_reset_daily_timer(self, app_state: AppState) -> None:
         """检查日期是否已更改，如有必要则重置每日计时器
 
         Args:
@@ -285,6 +293,8 @@ class PomodoroTimer(QTimer):
         if last_date != today:
             app_state.update_config_value("daily_pomodoro_seconds", 0)
             app_state.update_config_value("last_date", today)
+            # Note: completed_pomodoros is preserved across days
+            # to maintain streak count
 
     def _get_timer_display_data(
         self, config: dict[str, Any]
@@ -329,11 +339,12 @@ class PomodoroTimer(QTimer):
             mins, secs = divmod(
                 config.get("pomodoro_duration", 25) * 60, 60
             )  # 空闲时显示配置的时长
-            progress = Defaults.StatusBar.EMPTY_TOMATO * target  # 空闲时显示全空
+            # Use the same progress calculation for all states
+            # progress variable is already set above
 
         return icon, mins, secs, progress, daily_mins, daily_secs
 
-    def _get_statusbar_text(self, app_state: Any) -> str:
+    def _get_statusbar_text(self, app_state: AppState) -> str:
         """生成状态栏标签的文本
 
         Args:
@@ -390,7 +401,7 @@ class PomodoroTimer(QTimer):
                 target=target,
             )
 
-    def _update_circular_timer_progress(self, app_state: Any) -> None:
+    def _update_circular_timer_progress(self, app_state: AppState) -> None:
         """更新圆形计时器的进度
 
         Args:

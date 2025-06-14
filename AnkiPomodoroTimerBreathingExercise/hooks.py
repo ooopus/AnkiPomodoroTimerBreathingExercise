@@ -24,6 +24,7 @@ def on_reviewer_did_start(_reviewer):
     if timer is None or not isinstance(timer, PomodoroTimer):
         timer = PomodoroTimer(mw)
     else:
+        # Ensure break timer is stopped when reviewer starts
         if timer.break_timer.isActive():
             timer.stop_break_timer()
 
@@ -36,22 +37,30 @@ def on_reviewer_did_start(_reviewer):
 
 
 def on_state_did_change(new_state: str, old_state: str):
-    """Stops the Pomodoro timer when leaving the reviewer state."""
+    """Manages Pomodoro timer and streak reset when changing states."""
     timer: PomodoroTimer | None = get_pomodoro_timer()
     config = get_config()
+
+    # When leaving review state
     if (
-        not config.get("work_across_decks", False)  # Add this condition
+        not config.get("work_across_decks", False)
         and old_state == "review"
         and new_state != "review"
         and timer
         and timer.isActive()
         and config.get("enabled", True)
     ):
-        tooltip(
-            f"Left reviewer state ({old_state} -> {new_state}). "
-            f"Stopping Pomodoro timer."
-        )
         timer.stop_timer()
+        # Start break timer that will reset streak if it expires
+        max_break = config.get("max_break_duration", Defaults.MAX_BREAK_DURATION)
+        timer.start_break_timer(max_break)
+
+    # When returning to review state
+    if old_state != "review" and new_state == "review" and config.get("enabled", True):
+        # Ensure break timer is properly stopped when returning to review state
+        timer = get_pomodoro_timer()
+        if timer and timer.break_timer.isActive():
+            timer.stop_break_timer()
 
 
 def on_pomodoro_finished():
@@ -63,10 +72,12 @@ def on_pomodoro_finished():
     config["completed_pomodoros"] = completed
 
     # Get target count and check if long break is needed
-    target = config.get("pomodoros_before_long_break", 4)
+    target = config.get(
+        "pomodoros_before_long_break", Defaults.POMODOROS_BEFORE_LONG_BREAK
+    )
 
     if completed >= target:
-        long_break_mins = config.get("long_break_minutes", 15)
+        long_break_mins = config.get("long_break_minutes", Defaults.LONG_BREAK_MINUTES)
         tooltip(
             _("恭喜完成{target}个番茄钟！建议休息{minutes}分钟。").format(
                 target=target, minutes=long_break_mins
