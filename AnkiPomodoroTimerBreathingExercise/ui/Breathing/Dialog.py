@@ -11,7 +11,7 @@ from aqt import (
 )
 
 from ...translator import _
-from .animationWidget import BreathingAnimationWidget
+from .AnimationWidget import BreathingAnimationWidget
 
 
 # --- Breathing Dialog UI ---

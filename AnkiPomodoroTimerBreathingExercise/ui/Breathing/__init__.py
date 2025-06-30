@@ -1,4 +1,4 @@
-from .animationWidget import BreathingAnimationWidget
-from .dialog import BreathingDialog
+from .AnimationWidget import BreathingAnimationWidget
+from .Dialog import BreathingDialog
 
 __all__ = ["BreathingAnimationWidget", "BreathingDialog"]
