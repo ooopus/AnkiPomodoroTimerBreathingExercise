@@ -3,6 +3,7 @@ __pycache__
 meta.json
 .ruff_cache
 config.json
+config.json.*
 .DS_Store
 *.ankiaddon
 *egg-info
