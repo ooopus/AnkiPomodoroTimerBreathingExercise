@@ -1,6 +1,7 @@
 from typing import Optional, cast
 
-from ...constants import CircularTimerStyle, Defaults
+from ...config.constants import Defaults
+from ...config.enums import CircularTimerStyle
 from .timer_base import TimerClass
 from .timer_style_default import CircularTimer as DefaultTimer
 from .timer_style_rainbow import CircularTimer as RainbowTimer

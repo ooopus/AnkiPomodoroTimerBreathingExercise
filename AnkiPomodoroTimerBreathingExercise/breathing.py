@@ -7,7 +7,7 @@ from aqt import (
 )
 
 from .audioplayer import AudioPlayer
-from .constants import PHASES
+from .config.enums import PHASES
 from .state import get_app_state
 from .ui.Breathing import BreathingDialog
 

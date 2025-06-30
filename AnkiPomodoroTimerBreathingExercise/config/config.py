@@ -8,17 +8,17 @@ if str(vendor_dir) not in sys.path:
 # 由于anki使用自带的python，必须先导入外部依赖
 
 
-import dataclasses  # noqa: E402, I001
-import json  # noqa: E402
-import shutil  # noqa: E402
-from enum import Enum  # noqa: E402
-from pathlib import Path  # noqa: E402
+import dataclasses
+import json
+import shutil
+from enum import Enum
+from pathlib import Path
 
-from ..constants import CircularTimerStyle, StatusBarFormat, TimerPosition  # noqa: E402
+from koda_validate import Valid
 
-from koda_validate import Valid  # noqa: E402
-
-from .types import AppConfig, config_validator  # noqa: E402
+from .enums import CircularTimerStyle, StatusBarFormat, TimerPosition
+from .languages import LanguageCode
+from .types import AppConfig, config_validator
 
 # Path(__file__).resolve() 获取此文件的绝对路径
 # .parent 指向包含此文件的目录 (config/)
@@ -101,6 +101,17 @@ def _migrate_config_data(data: dict) -> dict:
                 f"使用默认值 '{TimerPosition.TOP_RIGHT.value}'."
             )
             data["timer_position"] = TimerPosition.TOP_RIGHT
+
+    # 迁移 language
+    if "language" in data and isinstance(data["language"], str):
+        try:
+            data["language"] = LanguageCode(data["language"])
+        except ValueError:
+            print(
+                f"警告: 无效的 language '{data['language']}', "
+                f"使用默认值 '{LanguageCode.AUTO.value}'."
+            )
+            data["language"] = LanguageCode.AUTO
 
     return data
 

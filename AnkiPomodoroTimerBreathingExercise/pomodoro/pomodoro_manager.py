@@ -4,7 +4,7 @@ from typing import Callable, Optional
 from aqt import QTimer, mw
 from aqt.utils import tooltip
 
-from ..constants import AnkiStates
+from ..config.constants import AnkiStates
 from ..state import get_app_state
 from ..translator import _
 from .timer_manager import TimerManager, TimerState

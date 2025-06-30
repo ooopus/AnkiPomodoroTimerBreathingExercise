@@ -7,54 +7,56 @@ if str(vendor_dir) not in sys.path:
     sys.path.insert(0, str(vendor_dir))
 # 由于anki使用自带的python，必须先导入外部依赖
 
-import dataclasses  # noqa: E402
-from pathlib import Path  # noqa: E402
-from typing import Optional  # noqa: E402
+import dataclasses
+from pathlib import Path
+from typing import Optional
 
-from koda_validate import DataclassValidator  # noqa: E402
+from koda_validate import DataclassValidator
 
-from ..constants import (  # noqa: E402
+from .constants import AUDIO_FILENAMES
+from .enums import (
+    BreathingPhase,
     CircularTimerStyle,
     StatusBarFormat,
     TimerPosition,
 )
-from ..translator import lang  # noqa: E402
+from .languages import LanguageCode
 
 
-def get_default_audio_path(file_name: str) -> str:
-    """根据当前语言和文件名，获取默认的音频文件路径。"""
+def get_default_audio_path(
+    phase: "BreathingPhase", language_code: LanguageCode
+) -> Optional[str]:
+    """
+    根据呼吸阶段和语言，获取默认的音频文件路径。
+    """
     # Correctly determine the media path relative to this file
     media_path = Path(__file__).resolve().parent.parent / "media"
 
-    # Determine the correct file names based on language
-    if lang.startswith("zh"):
-        inhale_file = "吸气.opus"
-        exhale_file = "呼气.opus"
-    elif lang.startswith("de"):
-        inhale_file = "einatmen.opus"
-        exhale_file = "ausatmen.opus"
-    else:
-        inhale_file = "inhale.opus"
-        exhale_file = "exhale.opus"
+    # Get the filename from the new constants structure
+    phase_audio = AUDIO_FILENAMES.get(language_code, {})
+    if not phase_audio:
+        # Fallback to English if the language is not defined
+        phase_audio = AUDIO_FILENAMES.get(LanguageCode.ENGLISH, {})
 
-    # Select the correct file name
-    actual_file_name = inhale_file if "inhale" in file_name else exhale_file
+    file_name = phase_audio.get(phase)
+    if not file_name:
+        return None  # No audio for this phase
 
     # Check for language-specific version
-    language_path = media_path / lang
-    if not language_path.exists() and "_" in lang:
+    language_path = media_path / language_code.value
+    if not language_path.exists() and "_" in language_code.value:
         # Fallback to base language (e.g., 'zh' from 'zh_CN')
-        language_path = media_path / lang.split("_")[0]
+        language_path = media_path / language_code.value.split("_")[0]
 
-    if language_path.exists() and (language_path / actual_file_name).exists():
-        return str(language_path / actual_file_name)
+    if language_path.exists() and (language_path / file_name).exists():
+        return str(language_path / file_name)
 
     # Fallback to English if no specific audio is found
-    return str(
-        media_path
-        / "en_US"
-        / ("inhale.opus" if "inhale" in file_name else "exhale.opus")
-    )
+    english_file_name = AUDIO_FILENAMES[LanguageCode.ENGLISH].get(phase)
+    if english_file_name:
+        return str(media_path / LanguageCode.ENGLISH.value / english_file_name)
+
+    return None
 
 
 @dataclasses.dataclass
@@ -70,18 +72,23 @@ class AppConfig:
     long_break_minutes: int = 15
     pomodoros_before_long_break: int = 4
     work_across_decks: bool = True
+    language: LanguageCode = LanguageCode.AUTO
 
     # 呼吸练习设置
     breathing_cycles: int = 25
     inhale_duration: int = 5
     inhale_enabled: bool = True
     inhale_audio: Optional[str] = dataclasses.field(
-        default_factory=lambda: get_default_audio_path("inhale.opus")
+        default_factory=lambda: get_default_audio_path(
+            BreathingPhase.INHALE, LanguageCode.ENGLISH
+        )
     )
     exhale_duration: int = 5
     exhale_enabled: bool = True
     exhale_audio: Optional[str] = dataclasses.field(
-        default_factory=lambda: get_default_audio_path("exhale.opus")
+        default_factory=lambda: get_default_audio_path(
+            BreathingPhase.EXHALE, LanguageCode.ENGLISH
+        )
     )
     hold_after_inhale_duration: int = 0
     hold_after_inhale_enabled: bool = False

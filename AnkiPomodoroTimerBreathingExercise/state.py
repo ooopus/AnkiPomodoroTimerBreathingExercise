@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from aqt import QLabel
 from aqt.utils import tooltip
 
-from .config import AppConfig, load_user_config, save_config
+from .config.config import AppConfig, load_user_config, save_config
 
 # 仅为类型检查导入 PomodoroManager，以避免循环导入
 if TYPE_CHECKING:

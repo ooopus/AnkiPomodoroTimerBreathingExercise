@@ -12,9 +12,9 @@ from aqt import (
 from aqt.utils import tooltip
 
 from ..config import AppConfig
-from ..constants import StatusBarFormat
+from ..config.enums import StatusBarFormat
 from ..state import get_pomodoro_manager, reload_config, update_and_save_config
-from ..translator import _
+from ..translator import _, set_language
 from .config_components import BreathingSettings, GeneralSettings
 
 
@@ -145,6 +145,7 @@ class ConfigDialog(QDialog):
 
             # 5. 使用新的状态管理函数来更新内存并保存到文件
             update_and_save_config(config_to_save)
+            set_language(config_to_save.language)
             tooltip(_("配置已保存"))
 
             # 6. 立即更新UI显示（如状态栏）

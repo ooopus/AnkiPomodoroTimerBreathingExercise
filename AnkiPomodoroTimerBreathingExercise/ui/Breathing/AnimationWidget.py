@@ -13,7 +13,7 @@ from aqt import (
     QWidget,
 )
 
-from ...constants import BreathingPhase
+from ...config.enums import BreathingPhase
 
 
 # --- Breathing Animation Widget ---

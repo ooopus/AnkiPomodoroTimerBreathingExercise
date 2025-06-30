@@ -14,7 +14,8 @@ from aqt import (
 )
 
 from ..config import AppConfig
-from ..constants import PHASES, TIMER_POSITION_NAMES, TimerPosition
+from ..config.enums import PHASES, TimerPosition
+from ..config.languages import LanguageCode
 from ..translator import _
 from .CircularTimer.timer_factory import list_timer_styles
 
@@ -33,6 +34,7 @@ class GeneralSettings:
         self.pomodoro_spinbox: Optional[QSpinBox] = None
         self.long_break_minutes_spinbox: Optional[QSpinBox] = None
         self.max_break_spinbox: Optional[QSpinBox] = None
+        self.language_combobox: Optional[QComboBox] = None
 
     def create_ui(self, parent):
         """创建常规设置部分的UI组件"""
@@ -42,6 +44,20 @@ class GeneralSettings:
         self.enable_checkbox = QCheckBox(_("启用番茄钟插件"), parent)
         self.enable_checkbox.setChecked(self.config.enabled)
         layout.addWidget(self.enable_checkbox)
+
+        # Language selection
+        language_layout = QHBoxLayout()
+        language_label = QLabel(_("语言:"), parent)
+        self.language_combobox = QComboBox(parent)
+
+        self.language_combobox.addItems([code.display_name for code in LanguageCode])
+
+        current_language_display = self.config.language.display_name
+        self.language_combobox.setCurrentText(current_language_display)
+
+        language_layout.addWidget(language_label)
+        language_layout.addWidget(self.language_combobox)
+        layout.addLayout(language_layout)
 
         self.work_across_decks_checkbox = QCheckBox(_("全局计时器"), parent)
         self.work_across_decks_checkbox.setChecked(self.config.work_across_decks)
@@ -67,11 +83,11 @@ class GeneralSettings:
         position_layout = QHBoxLayout()
         position_label = QLabel(_("计时器窗口位置:"), parent)
         self.timer_position_combobox = QComboBox(parent)
-        self.timer_position_combobox.addItems(TIMER_POSITION_NAMES.values())
-
-        current_position_text = TIMER_POSITION_NAMES.get(
-            self.config.timer_position, TIMER_POSITION_NAMES[TimerPosition.TOP_RIGHT]
+        self.timer_position_combobox.addItems(
+            [pos.display_name for pos in TimerPosition]
         )
+
+        current_position_text = self.config.timer_position.display_name
         self.timer_position_combobox.setCurrentText(current_position_text)
 
         position_layout.addWidget(position_label)
@@ -142,6 +158,7 @@ class GeneralSettings:
 
     def get_values(self) -> dict[str, Any]:
         """从常规设置获取值"""
+        assert self.language_combobox is not None
         assert self.timer_position_combobox is not None
         assert self.enable_checkbox is not None
         assert self.show_timer_checkbox is not None
@@ -152,12 +169,15 @@ class GeneralSettings:
         assert self.max_break_spinbox is not None
         assert self.work_across_decks_checkbox is not None
 
-        # 将UI上选择的中文文本映射回要存储的英文键
-        position_map_rev = {v: k for k, v in TIMER_POSITION_NAMES.items()}
+        position_map_rev = {pos.display_name: pos for pos in TimerPosition}
         selected_position_text = self.timer_position_combobox.currentText()
         position_key = position_map_rev.get(
             selected_position_text, TimerPosition.TOP_RIGHT
         )
+
+        language_map = {lang.display_name: lang for lang in LanguageCode}
+        selected_language_text = self.language_combobox.currentText()
+        language_key = language_map.get(selected_language_text, LanguageCode.AUTO)
 
         return {
             "enabled": self.enable_checkbox.isChecked(),
@@ -169,6 +189,7 @@ class GeneralSettings:
             "long_break_minutes": self.long_break_minutes_spinbox.value(),
             "max_break_duration": self.max_break_spinbox.value() * 60,
             "work_across_decks": self.work_across_decks_checkbox.isChecked(),
+            "language": language_key,
         }
 
 

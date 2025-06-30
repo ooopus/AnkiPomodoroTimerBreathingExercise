@@ -10,7 +10,7 @@ from aqt import (
     pyqtSignal,
 )
 
-from ...constants import TimerPosition
+from ...config.enums import TimerPosition
 from ...state import get_app_state, reload_config
 from ...translator import _
 from .timer_base import BaseCircularTimer, TimerClass

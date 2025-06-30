@@ -1,7 +1,8 @@
 from aqt import QLabel, mw
 from aqt.utils import tooltip
 
-from ..constants import Defaults, StatusBarFormat
+from ..config.constants import Defaults
+from ..config.enums import StatusBarFormat
 from ..state import get_app_state
 
 

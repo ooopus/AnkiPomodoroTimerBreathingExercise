@@ -3,7 +3,8 @@ from aqt.utils import tooltip
 
 from .breathing import start_breathing_exercise
 from .config import save_config
-from .constants import PHASES, AnkiStates
+from .config.constants import AnkiStates
+from .config.enums import PHASES
 from .pomodoro.pomodoro_manager import PomodoroManager
 from .pomodoro.timer_manager import TimerState
 from .state import get_app_state, get_config, get_pomodoro_manager, set_pomodoro_manager

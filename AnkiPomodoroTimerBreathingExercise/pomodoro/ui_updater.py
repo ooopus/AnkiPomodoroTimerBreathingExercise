@@ -3,7 +3,8 @@ from typing import Optional
 from aqt import QWidget
 
 from ..config import AppConfig
-from ..constants import Defaults, StatusBarFormat
+from ..config.constants import Defaults
+from ..config.enums import StatusBarFormat
 from ..state import get_app_state
 from ..ui.CircularTimer import (
     BaseCircularTimer,
