@@ -1,9 +1,7 @@
-from typing import Union
-
 from aqt import QLabel, mw
 from aqt.utils import tooltip
 
-from ..constants import Defaults
+from ..constants import Defaults, StatusBarFormat
 from ..state import get_app_state
 
 
@@ -28,7 +26,7 @@ def remove_widget():
             tooltip(f"Error removing timer widget: {e}")
 
 
-def show_timer_in_statusbar(show: Union[bool, None]) -> None:
+def show_timer_in_statusbar(show) -> None:
     """Adds or removes the timer label from the Anki status bar."""
     # Use AppState
     app_state = get_app_state()
@@ -40,9 +38,9 @@ def show_timer_in_statusbar(show: Union[bool, None]) -> None:
 
     if (
         not show
-        or not config.get("enabled", True)
-        or not config.get("statusbar_format", True)
-        or config.get("statusbar_format") == "NONE"
+        or not config.enabled
+        or not config.statusbar_format
+        or config.statusbar_format == StatusBarFormat.NONE
     ):
         if label:
             mw.progress.single_shot(0, remove_widget, False)

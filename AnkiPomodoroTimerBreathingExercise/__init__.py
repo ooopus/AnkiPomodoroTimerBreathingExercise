@@ -19,7 +19,7 @@ def show_config_dialog():
 def _check_and_reset_daily_timer(app_state: AppState):
     """Checks if the date has changed and resets the daily timer if needed."""
     config = app_state.config
-    last_date = config.get("last_date", "")
+    last_date = config.last_date
     today = time.strftime("%Y-%m-%d")
     if last_date != today:
         app_state.update_config_value("daily_pomodoro_seconds", 0)

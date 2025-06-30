@@ -1,9 +1,11 @@
 import time
+from typing import Optional
 
 from aqt import (
     QBrush,
     QColor,
     QPainter,
+    QPaintEvent,
     QPointF,
     QSizePolicy,
     Qt,
@@ -11,19 +13,16 @@ from aqt import (
     QWidget,
 )
 
+from ...constants import BreathingPhase
+
 
 # --- Breathing Animation Widget ---
 class BreathingAnimationWidget(QWidget):
     """Displays the expanding/contracting circle animation for breathing."""
 
-    INHALE = "inhale"
-    HOLD_AFTER_INHALE = "hold_after_inhale"
-    EXHALE = "exhale"
-    HOLD_AFTER_EXHALE = "hold_after_exhale"
-
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._current_phase_key = self.INHALE
+        self._current_phase_key: BreathingPhase = BreathingPhase.INHALE
         self._phase_duration_ms = 4000
         self._animation_timer = QTimer(self)
         self._animation_timer.timeout.connect(self._update_animation)
@@ -38,7 +37,7 @@ class BreathingAnimationWidget(QWidget):
         self.setMinimumSize(150, 150)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-    def set_phase(self, phase_key: str, duration_seconds: int):
+    def set_phase(self, phase_key: BreathingPhase, duration_seconds: int):
         """Sets the current breathing phase and its duration."""
         self._current_phase_key = phase_key
         self._phase_duration_ms = duration_seconds * 1000
@@ -77,7 +76,7 @@ class BreathingAnimationWidget(QWidget):
         if self._progress >= 1.0:
             self._animation_timer.stop()
 
-    def paintEvent(self, event):
+    def paintEvent(self, a0: Optional[QPaintEvent]):
         """Paints the breathing circle."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -96,19 +95,19 @@ class BreathingAnimationWidget(QWidget):
         current_color = QColor(Qt.GlobalColor.gray)  # Default color
 
         # Determine radius and color based on phase and progress
-        if self._current_phase_key == self.INHALE:
+        if self._current_phase_key == BreathingPhase.INHALE:
             # Linear interpolation from min to max radius
             current_radius = min_radius + radius_range * self._progress
             current_color = self._color_inhale
-        elif self._current_phase_key == self.HOLD_AFTER_INHALE:
+        elif self._current_phase_key == BreathingPhase.HOLD_AFTER_INHALE:
             # Stays at max radius during hold
             current_radius = max_radius
             current_color = self._color_hold
-        elif self._current_phase_key == self.EXHALE:
+        elif self._current_phase_key == BreathingPhase.EXHALE:
             # Linear interpolation from max to min radius
             current_radius = max_radius - radius_range * self._progress
             current_color = self._color_exhale
-        elif self._current_phase_key == self.HOLD_AFTER_EXHALE:
+        elif self._current_phase_key == BreathingPhase.HOLD_AFTER_EXHALE:
             # Stays at min radius during hold
             current_radius = min_radius
             current_color = self._color_hold
@@ -116,13 +115,13 @@ class BreathingAnimationWidget(QWidget):
         # Handle zero duration phases to show the final state immediately
         if self._phase_duration_ms <= 0:
             if (
-                self._current_phase_key == self.INHALE
-                or self._current_phase_key == self.HOLD_AFTER_INHALE
+                self._current_phase_key == BreathingPhase.INHALE
+                or self._current_phase_key == BreathingPhase.HOLD_AFTER_INHALE
             ):
                 current_radius = max_radius
             elif (
-                self._current_phase_key == self.EXHALE
-                or self._current_phase_key == self.HOLD_AFTER_EXHALE
+                self._current_phase_key == BreathingPhase.EXHALE
+                or self._current_phase_key == BreathingPhase.HOLD_AFTER_EXHALE
             ):
                 current_radius = min_radius
 

@@ -1,4 +1,7 @@
+from typing import Optional
+
 from aqt import (
+    QCloseEvent,
     QDialog,
     QLabel,
     QPushButton,
@@ -8,7 +11,7 @@ from aqt import (
 )
 
 from ...translator import _
-from .AnimationWidget import BreathingAnimationWidget
+from .animationWidget import BreathingAnimationWidget
 
 
 # --- Breathing Dialog UI ---
@@ -30,7 +33,7 @@ class BreathingDialog(QDialog):
     def _init_ui(self):
         """初始化UI组件"""
         # --- UI Elements ---
-        layout = QVBoxLayout()
+        layout = QVBoxLayout(mw)
         self.animation_widget = BreathingAnimationWidget(self)
         layout.addWidget(self.animation_widget, 1)
 
@@ -81,10 +84,10 @@ class BreathingDialog(QDialog):
         if hasattr(self.controller, "stop_timers"):
             self.controller.stop_timers()
 
-    def closeEvent(self, event):
+    def closeEvent(self, a0: Optional[QCloseEvent]):
         """Called when the dialog is closed (e.g., by window manager)."""
         self.stop_all_timers()
-        super().closeEvent(event)
+        super().closeEvent(a0)
 
     def accept(self):
         """Called when the exercise completes successfully."""

@@ -1,0 +1,7 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": false,
+    "python.analysis.extraPaths": [
+        "./AnkiPomodoroTimerBreathingExercise/vendor"
+    ]
+}

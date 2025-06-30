@@ -1,144 +1,159 @@
-from aqt import QDialog, QTimer, mw
+from aqt import QTimer, mw
 from aqt.utils import tooltip
 
 from .breathing import start_breathing_exercise
 from .config import save_config
-from .constants import PHASES, Defaults
-from .pomodoro import PomodoroTimer
-from .state import get_config, get_pomodoro_timer
+from .constants import PHASES, AnkiStates
+from .pomodoro.pomodoro_manager import PomodoroManager
+from .pomodoro.timer_manager import TimerState
+from .state import get_app_state, get_config, get_pomodoro_manager, set_pomodoro_manager
 from .translator import _
-from .ui.CircularTimer.timer_common import _timer_window_instance
 
 # --- Anki 钩子函数 ---
 
 
-def on_reviewer_did_start(_reviewer):
+def on_reviewer_did_start(card):
     """Starts the Pomodoro timer when the reviewer screen is shown."""
     config = get_config()
-    timer = get_pomodoro_timer()
+    pomodoro_manager = get_pomodoro_manager()
 
-    if not config.get("enabled", True):
+    if not config.enabled:
         return
 
-    # Ensure we are on the main thread before starting timer
-    if timer is None or not isinstance(timer, PomodoroTimer):
-        timer = PomodoroTimer(mw)
-    else:
-        # Ensure break timer is stopped when reviewer starts
-        if timer.break_timer.isActive():
-            timer.stop_break_timer()
+    # If Anki is in review state
+    if mw.state == AnkiStates.REVIEW:
+        if pomodoro_manager is None:
+            pomodoro_manager = PomodoroManager()
+            set_pomodoro_manager(pomodoro_manager)
+            # Set the callback for when a pomodoro finishes
+            pomodoro_manager.on_pomodoro_finished_callback = on_pomodoro_finished
 
-    def _start_timer():
-        if not timer.isActive():
-            pomo_minutes = config.get("pomodoro_minutes", Defaults.POMODORO_MINUTES)
-            timer.start_timer(pomo_minutes)
-
-    mw.progress.single_shot(100, _start_timer, False)
+        # If currently in a break, stop it and start a new pomodoro
+        if pomodoro_manager.timer_manager.state == TimerState.LONG_BREAK:
+            pomodoro_manager.stop_max_break_countdown()
+            mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
+        if pomodoro_manager.timer_manager.state == TimerState.MAX_BREAK_COUNTDOWN:
+            pomodoro_manager.stop_max_break_countdown()
+            mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
+        # If idle, start a new pomodoro
+        elif pomodoro_manager.timer_manager.state == TimerState.IDLE:
+            mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
 
 
 def on_state_did_change(new_state: str, old_state: str):
-    """Manages Pomodoro timer and streak reset when changing states."""
-    timer: PomodoroTimer | None = get_pomodoro_timer()
+    """管理状态变更时的Pomodoro计时器和休息状态"""
+    pomodoro_manager = get_pomodoro_manager()
     config = get_config()
 
-    # When leaving review state
+    # 离开复习状态时保存休息进度
     if (
-        not config.get("work_across_decks", False)
-        and old_state == "review"
-        and new_state != "review"
-        and timer
-        and timer.isActive()
-        and config.get("enabled", True)
+        not config.work_across_decks
+        and old_state == AnkiStates.REVIEW
+        and new_state != AnkiStates.REVIEW
+        and pomodoro_manager
+        and config.enabled
+        and pomodoro_manager.timer_manager.state == TimerState.WORKING
     ):
-        timer.stop_timer()
-        # Start break timer that will reset streak if it expires
-        max_break = config.get("max_break_duration", Defaults.MAX_BREAK_DURATION)
-        timer.start_break_timer(max_break)
+        # 停止工作番茄钟计时器
+        pomodoro_manager.timer_manager.stop()
+        tooltip(_("番茄钟计时器已停止。"), period=3000)
 
-    # When returning to review state
-    if old_state != "review" and new_state == "review" and config.get("enabled", True):
-        # Ensure break timer is properly stopped when returning to review state
-        timer = get_pomodoro_timer()
-        if timer and timer.break_timer.isActive():
-            timer.stop_break_timer()
+        # 启动最长休息时间倒计时
+        # config.max_break_duration 是秒，start_max_break_countdown 期望分钟
+        pomodoro_manager.start_max_break_countdown(config.max_break_duration / 60)
 
 
 def on_pomodoro_finished():
-    """Called when the Pomodoro timer reaches zero."""
+    """番茄钟完成时的处理函数"""
     config = get_config()
+    app_state = get_app_state()
 
-    # Simply increment completed pomodoros
-    completed = config.get("completed_pomodoros", 0) + 1
-    config["completed_pomodoros"] = completed
+    target = config.pomodoros_before_long_break
 
-    # Get target count and check if long break is needed
-    target = config.get(
-        "pomodoros_before_long_break", Defaults.POMODOROS_BEFORE_LONG_BREAK
-    )
-
-    if completed >= target:
-        long_break_mins = config.get("long_break_minutes", Defaults.LONG_BREAK_MINUTES)
+    # 根据完成数量显示不同提示
+    if config.completed_pomodoros >= target:
+        long_break_mins = config.long_break_minutes
         tooltip(
             _("恭喜完成{target}个番茄钟！建议休息{minutes}分钟。").format(
                 target=target, minutes=long_break_mins
             ),
             period=5000,
         )
-        config["completed_pomodoros"] = 0
-    else:
-        tooltip(_("番茄钟时间到！休息一下。"), period=3000)
+        config.completed_pomodoros = 0
+        app_state.pending_break_type = True  # True to start a long break
+        tooltip(_("番茄钟时间到！"), period=3000)
 
     save_config(config)
 
-    # Ensure we are on the main thread before changing state or showing dialog
     mw.progress.single_shot(100, lambda: _after_pomodoro_finish_tasks(), False)
 
 
 def on_theme_change():
-    """Called when the theme changes."""
-    if _timer_window_instance and _timer_window_instance.timer_widget:
-        _timer_window_instance.timer_widget.update_theme()
+    """
+    当Anki的主题（白天/夜间模式）改变时调用。
+    这个函数会找到活动的计时器实例并更新其颜色。
+    """
+    pomodoro_manager = get_pomodoro_manager()
+    if (
+        pomodoro_manager
+        and pomodoro_manager.ui_updater.circular_timer
+        and hasattr(pomodoro_manager.ui_updater.circular_timer, "update_theme_colors")
+    ):
+        timer_widget = pomodoro_manager.ui_updater.circular_timer
+        timer_widget.update_theme_colors()
 
 
 def _after_pomodoro_finish_tasks():
     """Actions to perform after the Pomodoro finishes (runs on main thread)."""
-    # from .ui import show_timer_in_statusbar
-
-    # Return to deck browser
-    if mw.state == "review":
-        mw.moveToState("deckBrowser")
-
-    # Show breathing dialog after a short delay
-    QTimer.singleShot(200, show_breathing_dialog)  # Delay allows state change to settle
+    if mw.state == AnkiStates.REVIEW:
+        mw.moveToState(AnkiStates.DECK_BROWSER)
+    QTimer.singleShot(200, _start_breathing_and_break)
 
 
 def show_breathing_dialog():
     """Checks config and shows the breathing exercise if appropriate."""
-    config = get_config()  # Use our config getter
-    if not config.get("enabled", True):
+    config = get_config()
+    if not config.enabled:
         return
 
-    # Check if *any* breathing phase is enabled
     any_phase_enabled = any(
-        config.get(f"{p['key']}_enabled", p["default_enabled"]) for p in PHASES
+        getattr(config, f"{p.key}_enabled", p.default_enabled) for p in PHASES
     )
     if not any_phase_enabled:
         tooltip(_("呼吸训练已跳过 (无启用阶段)。"), period=3000)
         return
 
-    # Get configured number of cycles using our config system
-    target_cycles = config.get("breathing_cycles", Defaults.BREATHING_CYCLES)
+    target_cycles = config.breathing_cycles
     if target_cycles <= 0:
         tooltip(_("呼吸训练已跳过 (循环次数为 0)。"), period=3000)
         return
 
-    # Ensure main window is visible before showing modal dialog
     if mw and mw.isVisible():
-        # 使用重构后的函数启动呼吸训练
         result = start_breathing_exercise(target_cycles, mw)
-        if result == QDialog.DialogCode.Accepted:
-            tooltip(_("呼吸训练完成！"), period=2000)  # "Breathing exercise complete!"
+        if result:
+            tooltip(_("呼吸训练完成！"), period=2000)
         else:
-            tooltip(_("呼吸训练已跳过。"), period=2000)  # "Breathing exercise skipped."
+            tooltip(_("呼吸训练已跳过。"), period=2000)
     else:
         tooltip(_("跳过呼吸训练 (主窗口不可见)。"), period=2000)
+
+
+def _start_breathing_and_break():
+    """
+    Starts breathing exercise and then the appropriate break or max break countdown.
+    """
+    config = get_config()
+    app_state = get_app_state()
+    pomodoro_manager = get_pomodoro_manager()
+
+    # Always show breathing dialog
+    show_breathing_dialog()  # This is a blocking call
+
+    # After breathing, start the pending break or max break countdown
+    if pomodoro_manager and app_state.pending_break_type:
+        pomodoro_manager.start_long_break()
+        app_state.pending_break_type = False
+
+        pomodoro_manager.ui_updater.update(pomodoro_manager.timer_manager)
+    elif pomodoro_manager:
+        pomodoro_manager.start_max_break_countdown(config.max_break_duration / 60)

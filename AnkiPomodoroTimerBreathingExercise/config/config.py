@@ -1,80 +1,182 @@
-import json
-import os
-from typing import Any
+import sys
+from pathlib import Path
 
-from aqt.utils import tooltip
-
-from .type import ConfigDict
-
-# 配置文件路径
-CONFIG_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json"
-)
+# Add the 'vendor' directory to Python's path
+vendor_dir = Path(__file__).resolve().parent.parent / "vendor"
+if str(vendor_dir) not in sys.path:
+    sys.path.insert(0, str(vendor_dir))
+# 由于anki使用自带的python，必须先导入外部依赖
 
 
-def load_config_from_file() -> dict[str, Any]:
-    """从JSON文件加载配置"""
-    try:
-        if os.path.exists(CONFIG_PATH):
-            with open(CONFIG_PATH, encoding="utf-8") as f:
-                config_data = json.load(f)
-                if not isinstance(config_data, dict):
-                    raise ValueError("Invalid config format")
-                return config_data
-    except json.JSONDecodeError as e:
-        tooltip(f"Configuration file format error: {e}", period=3000)
-    except Exception as e:
-        tooltip(f"Error loading configuration file: {e}", period=3000)
-    return {}
+import dataclasses  # noqa: E402, I001
+import json  # noqa: E402
+import shutil  # noqa: E402
+from enum import Enum  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+from ..constants import CircularTimerStyle, StatusBarFormat, TimerPosition  # noqa: E402
+
+from koda_validate import Valid  # noqa: E402
+
+from .types import AppConfig, config_validator  # noqa: E402
+
+# Path(__file__).resolve() 获取此文件的绝对路径
+# .parent 指向包含此文件的目录 (config/)
+# .parent.parent 指向上一级目录 (项目根目录)
+# 然后与 "config.json" 文件名结合
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.json"
 
 
-def save_config(config: dict[str, Any], force: bool = False) -> None:
-    """将配置保存到JSON文件
+class EnhancedJSONEncoder(json.JSONEncoder):
+    """一个增强的JSON编码器，可以处理枚举类型。"""
 
-    Args:
-        config: 要保存的配置字典
-        force: 如果为True，则在出错时强制覆盖配置文件
+    def default(self, o):
+        if isinstance(o, Enum):
+            return o.value
+        return super().default(o)
+
+
+def get_default_config() -> AppConfig:
+    """方便地获取一个包含所有默认值的 AppConfig 实例。"""
+    return AppConfig()
+
+
+def save_config(config: AppConfig):
     """
-    if not config and not force:
-        tooltip("Cannot save config: No configuration loaded.", period=3000)
-        return
+    将一个 AppConfig 实例保存到固定的 JSON 文件路径。
+    """
+    try:
+        # 确保配置文件所在的目录存在
+        CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        # 使用 "w" 模式以文本形式写入
+        with CONFIG_PATH.open("w", encoding="utf-8") as f:
+            # dataclasses.asdict 将 dataclass 实例转换为字典
+            config_dict = dataclasses.asdict(config)
+            # 使用 json.dump 写入文件，indent=4 使其格式化
+            json.dump(
+                config_dict, f, indent=4, ensure_ascii=False, cls=EnhancedJSONEncoder
+            )
+    except OSError as e:
+        print(f"错误: 无法写入配置文件 '{CONFIG_PATH}': {e}")
+
+
+def _migrate_config_data(data: dict) -> dict:
+    """
+    迁移旧的配置数据格式到新的枚举类型。
+    """
+    # 迁移 circular_timer_style
+    if "circular_timer_style" in data and isinstance(data["circular_timer_style"], str):
+        try:
+            data["circular_timer_style"] = CircularTimerStyle(
+                data["circular_timer_style"]
+            )
+        except ValueError:
+            print(
+                f"警告: 无效的 circular_timer_style '{data['circular_timer_style']}', "
+                f"使用默认值 '{CircularTimerStyle.DEFAULT.value}'."
+            )
+            data["circular_timer_style"] = CircularTimerStyle.DEFAULT
+
+    # 迁移 statusbar_format
+    if "statusbar_format" in data and isinstance(data["statusbar_format"], str):
+        try:
+            data["statusbar_format"] = StatusBarFormat(data["statusbar_format"])
+        except ValueError:
+            print(
+                f"警告: 无效的 statusbar_format '{data['statusbar_format']}', "
+                "使用默认值"
+                f"'{StatusBarFormat.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME.value}'."
+            )
+            data["statusbar_format"] = (
+                StatusBarFormat.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME
+            )
+
+    # 迁移 timer_position
+    if "timer_position" in data and isinstance(data["timer_position"], str):
+        try:
+            data["timer_position"] = TimerPosition(data["timer_position"])
+        except ValueError:
+            print(
+                f"警告: 无效的 timer_position '{data['timer_position']}', "
+                f"使用默认值 '{TimerPosition.TOP_RIGHT.value}'."
+            )
+            data["timer_position"] = TimerPosition.TOP_RIGHT
+
+    return data
+
+
+def _read_config_file(path: Path) -> dict:
+    """从指定路径读取并解析 JSON 文件内容。"""
+    with path.open("r", encoding="utf-8") as f:
+        content = f.read()
+        if not content:
+            raise json.JSONDecodeError("File is empty", "", 0)
+        return json.loads(content)
+
+
+def _backup_corrupted_config(path: Path):
+    """备份损坏的配置文件。"""
+    backup_path = path.with_suffix(".json.bak")
+    try:
+        if path.exists():
+            shutil.move(str(path), str(backup_path))
+            print(f"已将损坏的配置文件备份到: '{backup_path}'")
+    except OSError as backup_error:
+        print(f"警告: 备份损坏的配置文件失败: {backup_error}")
+
+
+def _create_default_config_file(path: Path):
+    """创建新的默认配置文件。"""
+    print(f"提示: 配置文件 '{path}' 不存在。")
+    print("正在使用默认设置创建新的配置文件...")
+    default_config = get_default_config()
+    save_config(default_config)
+    print(f"成功创建默认配置文件: '{path}'")
+    return default_config
+
+
+def load_user_config() -> AppConfig:
+    """
+    从固定的路径加载、验证并返回用户配置。
+    - 如果配置文件不存在，则创建一个包含默认值的配置文件。
+    - 如果配置文件损坏，则将其备份并创建一个新的默认配置文件。
+    - 如果配置文件缺少字段，则使用默认值填充。
+
+    Returns:
+        一个经过验证和完全填充的 AppConfig 实例。
+    """
+    if not CONFIG_PATH.exists():
+        return _create_default_config_file(CONFIG_PATH)
 
     try:
-        if not isinstance(config, dict) and not force:
-            raise ValueError("Configuration data must be a dictionary")
+        loaded_data = _read_config_file(CONFIG_PATH)
 
-        config_dir = os.path.dirname(CONFIG_PATH)
-        os.makedirs(config_dir, exist_ok=True)
+        # 在验证之前进行数据迁移
+        loaded_data = _migrate_config_data(loaded_data)
 
-        # 直接写入配置文件
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(config, f, indent=4, ensure_ascii=False)
-            f.flush()
+        # 使用从 types.py 导入的验证器进行验证和填充
+        result = config_validator(loaded_data)
 
-    except Exception as e:
-        if force:
-            # 强制模式下，尝试再次保存
-            try:
-                with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-                    json.dump(config, f, indent=4, ensure_ascii=False)
-            except Exception as force_e:
-                tooltip(f"强制保存配置也失败: {force_e}", period=3000)
-        tooltip(f"保存配置时出错: {e}", period=3000)
+        if isinstance(result, Valid):
+            config = result.val
+            # 将可能已更新的配置回写到文件
+            updated_dict = dataclasses.asdict(config)
+            if updated_dict != loaded_data:
+                print("提示: 配置已使用新添加的默认值更新。正在回写配置文件...")
+                save_config(config)
+            return config
+        else:
+            raise ValueError(f"配置验证失败: {result}")
 
+    except (json.JSONDecodeError, ValueError, TypeError) as e:
+        print(f"错误: 配置文件 '{CONFIG_PATH}' 已损坏或格式无效。")
+        print(f"详细信息: {e}")
 
-def get_default_config() -> ConfigDict:
-    """获取默认配置"""
-    # 从config.example.json加载默认配置
-    example_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "config.example.json"
-    )
-    try:
-        if os.path.exists(example_path):
-            with open(example_path, encoding="utf-8") as f:
-                default_config = json.load(f)
-                return default_config
-    except Exception as e:
-        tooltip(f"Error loading default configuration: {e}", period=3000)
+        _backup_corrupted_config(CONFIG_PATH)
 
-    # 如果无法加载示例配置，返回空字典
-    return {}
+        # 创建一个新的默认配置
+        print("正在创建全新的默认配置文件...")
+        default_config = get_default_config()
+        save_config(default_config)
+        print("已成功创建新的默认配置文件。程序将使用默认设置继续运行。")
+        return default_config

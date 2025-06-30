@@ -56,9 +56,6 @@ def process_file(filepath):
                 f.write(modified_content)
         except Exception as e:
             logging.error(f"无法写入文件 {filepath}: {e}")
-            # 考虑是否要恢复原文件（如果需要更安全的操作）
-    # else: # 如果需要，可以取消注释以查看未修改的文件
-    #     logging.debug(f"文件无需修改: {filepath}")
 
 
 def process_directory(root_dir):
