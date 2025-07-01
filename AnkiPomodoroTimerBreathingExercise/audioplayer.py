@@ -5,6 +5,7 @@ from PyQt6.QtMultimedia import QAudioOutput, QMediaPlayer
 
 class AudioPlayer(QObject):
     def __init__(self, parent=None):
+        super().__init__(parent)
         self.player = QMediaPlayer(parent)
         self._audio_output = QAudioOutput()
         self.player.setAudioOutput(self._audio_output)

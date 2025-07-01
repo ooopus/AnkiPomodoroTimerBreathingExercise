@@ -15,7 +15,7 @@ localedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "locales"))
 
 def build_translation(language_code: str):
     return gettext.translation(
-        "messages", localedir, languages=[language_code, "en_US"], fallback=True
+        "messages", localedir, languages=[language_code], fallback=True
     )
 
 

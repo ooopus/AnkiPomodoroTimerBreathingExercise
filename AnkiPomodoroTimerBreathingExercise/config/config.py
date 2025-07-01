@@ -17,7 +17,6 @@ from pathlib import Path
 from koda_validate import Valid
 
 from .enums import CircularTimerStyle, StatusBarFormat, TimerPosition
-from .languages import LanguageCode
 from .types import AppConfig, config_validator
 
 # Path(__file__).resolve() 获取此文件的绝对路径
@@ -104,6 +103,8 @@ def _migrate_config_data(data: dict) -> dict:
 
     # 迁移 language
     if "language" in data and isinstance(data["language"], str):
+        from .languages import LanguageCode
+
         try:
             data["language"] = LanguageCode(data["language"])
         except ValueError:
