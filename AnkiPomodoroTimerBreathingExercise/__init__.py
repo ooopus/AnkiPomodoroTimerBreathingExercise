@@ -6,7 +6,7 @@ from aqt import QAction, gui_hooks, mw
 
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
 from .state import AppState, get_app_state
-from .translator import _, set_language
+from .translator import _
 from .ui import ConfigDialog
 
 
@@ -31,7 +31,6 @@ def setup_plugin():
 
     app_state = get_app_state()
     _check_and_reset_daily_timer(app_state)
-    set_language(app_state.config.language)
 
     gui_hooks.reviewer_did_show_question.append(on_reviewer_did_start)
     gui_hooks.state_did_change.append(on_state_did_change)
