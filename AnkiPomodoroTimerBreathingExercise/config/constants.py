@@ -1,3 +1,5 @@
+from typing import Literal
+
 from ..translator import _
 from .enums import BreathingPhase, CircularTimerStyle, StatusBarFormat
 from .languages import LanguageCode
@@ -23,9 +25,13 @@ AUDIO_FILENAMES = {
 from enum import Enum
 
 
-class AnkiStates(str, Enum):
-    REVIEW = "review"
+class AnkiStates(Literal, Enum):
+    STARTUP = "startup"
     DECK_BROWSER = "deckBrowser"
+    OVERVIEW = "overview"
+    REVIEW = "review"
+    RESET_REQUIRED = "resetRequired"
+    PROFILE_MANAGER = "profileManager"
 
 
 class Defaults:

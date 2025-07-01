@@ -193,23 +193,6 @@ message = _("Text to translate")
 
 ### Development Guide
 
-#### Directory Structure
-
-```
-AnkiPomodoroTimerBreatheExercise/
-├── __init__.py          # Plugin entry
-├── babel.cfg            # Babel configuration
-├── breathing.py         # Breathing exercise related
-├── config.py           # Configuration management
-├── constants.py        # Constants definition
-├── hooks.py            # Anki hook functions
-├── locales/            # Translation files
-├── pomodoro.py         # Pomodoro functionality
-├── timer_utils.py      # Timer utilities
-├── translator.py       # Translator
-└── ui/                 # User interface
-```
-
 #### Code Style
 
 - Use Python type annotations
