@@ -1,5 +1,3 @@
-from typing import Literal
-
 from ..translator import _
 from .enums import BreathingPhase, CircularTimerStyle, StatusBarFormat
 from .languages import LanguageCode
