@@ -23,7 +23,7 @@ AUDIO_FILENAMES = {
 from enum import Enum
 
 
-class AnkiStates(Enum):
+class AnkiStates(str, Enum):
     STARTUP = "startup"
     DECK_BROWSER = "deckBrowser"
     OVERVIEW = "overview"

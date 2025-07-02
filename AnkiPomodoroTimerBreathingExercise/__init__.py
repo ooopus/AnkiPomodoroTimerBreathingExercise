@@ -4,10 +4,27 @@ import time
 
 from aqt import QAction, gui_hooks, mw
 
+from .breathing import start_breathing_exercise
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
 from .state import AppState, get_app_state
 from .translator import _
 from .ui import ConfigDialog
+
+
+def add_menu_item():
+    action = QAction(_("番茄钟 & 呼吸设置..."), mw)
+    action.triggered.connect(show_config_dialog)
+
+    breathe_action = QAction(_("启动呼吸训练"), mw)
+    breathe_action.triggered.connect(start_breathing_exercise)
+
+    if hasattr(mw, "form") and hasattr(mw.form, "menuTools"):
+        mw.form.menuTools.addAction(action)
+        mw.form.menuTools.addAction(breathe_action)
+    else:
+        from aqt.utils import tooltip
+
+        tooltip(_("警告: 无法添加番茄钟菜单项"), period=3000)
 
 
 def show_config_dialog():
@@ -35,15 +52,7 @@ def setup_plugin():
     gui_hooks.reviewer_did_show_question.append(on_reviewer_did_start)
     gui_hooks.state_did_change.append(on_state_did_change)
     gui_hooks.theme_did_change.append(on_theme_change)
-    # Add menu item
-    action = QAction(_("番茄钟 & 呼吸设置..."), mw)
-    action.triggered.connect(show_config_dialog)
-    if hasattr(mw, "form") and hasattr(mw.form, "menuTools"):
-        mw.form.menuTools.addAction(action)
-    else:
-        from aqt.utils import tooltip
-
-        tooltip(_("警告: 无法添加番茄钟菜单项"), period=3000)
+    add_menu_item()
 
 
 # ---Startup---
