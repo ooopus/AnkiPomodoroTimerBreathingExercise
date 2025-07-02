@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-01 00:18+0900\n"
-"PO-Revision-Date: 2025-06-10 21:15+0100\n"
+"POT-Creation-Date: 2025-07-02 12:31+0900\n"
+"PO-Revision-Date: 2025-07-02 12:35+0900\n"
 "Last-Translator: Diane Hemmen-Schüler <hemmen@mail.de>\n"
 "Language: de_DE\n"
 "Language-Team: de_DE <LL@li.org>\n"
@@ -18,116 +18,114 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: __init__.py:39
+#: __init__.py:15
 msgid "番茄钟 & 呼吸设置..."
-msgstr "Pomodoro & Atmungseinstellungen..."
+msgstr "Pomodoro & Atmung Einstellungen..."
 
-#: __init__.py:46
+#: __init__.py:18
+msgid "启动呼吸训练"
+msgstr "Atemübung starten"
+
+#: __init__.py:27
 msgid "警告: 无法添加番茄钟菜单项"
-msgstr "Warnung: Kann keinen Pomodoromenüeintrag hinzufügen"
+msgstr "Warnung: Menüeintrag für Pomodoro konnte nicht hinzugefügt werden"
 
-#: hooks.py:59 pomodoro/pomodoro_manager.py:97
+#: hooks.py:60 pomodoro/pomodoro_manager.py:97
 msgid "番茄钟计时器已停止。"
 msgstr "Pomodoro-Timer gestoppt."
 
-#: hooks.py:77
+#: hooks.py:78
 #, python-brace-format
 msgid "恭喜完成{target}个番茄钟！建议休息{minutes}分钟。"
-msgstr ""
-"Herzlichen Glückwunsch zum Abschluss von {target} Pomodoros! Empfohlene "
-"Pause: {minutes} Minuten."
+msgstr "Glückwunsch zum Abschluss von {target} Pomodoros! Empfohlene Pause: {minutes} Minuten."
 
-#: hooks.py:84
+#: hooks.py:85
 msgid "番茄钟时间到！"
-msgstr "Die Pomodoro-Zeit ist um! Mach eine Pause."
+msgstr "Pomodoro beendet! Zeit für eine Pause."
 
-#: hooks.py:123
+#: hooks.py:124
 msgid "呼吸训练已跳过 (无启用阶段)。"
 msgstr "Atemübung übersprungen (keine Phasen aktiviert)."
 
-#: hooks.py:128
+#: hooks.py:129
 msgid "呼吸训练已跳过 (循环次数为 0)。"
-msgstr "Atemübung übersprungen (Zykluszahl ist 0)."
+msgstr "Atemübung übersprungen (Anzahl der Zyklen ist 0)."
 
-#: hooks.py:134
+#: hooks.py:135
 msgid "呼吸训练完成！"
-msgstr "Atmungsübung abgeschlossen!"
+msgstr "Atemübung abgeschlossen!"
 
-#: hooks.py:136
+#: hooks.py:137
 msgid "呼吸训练已跳过。"
-msgstr "Atmungsübung übersprungen."
+msgstr "Atemübung übersprungen."
 
-#: hooks.py:138
+#: hooks.py:139
 msgid "跳过呼吸训练 (主窗口不可见)。"
-msgstr "Überspringen der Atemübung (Hauptfenster nicht sichtbar)."
+msgstr "Atemübung übersprungen (Hauptfenster nicht sichtbar)."
 
-#: config/enums.py:44
+#: config/constants.py:49
+msgid "⏳休息中："
+msgstr "⏳ In Pause:"
+
+#: config/constants.py:50
+msgid "⚠️休息上限："
+msgstr "⚠️ Pausenlimit erreicht:"
+
+#: config/enums.py:21
+msgid "左上角"
+msgstr "Oben links"
+
+#: config/enums.py:22
+msgid "右上角"
+msgstr "Oben rechts"
+
+#: config/enums.py:23
+msgid "左下角"
+msgstr "Unten links"
+
+#: config/enums.py:24
+msgid "右下角"
+msgstr "Unten rechts"
+
+#: config/enums.py:57
 msgid "吸气"
 msgstr "Einatmen"
 
-#: config/enums.py:50
+#: config/enums.py:63
 msgid "屏气 (吸气后)"
-msgstr "Atem-Anhalten (nach dem Einatmen)"
+msgstr "Atem anhalten (nach Einatmen)"
 
-#: config/enums.py:56
+#: config/enums.py:69
 msgid "呼气"
 msgstr "Ausatmen"
 
-#: config/enums.py:62
+#: config/enums.py:75
 msgid "屏气 (呼气后)"
-msgstr "Atem-Anhalten (nach dem Ausatmen)"
+msgstr "Atem anhalten (nach Ausatmen)"
 
-#: config/enums.py:77
-msgid "今日累计使用："
-msgstr "Heutige Gesamtnutzungszeit:"
-
-#: config/enums.py:88 config/enums.py:106
+#: config/enums.py:96
 msgid "不显示"
-msgstr "Ausblenden"
+msgstr "Nicht anzeigen"
 
-#: config/enums.py:89 config/enums.py:107
+#: config/enums.py:97
 msgid "仅显示图标"
-msgstr "nur das Icon"
+msgstr "Nur Symbol anzeigen"
 
-#: config/enums.py:90 config/enums.py:108
+#: config/enums.py:98
 msgid "仅显示倒计时"
-msgstr "nur den Timer"
+msgstr "Nur Timer anzeigen"
 
-#: config/enums.py:91 config/enums.py:109
+#: config/enums.py:99
 msgid "仅显示进度"
-msgstr "nur den Fortschritt"
+msgstr "Nur Fortschritt anzeigen"
 
-#: config/enums.py:92 config/enums.py:110
+#: config/enums.py:102
 msgid "显示图标+倒计时+进度"
-msgstr "Zeige Icon + Timer + Fortschritt"
+msgstr "Symbol + Timer + Fortschritt anzeigen"
 
-#: config/enums.py:94 config/enums.py:112
+#: config/enums.py:106
 msgid "显示图标+倒计时+进度+累计使用时间"
-msgstr "Zeige Icon + Timer + Fortschritt + Gesamtnutzungszeit"
-
-#: config/enums.py:117
-msgid "左上角"
-msgstr "oben links"
-
-#: config/enums.py:118
-msgid "右上角"
-msgstr "oben rechts"
-
-#: config/enums.py:119
-msgid "左下角"
-msgstr "unten links"
-
-#: config/enums.py:120
-msgid "右下角"
-msgstr "unten rechts"
-
-#: config/enums.py:138
-msgid "⏳休息中："
-msgstr "⏳In Pause:"
-
-#: config/enums.py:139
-msgid "⚠️休息上限："
-msgstr "⚠️Pausenlimit erreicht:"
+msgstr "Symbol + Timer + Fortschritt + Gesamtnutzung anzeigen"
 
 #: pomodoro/pomodoro_manager.py:54
 msgid "本次番茄钟结束"
@@ -144,11 +142,11 @@ msgstr "Pomodoro-Timer gestartet, Dauer: {} Minuten."
 
 #: pomodoro/pomodoro_manager.py:117
 msgid "检测到长时间空闲，连胜中断。"
-msgstr "Lange Leerlaufzeit erkannt, Streak unterbrochen."
+msgstr "Längere Inaktivität erkannt, Serie unterbrochen."
 
 #: pomodoro/pomodoro_manager.py:151
 msgid "休息时间过长，番茄钟连胜已清空。"
-msgstr "Zu lange Pause, Pomodoro-Streak zurückgesetzt."
+msgstr "Zu lange pausiert, Pomodoro-Serie zurückgesetzt."
 
 #: ui/config_components.py:41
 msgid "常规设置"
@@ -156,118 +154,118 @@ msgstr "Allgemeine Einstellungen"
 
 #: ui/config_components.py:44
 msgid "启用番茄钟插件"
-msgstr "Pomodoro Plugin aktivieren"
+msgstr "Pomodoro-Plugin aktivieren"
 
 #: ui/config_components.py:50
 msgid "语言:"
 msgstr "Sprache:"
 
-#: ui/config_components.py:64
+#: ui/config_components.py:62
 msgid "全局计时器"
 msgstr "Globaler Timer"
 
-#: ui/config_components.py:69
+#: ui/config_components.py:67
 msgid "显示圆形计时器"
-msgstr "Zeige Runden Timer"
+msgstr "Kreisförmigen Timer anzeigen"
 
-#: ui/config_components.py:73
+#: ui/config_components.py:71
 msgid "圆形计时器样式:"
-msgstr "Kreisförmiger Timer-Stil:"
+msgstr "Stil des kreisförmigen Timers:"
 
-#: ui/config_components.py:86
+#: ui/config_components.py:84
 msgid "计时器窗口位置:"
-msgstr "Timer Fenster Position:"
+msgstr "Position des Timer-Fensters:"
 
-#: ui/config_components.py:99
+#: ui/config_components.py:97
 msgid "连胜上限:"
-msgstr "Streak Limit:"
+msgstr "Serien-Limit:"
 
-#: ui/config_components.py:104
+#: ui/config_components.py:102
 msgid "个番茄钟"
 msgstr "Pomodoros"
 
-#: ui/config_components.py:110
+#: ui/config_components.py:108
 msgid "番茄钟时长:"
-msgstr "Pomodoro Dauer:"
+msgstr "Pomodoro-Dauer:"
 
-#: ui/config_components.py:115 ui/config_components.py:127
-#: ui/config_components.py:138
+#: ui/config_components.py:113 ui/config_components.py:125
+#: ui/config_components.py:136
 msgid "分钟"
 msgstr "Minuten"
 
-#: ui/config_components.py:122
+#: ui/config_components.py:120
 msgid "长休息时长:"
-msgstr "Lange Pausendauer:"
+msgstr "Dauer der langen Pause:"
 
-#: ui/config_components.py:133
+#: ui/config_components.py:131
 msgid "休息时间上限:"
-msgstr "Pausenzeitlimit:"
+msgstr "Pausenlimit:"
 
-#: ui/config_components.py:143
+#: ui/config_components.py:141
 msgid "连续完成指定数量的番茄钟后，将进行长休息"
-msgstr "Mache eine lange Pause, nachdem du die angegebene Anzahl von Pomodoros erledigt hast"
+msgstr "Nach Abschluss der festgelegten Anzahl von Pomodoros beginnt eine lange Pause."
 
-#: ui/config_components.py:146
+#: ui/config_components.py:144
 msgid "超过休息时间上限后，累计的番茄钟将归零"
-msgstr "Setzen Sie angesammelte Pomodoros zurück, wenn das Pausenzeitlimit überschritten wird"
+msgstr "Überschreitet die Pausenzeit das Limit, wird der Pomodoro-Zähler zurückgesetzt."
 
-#: ui/config_components.py:227
+#: ui/config_components.py:217
 msgid "呼吸训练设置"
 msgstr "Einstellungen für Atemübungen"
 
-#: ui/config_components.py:231
+#: ui/config_components.py:221
 msgid "目标循环次数:"
-msgstr "Zielzyklusanzahl:"
+msgstr "Anzahl der Zyklen:"
 
-#: ui/config_components.py:240
+#: ui/config_components.py:230
 msgid "呼吸阶段设置"
-msgstr "Einstellungen der Atemphase:"
+msgstr "Einstellungen der Atemphasen:"
 
-#: ui/config_components.py:266
+#: ui/config_components.py:256
 msgid "选择音频"
 msgstr "Audio auswählen"
 
-#: ui/config_components.py:267 ui/config_components.py:312
-#: ui/config_components.py:324
+#: ui/config_components.py:257 ui/config_components.py:302
+#: ui/config_components.py:314
 msgid "未选择"
-msgstr "Nichts ausgewählt"
+msgstr "Nicht ausgewählt"
 
-#: ui/config_components.py:276
+#: ui/config_components.py:266
 msgid "持续时间:"
 msgstr "Dauer:"
 
-#: ui/config_components.py:278
+#: ui/config_components.py:268
 msgid "秒"
 msgstr "Sekunden"
 
-#: ui/config_components.py:294
+#: ui/config_components.py:284
 msgid "预计时间: --:--"
 msgstr "Geschätzte Zeit: --:--"
 
-#: ui/config_components.py:305
+#: ui/config_components.py:295
 #, python-brace-format
 msgid "选择 {phase_label} 阶段的音频文件"
-msgstr "Audiodatei für Phase {phase_label} auswählen"
+msgstr "Audiodatei für die Phase '{phase_label}' auswählen"
 
-#: ui/config_components.py:307
+#: ui/config_components.py:297
 msgid "音频文件 (*.wav *.mp3 *.opus *.ogg);;所有文件 (*)"
-msgstr "Audio Dateien (*.wav *.mp3 *.opus *.ogg);;Alle Deiten (*)"
+msgstr "Audiodateien (*.wav *.mp3 *.opus *.ogg);;Alle Dateien (*)"
 
 #: ui/config_dialog.py:31
 msgid "番茄钟/呼吸训练设置"
-msgstr "Pomodoro-/Atemübungseinstellungen"
+msgstr "Pomodoro & Atmung Einstellungen"
 
 #: ui/config_dialog.py:41
 msgid "状态栏显示设置"
-msgstr "Anzeigeeinstellungen der Statusleiste"
+msgstr "Anzeigeeinstellungen für die Statusleiste"
 
 #: ui/config_dialog.py:55
 msgid "选择状态栏显示格式："
-msgstr "Wählen Sie das Anzeigeformat der Statusleiste:"
+msgstr "Anzeigeformat für die Statusleiste auswählen:"
 
 #: ui/config_dialog.py:108
 msgid "预计时间: --:-- (未启用或周期为0)"
-msgstr "Geschätzte Zeit: --:-- (keine Phasen aktiviert oder Zielzyklen sind 0)"
+msgstr "Geschätzte Zeit: --:-- (nicht aktiviert oder Zyklen = 0)"
 
 #: ui/config_dialog.py:115
 #, python-brace-format
@@ -287,29 +285,23 @@ msgstr "Konfiguration gespeichert"
 msgid "保存配置时出错: {}"
 msgstr "Fehler beim Speichern der Konfiguration: {}"
 
-#: ui/Breathing/dialog.py:24
+#: ui/Breathing/Dialog.py:24
 msgid "呼吸训练"
 msgstr "Atemübung"
 
-#: ui/Breathing/dialog.py:40
+#: ui/Breathing/Dialog.py:40
 msgid "准备..."
-msgstr "Vorbereitung..."
+msgstr "Bereit machen..."
 
-#: ui/Breathing/dialog.py:47 ui/Breathing/dialog.py:76
+#: ui/Breathing/Dialog.py:47 ui/Breathing/Dialog.py:76
 #, python-brace-format
 msgid "循环: {current} / {total}"
 msgstr "Zyklus: {current} / {total}"
 
-#: ui/Breathing/dialog.py:55
+#: ui/Breathing/Dialog.py:55
 msgid "跳过训练"
-msgstr "Überspringen Sie das Training"
+msgstr "Training überspringen"
 
 #: ui/CircularTimer/timer_common.py:43
 msgid "番茄钟计时器"
 msgstr "Pomodoro-Timer"
-
-#~ msgid "⚠️距离连胜重置还有："
-#~ msgstr "⚠️Zeit bis zum Zurücksetzen des Streaks:"
-
-#~ msgid "连胜中断"
-#~ msgstr "Streak unterbrochen"

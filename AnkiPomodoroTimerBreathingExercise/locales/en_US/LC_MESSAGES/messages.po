@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-01 00:18+0900\n"
+"POT-Creation-Date: 2025-07-02 12:31+0900\n"
 "PO-Revision-Date: 2025-04-04 12:15+0900\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -18,116 +18,116 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: __init__.py:39
+#: __init__.py:15
 msgid "番茄钟 & 呼吸设置..."
 msgstr "Pomodoro & Breathing Settings..."
 
-#: __init__.py:46
+#: __init__.py:18
+msgid "启动呼吸训练"
+msgstr "Start Breathing Exercise"
+
+#: __init__.py:27
 msgid "警告: 无法添加番茄钟菜单项"
 msgstr "Warning: Cannot add Pomodoro menu item"
 
-#: hooks.py:59 pomodoro/pomodoro_manager.py:97
+#: hooks.py:60 pomodoro/pomodoro_manager.py:97
 msgid "番茄钟计时器已停止。"
 msgstr "Pomodoro timer stopped."
 
-#: hooks.py:77
+#: hooks.py:78
 #, python-brace-format
 msgid "恭喜完成{target}个番茄钟！建议休息{minutes}分钟。"
 msgstr ""
 "Congratulations on completing {target} pomodoros! Suggested break: "
 "{minutes} minutes."
 
-#: hooks.py:84
+#: hooks.py:85
 msgid "番茄钟时间到！"
 msgstr "Pomodoro time's up! Take a break."
 
-#: hooks.py:123
+#: hooks.py:124
 msgid "呼吸训练已跳过 (无启用阶段)。"
 msgstr "Breathing exercise skipped (no phases enabled)."
 
-#: hooks.py:128
+#: hooks.py:129
 msgid "呼吸训练已跳过 (循环次数为 0)。"
 msgstr "Breathing exercise skipped (cycle count is 0)."
 
-#: hooks.py:134
+#: hooks.py:135
 msgid "呼吸训练完成！"
 msgstr "Breathing exercise completed!"
 
-#: hooks.py:136
+#: hooks.py:137
 msgid "呼吸训练已跳过。"
 msgstr "Breathing exercise skipped."
 
-#: hooks.py:138
+#: hooks.py:139
 msgid "跳过呼吸训练 (主窗口不可见)。"
 msgstr "Skipping breathing exercise (main window not visible)."
 
-#: config/enums.py:44
-msgid "吸气"
-msgstr "Inhale"
-
-#: config/enums.py:50
-msgid "屏气 (吸气后)"
-msgstr "Breath-hold (after inhale)"
-
-#: config/enums.py:56
-msgid "呼气"
-msgstr "Exhale"
-
-#: config/enums.py:62
-msgid "屏气 (呼气后)"
-msgstr "Breath-hold (after exhale)"
-
-#: config/enums.py:77
-msgid "今日累计使用："
-msgstr "Today's Total Usage:"
-
-#: config/enums.py:88 config/enums.py:106
-msgid "不显示"
-msgstr "Hide"
-
-#: config/enums.py:89 config/enums.py:107
-msgid "仅显示图标"
-msgstr "Icon only"
-
-#: config/enums.py:90 config/enums.py:108
-msgid "仅显示倒计时"
-msgstr "Timer only"
-
-#: config/enums.py:91 config/enums.py:109
-msgid "仅显示进度"
-msgstr "Progress only"
-
-#: config/enums.py:92 config/enums.py:110
-msgid "显示图标+倒计时+进度"
-msgstr "Show icon + timer + progress"
-
-#: config/enums.py:94 config/enums.py:112
-msgid "显示图标+倒计时+进度+累计使用时间"
-msgstr "Show icon + timer + progress + total usage time"
-
-#: config/enums.py:117
-msgid "左上角"
-msgstr "Top Left"
-
-#: config/enums.py:118
-msgid "右上角"
-msgstr "Top Right"
-
-#: config/enums.py:119
-msgid "左下角"
-msgstr "Bottom Left"
-
-#: config/enums.py:120
-msgid "右下角"
-msgstr "Bottom Right"
-
-#: config/enums.py:138
+#: config/constants.py:49
 msgid "⏳休息中："
 msgstr "⏳Resting:"
 
-#: config/enums.py:139
+#: config/constants.py:50
 msgid "⚠️休息上限："
 msgstr "⚠️Break Limit:"
+
+#: config/enums.py:21
+msgid "左上角"
+msgstr "Top Left"
+
+#: config/enums.py:22
+msgid "右上角"
+msgstr "Top Right"
+
+#: config/enums.py:23
+msgid "左下角"
+msgstr "Bottom Left"
+
+#: config/enums.py:24
+msgid "右下角"
+msgstr "Bottom Right"
+
+#: config/enums.py:57
+msgid "吸气"
+msgstr "Inhale"
+
+#: config/enums.py:63
+msgid "屏气 (吸气后)"
+msgstr "Breath-hold (after inhale)"
+
+#: config/enums.py:69
+msgid "呼气"
+msgstr "Exhale"
+
+#: config/enums.py:75
+msgid "屏气 (呼气后)"
+msgstr "Breath-hold (after exhale)"
+
+#: config/enums.py:96
+msgid "不显示"
+msgstr "Hide"
+
+#: config/enums.py:97
+msgid "仅显示图标"
+msgstr "Icon only"
+
+#: config/enums.py:98
+msgid "仅显示倒计时"
+msgstr "Timer only"
+
+#: config/enums.py:99
+msgid "仅显示进度"
+msgstr "Progress only"
+
+#: config/enums.py:102
+msgid "显示图标+倒计时+进度"
+msgstr "Show icon + timer + progress"
+
+#: config/enums.py:106
+msgid "显示图标+倒计时+进度+累计使用时间"
+msgstr "Show icon + timer + progress + total usage time"
 
 #: pomodoro/pomodoro_manager.py:54
 msgid "本次番茄钟结束"
@@ -162,94 +162,94 @@ msgstr "Enable Pomodoro Plugin"
 msgid "语言:"
 msgstr "Language:"
 
-#: ui/config_components.py:64
+#: ui/config_components.py:62
 msgid "全局计时器"
 msgstr "Global Timer"
 
-#: ui/config_components.py:69
+#: ui/config_components.py:67
 msgid "显示圆形计时器"
 msgstr "Show Circular Timer"
 
-#: ui/config_components.py:73
+#: ui/config_components.py:71
 msgid "圆形计时器样式:"
 msgstr "Circular Timer Style:"
 
-#: ui/config_components.py:86
+#: ui/config_components.py:84
 msgid "计时器窗口位置:"
 msgstr "Timer Window Position:"
 
-#: ui/config_components.py:99
+#: ui/config_components.py:97
 msgid "连胜上限:"
 msgstr "Streak Limit:"
 
-#: ui/config_components.py:104
+#: ui/config_components.py:102
 msgid "个番茄钟"
 msgstr "pomodoros"
 
-#: ui/config_components.py:110
+#: ui/config_components.py:108
 msgid "番茄钟时长:"
 msgstr "Pomodoro Duration:"
 
-#: ui/config_components.py:115 ui/config_components.py:127
-#: ui/config_components.py:138
+#: ui/config_components.py:113 ui/config_components.py:125
+#: ui/config_components.py:136
 msgid "分钟"
 msgstr "minutes"
 
-#: ui/config_components.py:122
+#: ui/config_components.py:120
 msgid "长休息时长:"
 msgstr "Long Break Duration:"
 
-#: ui/config_components.py:133
+#: ui/config_components.py:131
 msgid "休息时间上限:"
 msgstr "Break Time Limit:"
 
-#: ui/config_components.py:143
+#: ui/config_components.py:141
 msgid "连续完成指定数量的番茄钟后，将进行长休息"
 msgstr "Take a long break after completing specified number of pomodoros"
 
-#: ui/config_components.py:146
+#: ui/config_components.py:144
 msgid "超过休息时间上限后，累计的番茄钟将归零"
 msgstr "Reset accumulated pomodoros when break time limit is exceeded"
 
-#: ui/config_components.py:227
+#: ui/config_components.py:217
 msgid "呼吸训练设置"
 msgstr "Breathing Exercise Settings"
 
-#: ui/config_components.py:231
+#: ui/config_components.py:221
 msgid "目标循环次数:"
 msgstr "Target Cycle Count:"
 
-#: ui/config_components.py:240
+#: ui/config_components.py:230
 msgid "呼吸阶段设置"
 msgstr "Breathing Phase Settings:"
 
-#: ui/config_components.py:266
+#: ui/config_components.py:256
 msgid "选择音频"
 msgstr "Select Audio"
 
-#: ui/config_components.py:267 ui/config_components.py:312
-#: ui/config_components.py:324
+#: ui/config_components.py:257 ui/config_components.py:302
+#: ui/config_components.py:314
 msgid "未选择"
 msgstr "Not selected"
 
-#: ui/config_components.py:276
+#: ui/config_components.py:266
 msgid "持续时间:"
 msgstr "Duration:"
 
-#: ui/config_components.py:278
+#: ui/config_components.py:268
 msgid "秒"
 msgstr "seconds"
 
-#: ui/config_components.py:294
+#: ui/config_components.py:284
 msgid "预计时间: --:--"
 msgstr "Estimated Time: --:--"
 
-#: ui/config_components.py:305
+#: ui/config_components.py:295
 #, python-brace-format
 msgid "选择 {phase_label} 阶段的音频文件"
 msgstr "Select audio file for {phase_label} phase"
 
-#: ui/config_components.py:307
+#: ui/config_components.py:297
 msgid "音频文件 (*.wav *.mp3 *.opus *.ogg);;所有文件 (*)"
 msgstr "Audio files (*.wav *.mp3 *.opus *.ogg);;All files (*)"
 
@@ -287,20 +287,20 @@ msgstr "Configuration saved"
 msgid "保存配置时出错: {}"
 msgstr "Error saving configuration: {}"
 
-#: ui/Breathing/dialog.py:24
+#: ui/Breathing/Dialog.py:24
 msgid "呼吸训练"
 msgstr "Breathing Exercise"
 
-#: ui/Breathing/dialog.py:40
+#: ui/Breathing/Dialog.py:40
 msgid "准备..."
 msgstr "Preparing..."
 
-#: ui/Breathing/dialog.py:47 ui/Breathing/dialog.py:76
+#: ui/Breathing/Dialog.py:47 ui/Breathing/Dialog.py:76
 #, python-brace-format
 msgid "循环: {current} / {total}"
 msgstr "Cycle: {current} / {total}"
 
-#: ui/Breathing/dialog.py:55
+#: ui/Breathing/Dialog.py:55
 msgid "跳过训练"
 msgstr "Skip training"
 
@@ -313,3 +313,6 @@ msgstr "Pomodoro Timer"
 
 #~ msgid "连胜中断"
 #~ msgstr "Streak broken"
+
+#~ msgid "今日累计使用："
+#~ msgstr "Today's Total Usage:"
