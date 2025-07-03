@@ -1,11 +1,8 @@
 import dataclasses
 
 from aqt import (
-    QComboBox,
     QDialog,
     QDialogButtonBox,
-    QGroupBox,
-    QLabel,
     QTabWidget,
     QVBoxLayout,
     QWidget,
@@ -14,7 +11,6 @@ from aqt import (
 from aqt.utils import tooltip
 
 from ..config import AppConfig
-from ..config.enums import StatusBarFormat
 from ..state import get_pomodoro_manager, reload_config, update_and_save_config
 from ..translator import _, set_language
 from .config_components import BreathingSettings, GeneralSettings
@@ -23,7 +19,7 @@ from .config_components import BreathingSettings, GeneralSettings
 class ConfigDialog(QDialog):
     """用于番茄钟和呼吸设置的配置对话框。"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: QWidget = mw):
         super().__init__(parent or mw)
 
         self.config = reload_config()
@@ -33,15 +29,12 @@ class ConfigDialog(QDialog):
         self.tabs = QTabWidget()
         self.general_tab = QWidget()
         self.breathing_tab = QWidget()
-        self.statusbar_tab = QWidget()
 
         self.tabs.addTab(self.general_tab, _("常规设置"))
         self.tabs.addTab(self.breathing_tab, _("呼吸训练"))
-        self.tabs.addTab(self.statusbar_tab, _("状态栏"))
 
         self.setup_general_tab()
         self.setup_breathing_tab()
-        self.setup_statusbar_tab()
 
         self._main_layout.addWidget(self.tabs)
 
@@ -78,28 +71,6 @@ class ConfigDialog(QDialog):
         layout = QVBoxLayout(self.breathing_tab)
         self.breathing_settings = BreathingSettings(self.config)
         layout.addWidget(self.breathing_settings.create_ui(self))
-
-    def setup_statusbar_tab(self):
-        """设置状态栏选项卡"""
-        layout = QVBoxLayout(self.statusbar_tab)
-        self.statusbar_format_group = QGroupBox(_("状态栏显示设置"))
-        self.statusbar_format_layout = QVBoxLayout()
-
-        self.statusbar_format_combo = QComboBox()
-        for format_option in StatusBarFormat:
-            self.statusbar_format_combo.addItem(
-                format_option.display_name, format_option
-            )
-
-        current_format = self.config.statusbar_format
-        index = self.statusbar_format_combo.findData(current_format)
-        if index >= 0:
-            self.statusbar_format_combo.setCurrentIndex(index)
-
-        self.statusbar_format_layout.addWidget(QLabel(_("选择状态栏显示格式：")))
-        self.statusbar_format_layout.addWidget(self.statusbar_format_combo)
-        self.statusbar_format_group.setLayout(self.statusbar_format_layout)
-        layout.addWidget(self.statusbar_format_group)
 
     def _update_estimated_time(self):
         """计算并更新呼吸练习的预计时间标签。"""
@@ -147,7 +118,6 @@ class ConfigDialog(QDialog):
             config_dict = dataclasses.asdict(self.config)
             config_dict.update(general_values)
             config_dict.update(breathing_values)
-            config_dict["statusbar_format"] = self.statusbar_format_combo.currentData()
 
             app_config_fields = {field.name for field in dataclasses.fields(AppConfig)}
             filtered_config_dict = {
