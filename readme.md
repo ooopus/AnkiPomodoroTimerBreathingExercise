@@ -69,14 +69,6 @@ Access via "Tools" > "Pomodoro & Breathing Settings..."
 - Long break duration setting
 - Maximum break duration limit
 
-### Breathing Exercise Settings
-
-- Number of cycles (0-50)
-- Enable/Disable each phase
-- Duration for each phase (0-60 seconds)
-
-The settings interface displays estimated total training time in real-time.
-
 ## Development
 
 ### Requirements
