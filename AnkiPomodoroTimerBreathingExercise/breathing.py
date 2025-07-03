@@ -143,11 +143,11 @@ class BreathingController:
 # --- 便捷函数 ---
 def start_breathing_exercise(target_cycles: Optional[int] = None, parent=None) -> bool:
     """启动呼吸训练练习"""
-    # 如果未指定目标循环次数，则从配置中获取
-    if target_cycles is None:
+    # 如果未指定目标循环次数，或传入的是布尔值（来自Qt信号），则从配置中获取
+    if target_cycles is None or isinstance(target_cycles, bool):
         app_state = get_app_state()
         # Also ensure we have a valid integer.
-        cycles_from_config: int = getattr(app_state.config, "breathing_cycles", 3)
+        cycles_from_config: int = app_state.config.breathing_cycles
         target_cycles = cycles_from_config if cycles_from_config is not None else 3
 
     # 创建控制器并启动训练

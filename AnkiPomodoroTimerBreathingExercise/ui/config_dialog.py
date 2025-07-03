@@ -6,7 +6,9 @@ from aqt import (
     QDialogButtonBox,
     QGroupBox,
     QLabel,
+    QTabWidget,
     QVBoxLayout,
+    QWidget,
     mw,
 )
 from aqt.utils import tooltip
@@ -24,20 +26,62 @@ class ConfigDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent or mw)
 
-        # 每次打开对话框时，都从文件强制重新加载配置
-        # 这确保了UI显示的是最新的设置
         self.config = reload_config()
-
         self.setWindowTitle(_("番茄钟/呼吸训练设置"))
         self._main_layout = QVBoxLayout(self)
 
-        # 初始化UI组件，并传入最新的配置对象
+        self.tabs = QTabWidget()
+        self.general_tab = QWidget()
+        self.breathing_tab = QWidget()
+        self.statusbar_tab = QWidget()
+
+        self.tabs.addTab(self.general_tab, _("常规设置"))
+        self.tabs.addTab(self.breathing_tab, _("呼吸训练"))
+        self.tabs.addTab(self.statusbar_tab, _("状态栏"))
+
+        self.setup_general_tab()
+        self.setup_breathing_tab()
+        self.setup_statusbar_tab()
+
+        self._main_layout.addWidget(self.tabs)
+
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Save
+            | QDialogButtonBox.StandardButton.Cancel,
+            self,
+        )
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        self._main_layout.addWidget(button_box)
+
+        self.setLayout(self._main_layout)
+
+        self._update_estimated_time()
+
+        # 连接信号以实时更新预计时间
+        for phase_ui in self.breathing_settings.phase_uis.values():
+            phase_ui.checkbox.toggled.connect(self._update_estimated_time)
+            phase_ui.spinbox.valueChanged.connect(self._update_estimated_time)
+        assert self.breathing_settings.cycles_spinbox is not None
+        self.breathing_settings.cycles_spinbox.valueChanged.connect(
+            self._update_estimated_time
+        )
+
+    def setup_general_tab(self):
+        """设置常规选项卡"""
+        layout = QVBoxLayout(self.general_tab)
         self.general_settings = GeneralSettings(self.config)
+        layout.addWidget(self.general_settings.create_ui(self))
+
+    def setup_breathing_tab(self):
+        """设置呼吸选项卡"""
+        layout = QVBoxLayout(self.breathing_tab)
         self.breathing_settings = BreathingSettings(self.config)
+        layout.addWidget(self.breathing_settings.create_ui(self))
 
-        # 创建并添加UI组件
-        self._main_layout.addWidget(self.general_settings.create_ui(self))
-
+    def setup_statusbar_tab(self):
+        """设置状态栏选项卡"""
+        layout = QVBoxLayout(self.statusbar_tab)
         self.statusbar_format_group = QGroupBox(_("状态栏显示设置"))
         self.statusbar_format_layout = QVBoxLayout()
 
@@ -55,43 +99,16 @@ class ConfigDialog(QDialog):
         self.statusbar_format_layout.addWidget(QLabel(_("选择状态栏显示格式：")))
         self.statusbar_format_layout.addWidget(self.statusbar_format_combo)
         self.statusbar_format_group.setLayout(self.statusbar_format_layout)
-        self._main_layout.addWidget(self.statusbar_format_group)
-
-        self._main_layout.addWidget(self.breathing_settings.create_ui(self))
-
-        # 对话框按钮 (保存/取消)
-        button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Save
-            | QDialogButtonBox.StandardButton.Cancel,
-            self,
-        )
-        button_box.accepted.connect(self.accept)
-        button_box.rejected.connect(self.reject)
-        self._main_layout.addWidget(button_box)
-
-        self.setLayout(self._main_layout)
-        self._update_estimated_time()
-
-        # 连接信号以实时更新预计时间
-        for phase_ui in self.breathing_settings.phase_uis.values():
-            phase_ui.checkbox.toggled.connect(self._update_estimated_time)
-            phase_ui.spinbox.valueChanged.connect(self._update_estimated_time)
-        assert self.breathing_settings.cycles_spinbox is not None
-        self.breathing_settings.cycles_spinbox.valueChanged.connect(
-            self._update_estimated_time
-        )
+        layout.addWidget(self.statusbar_format_group)
 
     def _update_estimated_time(self):
         """计算并更新呼吸练习的预计时间标签。"""
-        # 在UI组件（如estimated_time_label）完全初始化之前，不要执行此函数。
-        # hasattr 检查确保在尝试访问属性之前，属性已经存在。
         if not hasattr(self.breathing_settings, "estimated_time_label") or not hasattr(
             self.breathing_settings, "phase_uis"
         ):
             return
 
         try:
-            # 确保 estimated_time_label 不是 None
             if self.breathing_settings.estimated_time_label is None:
                 return
 
@@ -124,34 +141,27 @@ class ConfigDialog(QDialog):
     def accept(self):
         """当点击“保存”时，收集UI值，更新全局状态并保存到文件。"""
         try:
-            # 1. 从UI组件获取更新后的值
             general_values = self.general_settings.get_values()
             breathing_values = self.breathing_settings.get_values()
 
-            # 2. 合并所有设置到一个字典中
             config_dict = dataclasses.asdict(self.config)
             config_dict.update(general_values)
             config_dict.update(breathing_values)
             config_dict["statusbar_format"] = self.statusbar_format_combo.currentData()
 
-            # 3. 过滤掉字典中不属于 AppConfig 的键 (安全措施)
             app_config_fields = {field.name for field in dataclasses.fields(AppConfig)}
             filtered_config_dict = {
                 k: v for k, v in config_dict.items() if k in app_config_fields
             }
 
-            # 4. 从更新后的字典创建一个新的 AppConfig 实例
             config_to_save = AppConfig(**filtered_config_dict)
 
-            # 5. 使用新的状态管理函数来更新内存并保存到文件
             update_and_save_config(config_to_save)
             set_language(config_to_save.language)
             tooltip(_("配置已保存"))
 
-            # 6. 立即更新UI显示（如状态栏）
             pomodoro_manager = get_pomodoro_manager()
             if pomodoro_manager:
-                # Trigger UI update through the manager's UI updater
                 pomodoro_manager.ui_updater.update(pomodoro_manager.timer_manager)
 
             super().accept()
