@@ -296,7 +296,7 @@ class BreathingSettings:
             spinbox.setEnabled(checkbox.isChecked())
 
             audio_button = QPushButton(_("选择音频"), parent)
-            audio_label = QLabel(os.path.basename(audio) or _("未选择"), parent)
+            audio_label = QLabel(os.path.basename(audio) if audio else _("未选择"), parent)
             audio_label.setWordWrap(True)
             audio_label.setToolTip(audio)
             audio_label.setProperty("filePath", audio)
