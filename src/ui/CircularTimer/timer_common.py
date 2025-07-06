@@ -177,6 +177,6 @@ def setup_circular_timer(
             global _timer_window_instance
             _timer_window_instance = None
 
-        _timer_window_instance.closed.connect(on_closed)  # type: ignore
+        _timer_window_instance.closed.connect(on_closed)
 
     return _timer_window_instance.timer_widget if _timer_window_instance else None

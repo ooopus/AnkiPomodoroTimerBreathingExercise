@@ -23,15 +23,15 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.9"
 
       - name: Install dependencies to vendor directory
         run: |
           pip install --upgrade pip setuptools wheel
-          pip install --target=AnkiPomodoroTimerBreathingExercise/vendor -r requirements.txt
+          pip install --target=src/vendor -r requirements.txt
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.FILENAME }}
-          path: AnkiPomodoroTimerBreathingExercise
+          path: src

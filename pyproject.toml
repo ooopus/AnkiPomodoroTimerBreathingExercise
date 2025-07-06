@@ -13,12 +13,12 @@ dependencies = ["koda-validate>=5.0.0"]
 
 [tool.setuptools.packages.find]
 # 自动查找项目中的所有Python包 (即包含 __init__.py 的目录)
-# 这会找到 AnkiPomodoroTimerBreathingExercise 目录
+# 这会找到 src 目录
 where = ["."]
 
 [tool.setuptools.package-data]
 # 确保插件所需的非代码文件被一同打包，这对于插件的正常功能至关重要
-"AnkiPomodoroTimerBreathingExercise" = [
+"src" = [
     "locales/*.pot",             # 打包翻译模板
     "locales/*_*/LC_MESSAGES/*", # 打包所有语言的 .po 和 .mo 文件
     "babel.cfg",                 # 打包 Babel 配置文件

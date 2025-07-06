@@ -13,14 +13,14 @@ from .ui import ConfigDialog
 
 def add_menu_item():
     action = QAction(_("番茄钟 & 呼吸设置..."), mw)
-    action.triggered.connect(show_config_dialog)  # type: ignore
+    action.triggered.connect(show_config_dialog)
 
     breathe_action = QAction(_("启动呼吸训练"), mw)
-    breathe_action.triggered.connect(start_breathing_exercise)  # type: ignore
+    breathe_action.triggered.connect(start_breathing_exercise)
 
     if hasattr(mw, "form") and hasattr(mw.form, "menuTools"):
-        mw.form.menuTools.addAction(action)  # type: ignore
-        mw.form.menuTools.addAction(breathe_action)  # type: ignore
+        mw.form.menuTools.addAction(action)
+        mw.form.menuTools.addAction(breathe_action)
     else:
         from aqt.utils import tooltip
 
@@ -50,7 +50,7 @@ def setup_plugin():
     _check_and_reset_daily_timer(app_state)
 
     gui_hooks.reviewer_did_show_question.append(on_reviewer_did_start)
-    gui_hooks.state_did_change.append(on_state_did_change)  # type: ignore
+    gui_hooks.state_did_change.append(on_state_did_change)
     gui_hooks.theme_did_change.append(on_theme_change)
     add_menu_item()
 

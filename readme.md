@@ -112,7 +112,7 @@ pybabel --version  # Verify installation
 Extract all translatable strings from the source code into a template file (`messages.pot`). This command scans the project for strings wrapped in `_()` and collects them.
 
 ```bash
-cd AnkiPomodoroTimerBreathingExercise
+cd src
 pybabel extract -F babel.cfg -o locales/messages.pot .
 ```
 
