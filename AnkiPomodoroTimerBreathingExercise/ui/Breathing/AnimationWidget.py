@@ -1,9 +1,11 @@
 import time
-from typing import Optional
+from typing import Optional, Union
 
 from aqt import (
     QBrush,
     QColor,
+    QDialog,
+    QMainWindow,
     QPainter,
     QPaintEvent,
     QPointF,
@@ -11,6 +13,7 @@ from aqt import (
     Qt,
     QTimer,
     QWidget,
+    mw,
 )
 
 from ...config.enums import BreathingPhase
@@ -20,7 +23,7 @@ from ...config.enums import BreathingPhase
 class BreathingAnimationWidget(QWidget):
     """Displays the expanding/contracting circle animation for breathing."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: Union[QMainWindow, QDialog] = mw):
         super().__init__(parent)
         self._current_phase_key: BreathingPhase = BreathingPhase.INHALE
         self._phase_duration_ms = 4000

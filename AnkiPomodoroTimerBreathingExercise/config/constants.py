@@ -1,3 +1,5 @@
+from enum import Enum
+
 from ..translator import _
 from .enums import BreathingPhase, CircularTimerStyle, StatusBarFormat
 from .languages import LanguageCode
@@ -18,9 +20,6 @@ AUDIO_FILENAMES = {
         BreathingPhase.EXHALE: "呼气.opus",
     },
 }
-
-
-from enum import Enum
 
 
 class AnkiStates(str, Enum):

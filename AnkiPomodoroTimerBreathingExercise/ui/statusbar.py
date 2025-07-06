@@ -27,15 +27,12 @@ def remove_widget():
             tooltip(f"Error removing timer widget: {e}")
 
 
-def show_timer_in_statusbar(show) -> None:
+def show_timer_in_statusbar(show: bool) -> None:
     """Adds or removes the timer label from the Anki status bar."""
     # Use AppState
     app_state = get_app_state()
     config = app_state.config
     label = app_state.timer_label
-
-    if show is None:
-        show = False
 
     if (
         not show

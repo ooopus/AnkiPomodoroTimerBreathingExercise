@@ -24,7 +24,7 @@ from .languages import LanguageCode
 
 
 def get_default_audio_path(
-    phase: "BreathingPhase", language_code: LanguageCode
+    phase: BreathingPhase, language_code: LanguageCode
 ) -> Optional[str]:
     """
     根据呼吸阶段和语言，获取默认的音频文件路径。

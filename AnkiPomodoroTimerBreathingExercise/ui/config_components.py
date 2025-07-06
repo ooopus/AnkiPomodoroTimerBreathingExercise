@@ -254,6 +254,7 @@ class BreathingSettings:
         self.cycles_spinbox: Optional[QSpinBox] = None
         self.estimated_time_label: Optional[QLabel] = None
         self.phase_uis: dict[str, PhaseUI] = {}
+        self.audio_paths: dict[str, str] = {}
 
     def create_ui(self, parent: QWidget) -> QGroupBox:
         """创建呼吸设置部分的UI组件"""
@@ -265,7 +266,7 @@ class BreathingSettings:
         self.cycles_spinbox = QSpinBox(parent)
         self.cycles_spinbox.setMinimum(1)
         self.cycles_spinbox.setMaximum(100)
-        self.cycles_spinbox.setValue(self.config.breathing_cycles)
+        self.cycles_spinbox.setValue(self.config.breathing_cycles or 1)
         cycles_layout.addWidget(cycles_label)
         cycles_layout.addWidget(self.cycles_spinbox)
         layout.addLayout(cycles_layout)
@@ -275,7 +276,7 @@ class BreathingSettings:
         phases_layout.setColumnStretch(5, 1)
 
         for i, phase_def in enumerate(PHASES):
-            key = phase_def.key
+            key = phase_def.key.value
             label_text = phase_def.label
 
             is_enabled = getattr(
@@ -285,6 +286,7 @@ class BreathingSettings:
                 self.config, f"{key}_duration", phase_def.default_duration
             )
             audio = getattr(self.config, f"{key}_audio", phase_def.default_audio)
+            self.audio_paths[key] = audio or ""
 
             checkbox = QCheckBox(label_text, parent)
             checkbox.setChecked(is_enabled)
@@ -296,16 +298,17 @@ class BreathingSettings:
             spinbox.setEnabled(checkbox.isChecked())
 
             audio_button = QPushButton(_("选择音频"), parent)
-            audio_label = QLabel(os.path.basename(audio) if audio else _("未选择"), parent)
+            audio_label = QLabel(
+                os.path.basename(audio) if audio else _("未选择"), parent
+            )
             audio_label.setWordWrap(True)
             audio_label.setToolTip(audio)
-            audio_label.setProperty("filePath", audio)
             audio_button.setEnabled(checkbox.isChecked())
 
             checkbox.toggled.connect(spinbox.setEnabled)
             checkbox.toggled.connect(audio_button.setEnabled)
             audio_button.clicked.connect(
-                lambda _, k=key, lbl=audio_label: self._select_audio_file(k, lbl)
+                lambda k=key, lbl=audio_label: self._select_audio_file(k, lbl)
             )
 
             duration_label = QLabel(_("持续时间:"))
@@ -349,7 +352,7 @@ class BreathingSettings:
         """打开文件对话框为某个阶段选择音频文件。"""
         file_path, __ = QFileDialog.getOpenFileName(
             None,
-            _("选择 {phase_label} 阶段的音频文件").format(phase_label=phase_key),
+            _("为 {phase_key} 阶段选择音频文件").format(phase_key=phase_key),
             "",
             _("音频文件 (*.wav *.mp3 *.opus *.ogg);;所有文件 (*)"),
         )
@@ -357,11 +360,11 @@ class BreathingSettings:
             file_name = os.path.basename(file_path)
             label_widget.setText(file_name)
             label_widget.setToolTip(file_path)
-            label_widget.setProperty("filePath", file_path)
+            self.audio_paths[phase_key] = file_path
         else:
             label_widget.setText(_("未选择"))
             label_widget.setToolTip("")
-            label_widget.setProperty("filePath", "")
+            self.audio_paths[phase_key] = ""
 
     def get_values(self) -> dict[str, Any]:
         """从呼吸设置获取值"""
@@ -372,6 +375,5 @@ class BreathingSettings:
         for key, ui in self.phase_uis.items():
             values[f"{key}_enabled"] = ui.checkbox.isChecked()
             values[f"{key}_duration"] = ui.spinbox.value()
-            audio_path = ui.audio_label.property("filePath") or ""
-            values[f"{key}_audio"] = audio_path
+            values[f"{key}_audio"] = self.audio_paths.get(key, "")
         return values

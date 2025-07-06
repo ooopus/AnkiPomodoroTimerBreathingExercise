@@ -2,11 +2,14 @@ from typing import Optional
 
 from aqt import (
     QApplication,
+    QCloseEvent,
     QDialog,
+    QMainWindow,
     QMouseEvent,
     QPointF,
     QResizeEvent,
     Qt,
+    mw,
     pyqtSignal,
 )
 
@@ -22,7 +25,7 @@ class TimerWindow(QDialog):
     closed = pyqtSignal()
     timer_widget: BaseCircularTimer
 
-    def __init__(self, timer_widget_class: TimerClass, parent=None):
+    def __init__(self, timer_widget_class: TimerClass, parent: QMainWindow = mw):
         super().__init__(parent)
 
         use_frameless = True
@@ -46,10 +49,10 @@ class TimerWindow(QDialog):
         # 实例化计时器控件
         self.timer_widget = timer_widget_class(self)
         self.resize(150, 150)
-        self._position_window()
+        self.position_window()
         self._center_timer_widget()
 
-    def _position_window(self):
+    def position_window(self):
         """根据配置将窗口定位到屏幕的指定角落"""
         screen = QApplication.primaryScreen()
         if not screen:
@@ -90,47 +93,35 @@ class TimerWindow(QDialog):
         widget_y = (dialog_h - widget_size) // 2
         self.timer_widget.move(widget_x, widget_y)
 
-    def resizeEvent(self, event: Optional[QResizeEvent]):
-        super().resizeEvent(event)
+    def resizeEvent(self, a0: Optional[QResizeEvent]):
+        super().resizeEvent(a0)
         self._center_timer_widget()
 
     # 拖动功能
-    def mousePressEvent(self, event: Optional[QMouseEvent]):
-        if (
-            self._offset is not None
-            and event
-            and event.button() == Qt.MouseButton.LeftButton
-        ):
-            self._offset = event.globalPosition() - QPointF(self.pos())
-            event.accept()
+    def mousePressEvent(self, a0: Optional[QMouseEvent]):
+        if self._offset is not None and a0 and a0.button() == Qt.MouseButton.LeftButton:
+            self._offset = a0.globalPosition() - QPointF(self.pos())
+            a0.accept()
         else:
-            super().mousePressEvent(event)
+            super().mousePressEvent(a0)
 
-    def mouseMoveEvent(self, event: Optional[QMouseEvent]):
-        if (
-            self._offset is not None
-            and event
-            and event.buttons() & Qt.MouseButton.LeftButton
-        ):
-            new_pos = event.globalPosition() - self._offset
+    def mouseMoveEvent(self, a0: Optional[QMouseEvent]):
+        if self._offset is not None and a0 and a0.buttons() & Qt.MouseButton.LeftButton:
+            new_pos = a0.globalPosition() - self._offset
             self.move(new_pos.toPoint())
-            event.accept()
+            a0.accept()
         else:
-            super().mouseMoveEvent(event)
+            super().mouseMoveEvent(a0)
 
-    def mouseReleaseEvent(self, event: Optional[QMouseEvent]):
-        if (
-            self._offset is not None
-            and event
-            and event.button() == Qt.MouseButton.LeftButton
-        ):
-            event.accept()
+    def mouseReleaseEvent(self, a0: Optional[QMouseEvent]):
+        if self._offset is not None and a0 and a0.button() == Qt.MouseButton.LeftButton:
+            a0.accept()
         else:
-            super().mouseReleaseEvent(event)
+            super().mouseReleaseEvent(a0)
 
-    def closeEvent(self, event):
+    def closeEvent(self, a0: Optional[QCloseEvent]):
         self.closed.emit()
-        super().closeEvent(event)
+        super().closeEvent(a0)
 
 
 # 全局窗口实例
@@ -138,7 +129,7 @@ _timer_window_instance: Optional[TimerWindow] = None
 
 
 def setup_circular_timer(
-    timer_widget_class: TimerClass, force_new=False
+    timer_widget_class: TimerClass, force_new: bool = False
 ) -> Optional[BaseCircularTimer]:
     """
     创建或显示独立的计时器窗口。
@@ -170,7 +161,7 @@ def setup_circular_timer(
         force_new = True
 
     if _timer_window_instance and not force_new:
-        _timer_window_instance._position_window()
+        _timer_window_instance.position_window()
         _timer_window_instance.show()
         _timer_window_instance.raise_()
         _timer_window_instance.activateWindow()
@@ -179,15 +170,13 @@ def setup_circular_timer(
             _timer_window_instance.close()
             _timer_window_instance = None
 
-        _timer_window_instance = TimerWindow(
-            timer_widget_class=timer_widget_class, parent=None
-        )
+        _timer_window_instance = TimerWindow(timer_widget_class=timer_widget_class)
         _timer_window_instance.show()
 
         def on_closed():
             global _timer_window_instance
             _timer_window_instance = None
 
-        _timer_window_instance.closed.connect(on_closed)
+        _timer_window_instance.closed.connect(on_closed)  # type: ignore
 
     return _timer_window_instance.timer_widget if _timer_window_instance else None

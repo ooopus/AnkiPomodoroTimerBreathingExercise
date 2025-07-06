@@ -13,6 +13,7 @@ import json
 import shutil
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 from koda_validate import Valid
 
@@ -29,7 +30,7 @@ CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.json"
 class EnhancedJSONEncoder(json.JSONEncoder):
     """一个增强的JSON编码器，可以处理枚举类型。"""
 
-    def default(self, o):
+    def default(self, o: Any):
         if isinstance(o, Enum):
             return o.value
         return super().default(o)
@@ -59,7 +60,7 @@ def save_config(config: AppConfig):
         print(f"错误: 无法写入配置文件 '{CONFIG_PATH}': {e}")
 
 
-def _migrate_config_data(data: dict) -> dict:
+def _migrate_config_data(data: dict[str, Any]) -> dict[str, Any]:
     """
     迁移旧的配置数据格式到新的枚举类型。
     """
@@ -117,7 +118,7 @@ def _migrate_config_data(data: dict) -> dict:
     return data
 
 
-def _read_config_file(path: Path) -> dict:
+def _read_config_file(path: Path) -> dict[str, Any]:
     """从指定路径读取并解析 JSON 文件内容。"""
     with path.open("r", encoding="utf-8") as f:
         content = f.read()

@@ -1,3 +1,4 @@
+from anki.cards import Card
 from aqt import QTimer, mw
 from aqt.utils import tooltip
 
@@ -13,7 +14,7 @@ from .translator import _
 # --- Anki 钩子函数 ---
 
 
-def on_reviewer_did_start(_card):
+def on_reviewer_did_start(card: Card):
     """Starts the Pomodoro timer when the reviewer screen is shown."""
     config = get_config()
     pomodoro_manager = get_pomodoro_manager()

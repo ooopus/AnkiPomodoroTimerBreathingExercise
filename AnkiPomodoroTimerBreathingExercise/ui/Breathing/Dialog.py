@@ -4,12 +4,14 @@ from aqt import (
     QCloseEvent,
     QDialog,
     QLabel,
+    QMainWindow,
     QPushButton,
     Qt,
     QVBoxLayout,
     mw,
 )
 
+from ...config.enums import BreathingPhase
 from ...translator import _
 from .AnimationWidget import BreathingAnimationWidget
 
@@ -18,7 +20,11 @@ from .AnimationWidget import BreathingAnimationWidget
 class BreathingDialog(QDialog):
     """Dialog window for the guided breathing exercise based on cycles."""
 
-    def __init__(self, breathing_controller, parent=None):
+    from ...breathing import BreathingController
+
+    def __init__(
+        self, breathing_controller: BreathingController, parent: QMainWindow = mw
+    ):
         super().__init__(parent or mw)
         self.controller = breathing_controller
         self.setWindowTitle(_("呼吸训练"))
@@ -65,12 +71,14 @@ class BreathingDialog(QDialog):
         """连接信号和槽"""
         self.skip_button.clicked.connect(self.reject)
 
-    def update_phase_display(self, label, duration, phase_key):
+    def update_phase_display(
+        self, label: str, duration: int, phase_key: BreathingPhase
+    ):
         """更新当前阶段的显示"""
         self.instruction_label.setText(f"{label} ({duration}s)")
         self.animation_widget.set_phase(phase_key, duration)
 
-    def update_cycle_display(self, current_cycle, total_cycles):
+    def update_cycle_display(self, current_cycle: int, total_cycles: int):
         """更新循环计数的显示"""
         self.cycle_label.setText(
             _("循环: {current} / {total}").format(

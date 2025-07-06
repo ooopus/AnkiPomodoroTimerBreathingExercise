@@ -33,10 +33,9 @@ def build_translation(language_code: str):
 translation = build_translation(lang)
 
 
-def _(*args, **kwargs):
-    # # Show tooltip when translation function is called
-    # tooltip(f"Current language: {lang}")
-    return translation.gettext(*args, **kwargs)
+def _(s: str) -> str:
+    """带类型注解的翻译函数"""
+    return translation.gettext(s)
 
 
 def set_language(language_code: LanguageCode):

@@ -7,7 +7,7 @@ from ..translator import _
 class TimerPosition(str, Enum):
     _display_name: str
 
-    def __new__(cls, value, display_name: str):
+    def __new__(cls, value: str, display_name: str):
         obj = str.__new__(cls, value)
         obj._value_ = value
         obj._display_name = display_name
@@ -68,7 +68,7 @@ PHASES: tuple[BreathingPhaseInfo, ...] = (
         key=BreathingPhase.EXHALE,
         label=_("呼气"),
         default_enabled=True,
-        default_duration=8,
+        default_duration=6,
     ),
     BreathingPhaseInfo(
         key=BreathingPhase.HOLD_AFTER_EXHALE,
@@ -82,7 +82,7 @@ PHASES: tuple[BreathingPhaseInfo, ...] = (
 class StatusBarFormat(str, Enum):
     _display_name: str
 
-    def __new__(cls, value, display_name: str):
+    def __new__(cls, value: str, display_name: str):
         obj = str.__new__(cls, value)
         obj._value_ = value
         obj._display_name = display_name

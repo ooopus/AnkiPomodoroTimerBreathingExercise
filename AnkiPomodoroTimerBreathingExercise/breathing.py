@@ -1,15 +1,15 @@
-from typing import Optional
+from typing import Optional, Union
 
 from aqt import (
     QDialog,
+    QMainWindow,
     QTimer,
     mw,
 )
 
 from .audioplayer import AudioPlayer
-from .config.enums import PHASES
+from .config.enums import PHASES, BreathingPhase
 from .state import get_app_state
-from .ui.Breathing import BreathingDialog
 
 
 # --- Breathing Exercise Controller ---
@@ -25,6 +25,7 @@ class BreathingController:
 
         # 从配置中获取活动阶段
         self._load_active_phases()
+        from .ui.Breathing import BreathingDialog
 
         # UI对话框
         self.dialog: Optional[BreathingDialog] = None
@@ -35,7 +36,7 @@ class BreathingController:
         # Initialize phase timer once for reuse
         self._init_phase_timer()
 
-    def _init_phase_timer(self):
+    def _init_phase_timer(self) -> None:
         """Initialize phase timer once for reuse across sessions"""
         if self._phase_timer is None:
             self._phase_timer = QTimer(mw)
@@ -48,27 +49,32 @@ class BreathingController:
         config = app_state.config
 
         # --- 根据配置动态构建活动阶段 ---
-        self.active_phases = []
+        self.active_phases: list[dict[str, Union[str, int, BreathingPhase]]] = []
         for phase_def in PHASES:
             key = phase_def.key
-            is_enabled = getattr(config, f"{key}_enabled", phase_def.default_enabled)
-            duration = getattr(config, f"{key}_duration", phase_def.default_duration)
-            audio_path = getattr(config, f"{key}_audio", phase_def.default_audio)
+            is_enabled = getattr(
+                config, f"{key.value}_enabled", phase_def.default_enabled
+            )
+            duration = getattr(
+                config, f"{key.value}_duration", phase_def.default_duration
+            )
+            audio_path = getattr(config, f"{key.value}_audio", phase_def.default_audio)
 
             if is_enabled:
                 self.active_phases.append(
                     {
                         "label": phase_def.label,
                         "duration": duration,
-                        "key": key,
+                        "key": key.value,
                         "audio_path": audio_path,
                     }
                 )
 
-    def start(self, parent=None) -> bool:
+    def start(self, parent: QMainWindow = mw) -> bool:
         """启动呼吸训练"""
         if not self.active_phases:
             return False
+        from .ui.Breathing import BreathingDialog
 
         # 创建对话框
         self.dialog = BreathingDialog(self, parent)
@@ -85,7 +91,7 @@ class BreathingController:
         # 显示对话框并返回结果
         return self.dialog.exec() == QDialog.DialogCode.Accepted
 
-    def _advance_to_next_phase(self):
+    def _advance_to_next_phase(self) -> None:
         """处理进入下一个阶段或完成练习的逻辑"""
         if not self.dialog:
             return
@@ -113,10 +119,10 @@ class BreathingController:
 
         self.current_phase_index = next_phase_index
         current_phase_data = self.active_phases[self.current_phase_index]
-        duration = current_phase_data["duration"]
-        label = current_phase_data["label"]
-        phase_key = current_phase_data["key"]
-        audio_path = current_phase_data["audio_path"]
+        duration = int(current_phase_data["duration"])
+        label = str(current_phase_data["label"])
+        phase_key = BreathingPhase(current_phase_data["key"])
+        audio_path = str(current_phase_data["audio_path"])
 
         # 更新UI显示当前阶段
         self.dialog.update_phase_display(label, duration, phase_key)
@@ -141,15 +147,19 @@ class BreathingController:
 
 
 # --- 便捷函数 ---
-def start_breathing_exercise(target_cycles: Optional[int] = None, parent=None) -> bool:
+def start_breathing_exercise(
+    target_cycles: Optional[int] = None, parent: QMainWindow = mw
+) -> bool:
     """启动呼吸训练练习"""
+    _target_cycles: int
     # 如果未指定目标循环次数，或传入的是布尔值（来自Qt信号），则从配置中获取
     if target_cycles is None or isinstance(target_cycles, bool):
         app_state = get_app_state()
-        # Also ensure we have a valid integer.
         cycles_from_config: int = app_state.config.breathing_cycles
-        target_cycles = cycles_from_config if cycles_from_config is not None else 3
+        _target_cycles = cycles_from_config
+    else:
+        _target_cycles = target_cycles
 
     # 创建控制器并启动训练
-    controller = BreathingController(target_cycles)
+    controller = BreathingController(_target_cycles)
     return controller.start(parent)

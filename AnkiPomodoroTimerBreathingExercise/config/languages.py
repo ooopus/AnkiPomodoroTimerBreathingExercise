@@ -4,7 +4,7 @@ from enum import Enum
 class LanguageCode(str, Enum):
     _display_name: str
 
-    def __new__(cls, value, display_name: str):
+    def __new__(cls, value: str, display_name: str):
         obj = str.__new__(cls, value)
         obj._value_ = value
         obj._display_name = display_name

@@ -91,12 +91,12 @@ class CircularTimer(BaseCircularTimer):
         font_size = max(10, inner_dim * 0.25)
         self._text_font.setPointSizeF(font_size)
 
-    def resizeEvent(self, event: Optional[QResizeEvent]) -> None:
+    def resizeEvent(self, a0: Optional[QResizeEvent]) -> None:
         """窗口大小改变事件"""
         self._update_font_size()
-        super().resizeEvent(event)
+        super().resizeEvent(a0)
 
-    def paintEvent(self, event: Optional[QPaintEvent]) -> None:
+    def paintEvent(self, a0: Optional[QPaintEvent]) -> None:
         """绘制事件"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
