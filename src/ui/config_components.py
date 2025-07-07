@@ -307,9 +307,7 @@ class BreathingSettings:
 
             checkbox.toggled.connect(spinbox.setEnabled)
             checkbox.toggled.connect(audio_button.setEnabled)
-            audio_button.clicked.connect(
-                lambda k=key, lbl=audio_label: self._select_audio_file(k, lbl)
-            )
+            self._connect_audio_button(audio_button, key, audio_label)
 
             duration_label = QLabel(_("持续时间:"))
             duration_label.setAlignment(
@@ -347,6 +345,16 @@ class BreathingSettings:
 
         group.setLayout(layout)
         return group
+
+    def _connect_audio_button(
+        self, button: QPushButton, phase_key: str, label_widget: QLabel
+    ):
+        """Connects the audio button's clicked signal to the file selection logic."""
+
+        def on_click():
+            self._select_audio_file(phase_key, label_widget)
+
+        button.clicked.connect(on_click)
 
     def _select_audio_file(self, phase_key: str, label_widget: QLabel):
         """打开文件对话框为某个阶段选择音频文件。"""
