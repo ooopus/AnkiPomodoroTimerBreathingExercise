@@ -1,5 +1,5 @@
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from aqt import QTimer, mw
 from aqt.utils import tooltip
@@ -20,13 +20,13 @@ class PomodoroManager:
         self.ui_updater = UiUpdater()
 
         # Callbacks
-        self.on_pomodoro_finished_callback: Optional[Callable[[], None]] = None
+        self.on_pomodoro_finished_callback: Callable[[], None] | None = None
 
         # 连接计时器事件
         self.timer_manager.on_tick = self.on_timer_tick
         self.timer_manager.on_finish = self.on_timer_finish
 
-        self._max_break_timer: Optional[QTimer] = None
+        self._max_break_timer: QTimer | None = None
         self._init_max_break_timer()
 
         # 在 AppState 中注册此实例
@@ -50,22 +50,24 @@ class PomodoroManager:
 
     def on_timer_finish(self, finished_state: TimerState):
         """处理计时器完成事件"""
-        if finished_state == TimerState.WORKING:
-            tooltip(_("本次番茄钟结束"), period=3000)
+        match finished_state:
+            case TimerState.WORKING:
+                tooltip(_("本次番茄钟结束"), period=3000)
 
-            # 更新状态
-            self.app_state.update_config_value("last_pomodoro_time", time.time())
-            completed = self.app_state.config.completed_pomodoros + 1
-            self.app_state.update_config_value("completed_pomodoros", completed)
+                # 更新状态
+                self.app_state.update_config_value("last_pomodoro_time", time.time())
+                completed = self.app_state.config.completed_pomodoros + 1
+                self.app_state.update_config_value("completed_pomodoros", completed)
 
-            # 调用钩子函数
-            if self.on_pomodoro_finished_callback:
-                self.on_pomodoro_finished_callback()
-        elif finished_state == TimerState.LONG_BREAK:
-            # Long break finished, start max break countdown
-            self.start_max_break_countdown(
-                self.app_state.config.max_break_duration / 60
-            )
+                # 调用钩子函数
+                if self.on_pomodoro_finished_callback:
+                    self.on_pomodoro_finished_callback()
+
+            case TimerState.LONG_BREAK:
+                # Long break finished, start max break countdown
+                self.start_max_break_countdown(
+                    self.app_state.config.max_break_duration / 60
+                )
 
         # 确保UI更新到空闲状态
         self.ui_updater.update(self.timer_manager)

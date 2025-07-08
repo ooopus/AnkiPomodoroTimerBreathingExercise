@@ -1,5 +1,4 @@
 import time
-from typing import Optional, Union
 
 from aqt import (
     QBrush,
@@ -23,7 +22,7 @@ from ...config.enums import BreathingPhase
 class BreathingAnimationWidget(QWidget):
     """Displays the expanding/contracting circle animation for breathing."""
 
-    def __init__(self, parent: Union[QMainWindow, QDialog] = mw):
+    def __init__(self, parent: QMainWindow | QDialog = mw):
         super().__init__(parent)
         self._current_phase_key: BreathingPhase = BreathingPhase.INHALE
         self._phase_duration_ms = 4000
@@ -79,7 +78,7 @@ class BreathingAnimationWidget(QWidget):
         if self._progress >= 1.0:
             self._animation_timer.stop()
 
-    def paintEvent(self, a0: Optional[QPaintEvent]):
+    def paintEvent(self, a0: QPaintEvent | None):
         """Paints the breathing circle."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -98,35 +97,34 @@ class BreathingAnimationWidget(QWidget):
         current_color = QColor(Qt.GlobalColor.gray)  # Default color
 
         # Determine radius and color based on phase and progress
-        if self._current_phase_key == BreathingPhase.INHALE:
-            # Linear interpolation from min to max radius
-            current_radius = min_radius + radius_range * self._progress
-            current_color = self._color_inhale
-        elif self._current_phase_key == BreathingPhase.HOLD_AFTER_INHALE:
-            # Stays at max radius during hold
-            current_radius = max_radius
-            current_color = self._color_hold
-        elif self._current_phase_key == BreathingPhase.EXHALE:
-            # Linear interpolation from max to min radius
-            current_radius = max_radius - radius_range * self._progress
-            current_color = self._color_exhale
-        elif self._current_phase_key == BreathingPhase.HOLD_AFTER_EXHALE:
-            # Stays at min radius during hold
-            current_radius = min_radius
-            current_color = self._color_hold
+        match self._current_phase_key:
+            case BreathingPhase.INHALE:
+                # Linear interpolation from min to max radius
+                current_radius = min_radius + radius_range * self._progress
+                current_color = self._color_inhale
+            case BreathingPhase.HOLD_AFTER_INHALE:
+                # Stays at max radius during hold
+                current_radius = max_radius
+                current_color = self._color_hold
+            case BreathingPhase.EXHALE:
+                # Linear interpolation from max to min radius
+                current_radius = max_radius - radius_range * self._progress
+                current_color = self._color_exhale
+            case BreathingPhase.HOLD_AFTER_EXHALE:
+                # Stays at min radius during hold
+                current_radius = min_radius
+                current_color = self._color_hold
+            case _:
+                current_radius = min_radius
+                current_color = QColor(Qt.GlobalColor.gray)
 
         # Handle zero duration phases to show the final state immediately
         if self._phase_duration_ms <= 0:
-            if (
-                self._current_phase_key == BreathingPhase.INHALE
-                or self._current_phase_key == BreathingPhase.HOLD_AFTER_INHALE
-            ):
-                current_radius = max_radius
-            elif (
-                self._current_phase_key == BreathingPhase.EXHALE
-                or self._current_phase_key == BreathingPhase.HOLD_AFTER_EXHALE
-            ):
-                current_radius = min_radius
+            match self._current_phase_key:
+                case BreathingPhase.INHALE | BreathingPhase.HOLD_AFTER_INHALE:
+                    current_radius = max_radius
+                case BreathingPhase.EXHALE | BreathingPhase.HOLD_AFTER_EXHALE:
+                    current_radius = min_radius
 
         # Draw the circle
         painter.setBrush(QBrush(current_color))

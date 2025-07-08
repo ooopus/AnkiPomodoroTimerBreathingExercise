@@ -1,4 +1,5 @@
 import dataclasses
+from typing import override
 
 from aqt import (
     QDialog,
@@ -109,6 +110,7 @@ class ConfigDialog(QDialog):
                     _("预计时间: 计算错误")
                 )
 
+    @override
     def accept(self):
         """当点击“保存”时，收集UI值，更新全局状态并保存到文件。"""
         try:

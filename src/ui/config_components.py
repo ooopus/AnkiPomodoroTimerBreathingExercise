@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Any
 
 from aqt import (
     QCheckBox,
@@ -29,17 +29,17 @@ class GeneralSettings:
 
     def __init__(self, config: AppConfig):
         self.config = config
-        self.enable_checkbox: Optional[QCheckBox] = None
-        self.work_across_decks_checkbox: Optional[QCheckBox] = None
-        self.show_timer_checkbox: Optional[QCheckBox] = None
-        self.circular_timer_style_combobox: Optional[QComboBox] = None
-        self.timer_position_combobox: Optional[QComboBox] = None
-        self.streak_spinbox: Optional[QSpinBox] = None
-        self.pomodoro_spinbox: Optional[QSpinBox] = None
-        self.long_break_minutes_spinbox: Optional[QSpinBox] = None
-        self.max_break_spinbox: Optional[QSpinBox] = None
-        self.language_combobox: Optional[QComboBox] = None
-        self.statusbar_format_combobox: Optional[QComboBox] = None
+        self.enable_checkbox: QCheckBox | None = None
+        self.work_across_decks_checkbox: QCheckBox | None = None
+        self.show_timer_checkbox: QCheckBox | None = None
+        self.circular_timer_style_combobox: QComboBox | None = None
+        self.timer_position_combobox: QComboBox | None = None
+        self.streak_spinbox: QSpinBox | None = None
+        self.pomodoro_spinbox: QSpinBox | None = None
+        self.long_break_minutes_spinbox: QSpinBox | None = None
+        self.max_break_spinbox: QSpinBox | None = None
+        self.language_combobox: QComboBox | None = None
+        self.statusbar_format_combobox: QComboBox | None = None
 
     def create_ui(self, parent: QWidget) -> QGroupBox:
         """创建常规设置部分的UI组件"""
@@ -251,8 +251,8 @@ class BreathingSettings:
 
     def __init__(self, config: AppConfig):
         self.config = config
-        self.cycles_spinbox: Optional[QSpinBox] = None
-        self.estimated_time_label: Optional[QLabel] = None
+        self.cycles_spinbox: QSpinBox | None = None
+        self.estimated_time_label: QLabel | None = None
         self.phase_uis: dict[str, PhaseUI] = {}
         self.audio_paths: dict[str, str] = {}
 
@@ -377,7 +377,7 @@ class BreathingSettings:
     def get_values(self) -> dict[str, Any]:
         """从呼吸设置获取值"""
         assert self.cycles_spinbox is not None
-        values: dict[str, Union[int, str, bool]] = {
+        values: dict[str, int | str | bool] = {
             "breathing_cycles": self.cycles_spinbox.value()
         }
         for key, ui in self.phase_uis.items():

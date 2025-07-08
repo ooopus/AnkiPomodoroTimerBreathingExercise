@@ -1,12 +1,10 @@
-from typing import Union
-
 from aqt import QDialog, QMainWindow, QObject, mw
 from PyQt6.QtCore import QUrl
 from PyQt6.QtMultimedia import QAudioOutput, QMediaPlayer
 
 
 class AudioPlayer(QObject):
-    def __init__(self, parent: Union[QMainWindow, QDialog] = mw):
+    def __init__(self, parent: QMainWindow | QDialog = mw):
         super().__init__(parent)
         self.player = QMediaPlayer(parent)
         self._audio_output = QAudioOutput()

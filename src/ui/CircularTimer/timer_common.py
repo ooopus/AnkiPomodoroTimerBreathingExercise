@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import override
 
 from aqt import (
     QApplication,
@@ -68,13 +68,16 @@ class TimerWindow(QDialog):
         # 默认位置为左上角
         x, y = margin, margin
 
-        if position == TimerPosition.TOP_RIGHT:
-            x = screen_rect.width() - window_width - margin
-        elif position == TimerPosition.BOTTOM_LEFT:
-            y = screen_rect.height() - window_height - margin
-        elif position == TimerPosition.BOTTOM_RIGHT:
-            x = screen_rect.width() - window_width - margin
-            y = screen_rect.height() - window_height - margin
+        match position:
+            case TimerPosition.TOP_RIGHT:
+                x = screen_rect.width() - window_width - margin
+            case TimerPosition.BOTTOM_LEFT:
+                y = screen_rect.height() - window_height - margin
+            case TimerPosition.BOTTOM_RIGHT:
+                x = screen_rect.width() - window_width - margin
+                y = screen_rect.height() - window_height - margin
+            case TimerPosition.TOP_LEFT:
+                pass
 
         self.move(x, y)
 
@@ -93,19 +96,19 @@ class TimerWindow(QDialog):
         widget_y = (dialog_h - widget_size) // 2
         self.timer_widget.move(widget_x, widget_y)
 
-    def resizeEvent(self, a0: Optional[QResizeEvent]):
+    def resizeEvent(self, a0: QResizeEvent | None):
         super().resizeEvent(a0)
         self._center_timer_widget()
 
     # 拖动功能
-    def mousePressEvent(self, a0: Optional[QMouseEvent]):
+    def mousePressEvent(self, a0: QMouseEvent | None):
         if self._offset is not None and a0 and a0.button() == Qt.MouseButton.LeftButton:
             self._offset = a0.globalPosition() - QPointF(self.pos())
             a0.accept()
         else:
             super().mousePressEvent(a0)
 
-    def mouseMoveEvent(self, a0: Optional[QMouseEvent]):
+    def mouseMoveEvent(self, a0: QMouseEvent | None):
         if self._offset is not None and a0 and a0.buttons() & Qt.MouseButton.LeftButton:
             new_pos = a0.globalPosition() - self._offset
             self.move(new_pos.toPoint())
@@ -113,24 +116,25 @@ class TimerWindow(QDialog):
         else:
             super().mouseMoveEvent(a0)
 
-    def mouseReleaseEvent(self, a0: Optional[QMouseEvent]):
+    def mouseReleaseEvent(self, a0: QMouseEvent | None):
         if self._offset is not None and a0 and a0.button() == Qt.MouseButton.LeftButton:
             a0.accept()
         else:
             super().mouseReleaseEvent(a0)
 
-    def closeEvent(self, a0: Optional[QCloseEvent]):
+    @override
+    def closeEvent(self, a0: QCloseEvent | None):
         self.closed.emit()
         super().closeEvent(a0)
 
 
 # 全局窗口实例
-_timer_window_instance: Optional[TimerWindow] = None
+_timer_window_instance: TimerWindow | None = None
 
 
 def setup_circular_timer(
     timer_widget_class: TimerClass, force_new: bool = False
-) -> Optional[BaseCircularTimer]:
+) -> BaseCircularTimer | None:
     """
     创建或显示独立的计时器窗口。
 

@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 name = "anki-pomodoro-timer-breathing-exercise"
 version = "1.0.0"
 description = "一个为Anki设计的番茄钟、休息和呼吸练习插件。"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = ["koda-validate>=5.0.0"]
 
 [tool.setuptools.packages.find]
@@ -25,4 +25,4 @@ where = ["."]
 ]
 
 [dependency-groups]
-dev = ["aqt>=25.2.7", "babel>=2.17.0"]
+dev = ["aqt>=25.7.2", "babel>=2.17.0"]

@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from aqt import (
     QDialog,
     QMainWindow,
@@ -20,18 +18,18 @@ class BreathingController:
         self.target_cycles = max(1, target_cycles)  # 确保至少有一个循环
         self.completed_cycles = 0
         self.current_phase_index = -1
-        self._phase_timer: Optional[QTimer] = None
-        self._current_audio_player: Optional[AudioPlayer] = None
+        self._phase_timer: QTimer | None = None
+        self._current_audio_player: AudioPlayer | None = None
 
         # 从配置中获取活动阶段
         self._load_active_phases()
         from .ui.Breathing import BreathingDialog
 
         # UI对话框
-        self.dialog: Optional[BreathingDialog] = None
+        self.dialog: BreathingDialog | None = None
 
         # Audio Player
-        self.audio_player: Optional[AudioPlayer] = None
+        self.audio_player: AudioPlayer | None = None
 
         # Initialize phase timer once for reuse
         self._init_phase_timer()
@@ -49,7 +47,7 @@ class BreathingController:
         config = app_state.config
 
         # --- 根据配置动态构建活动阶段 ---
-        self.active_phases: list[dict[str, Union[str, int, BreathingPhase]]] = []
+        self.active_phases: list[dict[str, str | int | BreathingPhase]] = []
         for phase_def in PHASES:
             key = phase_def.key
             is_enabled = getattr(
@@ -148,7 +146,7 @@ class BreathingController:
 
 # --- 便捷函数 ---
 def start_breathing_exercise(
-    target_cycles: Optional[int] = None, parent: QMainWindow = mw
+    target_cycles: int | None = None, parent: QMainWindow = mw
 ) -> bool:
     """启动呼吸训练练习"""
     _target_cycles: int

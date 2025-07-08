@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import override
 
 from aqt import (
     QCloseEvent,
@@ -92,7 +92,7 @@ class BreathingDialog(QDialog):
         if hasattr(self.controller, "stop_timers"):
             self.controller.stop_timers()
 
-    def closeEvent(self, a0: Optional[QCloseEvent]):
+    def closeEvent(self, a0: QCloseEvent | None):
         """Called when the dialog is closed (e.g., by window manager)."""
         self.stop_all_timers()
         super().closeEvent(a0)
@@ -102,6 +102,7 @@ class BreathingDialog(QDialog):
         self.stop_all_timers()
         super().accept()
 
+    @override
     def reject(self):
         """Called when the dialog is skipped or closed prematurely."""
         self.stop_all_timers()

@@ -31,15 +31,12 @@ def on_reviewer_did_start(card: Card):
             pomodoro_manager.on_pomodoro_finished_callback = on_pomodoro_finished
 
         # If currently in a break, stop it and start a new pomodoro
-        if pomodoro_manager.timer_manager.state == TimerState.LONG_BREAK:
-            pomodoro_manager.stop_max_break_countdown()
-            mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
-        if pomodoro_manager.timer_manager.state == TimerState.MAX_BREAK_COUNTDOWN:
-            pomodoro_manager.stop_max_break_countdown()
-            mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
-        # If idle, start a new pomodoro
-        elif pomodoro_manager.timer_manager.state == TimerState.IDLE:
-            mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
+        match pomodoro_manager.timer_manager.state:
+            case TimerState.LONG_BREAK | TimerState.MAX_BREAK_COUNTDOWN:
+                pomodoro_manager.stop_max_break_countdown()
+                mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
+            case TimerState.IDLE:
+                mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
 
 
 def on_state_did_change(new_state: str, old_state: str):
@@ -107,8 +104,8 @@ def on_theme_change():
 
 def _after_pomodoro_finish_tasks():
     """Actions to perform after the Pomodoro finishes (runs on main thread)."""
-    if mw.state == AnkiStates.REVIEW:
-        mw.moveToState(AnkiStates.DECK_BROWSER)
+    if mw.state == AnkiStates.REVIEW.value:
+        mw.moveToState(AnkiStates.DECK_BROWSER.value)
     QTimer.singleShot(200, _start_breathing_and_break)
 
 

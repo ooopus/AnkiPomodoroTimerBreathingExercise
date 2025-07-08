@@ -9,7 +9,6 @@ if str(vendor_dir) not in sys.path:
 
 import dataclasses
 from pathlib import Path
-from typing import Optional
 
 from koda_validate import DataclassValidator
 
@@ -25,7 +24,7 @@ from .languages import LanguageCode
 
 def get_default_audio_path(
     phase: BreathingPhase, language_code: LanguageCode
-) -> Optional[str]:
+) -> str | None:
     """
     根据呼吸阶段和语言，获取默认的音频文件路径。
     """
@@ -78,24 +77,24 @@ class AppConfig:
     breathing_cycles: int = 25
     inhale_duration: int = 5
     inhale_enabled: bool = True
-    inhale_audio: Optional[str] = dataclasses.field(
+    inhale_audio: str | None = dataclasses.field(
         default_factory=lambda: get_default_audio_path(
             BreathingPhase.INHALE, LanguageCode.ENGLISH
         )
     )
     exhale_duration: int = 5
     exhale_enabled: bool = True
-    exhale_audio: Optional[str] = dataclasses.field(
+    exhale_audio: str | None = dataclasses.field(
         default_factory=lambda: get_default_audio_path(
             BreathingPhase.EXHALE, LanguageCode.ENGLISH
         )
     )
     hold_after_inhale_duration: int = 0
     hold_after_inhale_enabled: bool = False
-    hold_after_inhale_audio: Optional[str] = None
+    hold_after_inhale_audio: str | None = None
     hold_after_exhale_duration: int = 0
     hold_after_exhale_enabled: bool = False
-    hold_after_exhale_audio: Optional[str] = None
+    hold_after_exhale_audio: str | None = None
 
     # 界面设置
     show_circular_timer: bool = True

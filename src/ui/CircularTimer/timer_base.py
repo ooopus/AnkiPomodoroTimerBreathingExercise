@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional
 
 from aqt import QWidget
 
@@ -15,7 +14,7 @@ class BaseCircularTimer(QWidget, metaclass=QWidgetABCMeta):
     所有计时器样式都必须继承此类并实现抽象方法。
     """
 
-    def __init__(self, parent: Optional[QWidget] = None):
+    def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
         self.setMinimumSize(50, 50)
         self._progress = 0.0
@@ -56,4 +55,4 @@ class BaseCircularTimer(QWidget, metaclass=QWidgetABCMeta):
 
 
 # 类型别名
-TimerClass = type[BaseCircularTimer]
+type TimerClass = type[BaseCircularTimer]

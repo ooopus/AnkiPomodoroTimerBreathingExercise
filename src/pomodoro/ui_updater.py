@@ -1,5 +1,3 @@
-from typing import Optional
-
 from aqt import QWidget
 
 from ..config import AppConfig
@@ -19,7 +17,7 @@ class UiUpdater:
     """负责更新所有与计时器相关的UI元素。"""
 
     def __init__(self):
-        self.circular_timer: Optional[BaseCircularTimer] = None
+        self.circular_timer: BaseCircularTimer | None = None
         self._setup_circular_timer_if_needed()
 
     def _setup_circular_timer_if_needed(self):
@@ -123,18 +121,19 @@ class UiUpdater:
         daily_total_seconds = config.daily_pomodoro_seconds
         daily_mins, daily_secs = divmod(daily_total_seconds, 60)
 
-        if timer_manager.state == TimerState.LONG_BREAK:
-            icon = Defaults.StatusBar.BREAK_WARNING
-            mins, secs = divmod(timer_manager.remaining_seconds, 60)
-        elif timer_manager.state == TimerState.MAX_BREAK_COUNTDOWN:
-            icon = Defaults.StatusBar.MAX_BREAK_WARNING
-            mins, secs = divmod(timer_manager.remaining_seconds, 60)
-        elif timer_manager.state == TimerState.WORKING:
-            icon = Defaults.StatusBar.FILLED_TOMATO
-            mins, secs = divmod(timer_manager.remaining_seconds, 60)
-        else:  # IDLE
-            icon = Defaults.StatusBar.EMPTY_TOMATO
-            mins, secs = divmod(int(config.pomodoro_minutes * 60), 60)
+        match timer_manager.state:
+            case TimerState.LONG_BREAK:
+                icon = Defaults.StatusBar.BREAK_WARNING
+                mins, secs = divmod(timer_manager.remaining_seconds, 60)
+            case TimerState.MAX_BREAK_COUNTDOWN:
+                icon = Defaults.StatusBar.MAX_BREAK_WARNING
+                mins, secs = divmod(timer_manager.remaining_seconds, 60)
+            case TimerState.WORKING:
+                icon = Defaults.StatusBar.FILLED_TOMATO
+                mins, secs = divmod(timer_manager.remaining_seconds, 60)
+            case TimerState.IDLE | _:
+                icon = Defaults.StatusBar.EMPTY_TOMATO
+                mins, secs = divmod(int(config.pomodoro_minutes * 60), 60)
 
         return icon, mins, secs, progress, daily_mins, daily_secs
 
@@ -143,16 +142,17 @@ class UiUpdater:
         if not self.circular_timer:
             return
 
-        if timer_manager.state in (
-            TimerState.WORKING,
-            TimerState.LONG_BREAK,
-            TimerState.MAX_BREAK_COUNTDOWN,
-        ):
-            self.circular_timer.set_progress(
-                timer_manager.remaining_seconds, timer_manager.total_seconds
-            )
-        else:  # 空闲或完成
-            self.circular_timer.set_progress(0, 1)
+        match timer_manager.state:
+            case (
+                TimerState.WORKING
+                | TimerState.LONG_BREAK
+                | TimerState.MAX_BREAK_COUNTDOWN
+            ):
+                self.circular_timer.set_progress(
+                    timer_manager.remaining_seconds, timer_manager.total_seconds
+                )
+            case _:  # 空闲或完成
+                self.circular_timer.set_progress(0, 1)
 
     def cleanup(self):
         """清理所有UI资源。"""

@@ -1,5 +1,5 @@
 import time
-from typing import Optional
+from typing import override
 
 from aqt import (
     QBrush,
@@ -40,7 +40,7 @@ class CircularTimer(BaseCircularTimer):
     RAINBOW_CYCLE_DURATION_S = 6.0
     ANIMATION_UPDATE_INTERVAL_MS = 50  # ~20 FPS
 
-    def __init__(self, parent: Optional[QWidget] = None):
+    def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
 
         # 初始化绘制工具
@@ -61,6 +61,7 @@ class CircularTimer(BaseCircularTimer):
         self._animation_timer.timeout.connect(self.update)
         self._animation_timer.start(self.ANIMATION_UPDATE_INTERVAL_MS)
 
+    @override
     def update_theme_colors(self) -> None:
         """根据当前的Anki主题更新所有颜色"""
         self._dark_mode = theme.theme_manager.night_mode
@@ -91,12 +92,14 @@ class CircularTimer(BaseCircularTimer):
         font_size = max(10, inner_dim * 0.25)
         self._text_font.setPointSizeF(font_size)
 
-    def resizeEvent(self, a0: Optional[QResizeEvent]) -> None:
+    @override
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
         """窗口大小改变事件"""
         self._update_font_size()
         super().resizeEvent(a0)
 
-    def paintEvent(self, a0: Optional[QPaintEvent]) -> None:
+    @override
+    def paintEvent(self, a0: QPaintEvent | None) -> None:
         """绘制事件"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -171,3 +174,10 @@ class CircularTimer(BaseCircularTimer):
         self._text_pen.setColor(rainbow_color)
         painter.setPen(self._text_pen)
         painter.drawText(text_rect, Qt.AlignmentFlag.AlignCenter, self._remaining_time)
+
+    @override
+    def set_progress(self, current: float, total: float) -> None:
+        """设置计时器进度"""
+        self._progress = current / total if total > 0 else 0
+        self._remaining_time = self._format_time(current)
+        self.update()

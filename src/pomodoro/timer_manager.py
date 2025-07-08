@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from enum import Enum, auto
-from typing import Callable, Optional
 
 from aqt import QTimer, QWidget
 
@@ -16,15 +16,15 @@ class TimerState(Enum):
 class TimerManager(QWidget):
     """负责管理番茄工作法的所有计时器（工作和休息）。"""
 
-    def __init__(self, parent: Optional[QWidget] = None):
+    def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
         self.state = TimerState.IDLE
         self.remaining_seconds = 0
         self.total_seconds = 0
 
         # Callbacks
-        self.on_tick: Optional[Callable[[], None]] = None
-        self.on_finish: Optional[Callable[[TimerState], None]] = None
+        self.on_tick: Callable[[], None] | None = None
+        self.on_finish: Callable[[TimerState], None] | None = None
 
         # Main timer for both work and break
         self._timer = QTimer(self)

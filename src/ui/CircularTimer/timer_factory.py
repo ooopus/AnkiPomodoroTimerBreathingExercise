@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 from ...config.constants import Defaults
 from ...config.enums import CircularTimerStyle
@@ -13,7 +13,7 @@ TIMER_STYLES: dict[CircularTimerStyle, TimerClass] = {
 }
 
 
-def get_timer_class(style_name: Optional[CircularTimerStyle] = None) -> TimerClass:
+def get_timer_class(style_name: CircularTimerStyle | None = None) -> TimerClass:
     """
     根据样式名称获取对应的计时器类。
 
