@@ -37,6 +37,8 @@ def on_reviewer_did_start(card: Card):
                 mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
             case TimerState.IDLE:
                 mw.progress.single_shot(100, pomodoro_manager.start_pomodoro, False)
+            case TimerState.WORKING:
+                pass
 
 
 def on_state_did_change(new_state: str, old_state: str):

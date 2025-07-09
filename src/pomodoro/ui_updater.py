@@ -131,7 +131,7 @@ class UiUpdater:
             case TimerState.WORKING:
                 icon = Defaults.StatusBar.FILLED_TOMATO
                 mins, secs = divmod(timer_manager.remaining_seconds, 60)
-            case TimerState.IDLE | _:
+            case TimerState.IDLE:
                 icon = Defaults.StatusBar.EMPTY_TOMATO
                 mins, secs = divmod(int(config.pomodoro_minutes * 60), 60)
 

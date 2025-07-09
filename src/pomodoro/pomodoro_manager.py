@@ -68,6 +68,10 @@ class PomodoroManager:
                 self.start_max_break_countdown(
                     self.app_state.config.max_break_duration / 60
                 )
+            case TimerState.MAX_BREAK_COUNTDOWN:
+                self._on_max_break_timeout()
+            case TimerState.IDLE:
+                pass
 
         # 确保UI更新到空闲状态
         self.ui_updater.update(self.timer_manager)

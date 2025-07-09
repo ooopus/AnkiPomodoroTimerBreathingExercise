@@ -38,7 +38,7 @@ REPLACEMENT = r"\1(_(\2\3\2)\4)"
 # REPLACEMENT = r'\1(_(\2\3\2)\4\5' # \4 包含逗号和参数, \5 是右括号
 
 
-def process_file(filepath):
+def process_file(filepath: str):
     """处理单个文件，查找并替换模式"""
     try:
         with open(filepath, encoding="utf-8") as f:
@@ -58,7 +58,7 @@ def process_file(filepath):
             logging.error(f"无法写入文件 {filepath}: {e}")
 
 
-def process_directory(root_dir):
+def process_directory(root_dir: str):
     """递归处理目录下的所有 .py 文件"""
     if not os.path.isdir(root_dir):
         logging.error(f"错误：目录 '{root_dir}' 不存在或不是一个有效的目录。")
