@@ -14,8 +14,10 @@ from aqt import (
 )
 
 from ...config.enums import TimerPosition
+from ...config.types import DisplayPosition
 from ...state import get_app_state, reload_config
 from ...translator import _
+from ..utils import get_screen_identifier
 from .timer_base import BaseCircularTimer, TimerClass
 
 
@@ -54,28 +56,46 @@ class TimerWindow(QDialog):
 
     def position_window(self):
         """根据配置将窗口定位到屏幕的指定角落"""
-        screen = QApplication.primaryScreen()
+        screen = self.screen()
         if not screen:
-            return
+            screen = QApplication.primaryScreen()
+            if not screen:
+                return
 
         config = reload_config()
         position = config.timer_position
+
+        if position == TimerPosition.LAST_USED:
+            identifier = get_screen_identifier(screen)
+            if identifier in config.saved_timer_positions:
+                saved_pos = config.saved_timer_positions[identifier]
+                current_res = screen.size()
+                current_dpi = (
+                    screen.logicalDotsPerInchX(),
+                    screen.logicalDotsPerInchY(),
+                )
+
+                if (
+                    saved_pos.resolution == (current_res.width(), current_res.height())
+                    and saved_pos.logical_dpi == current_dpi
+                ):
+                    self.move(saved_pos.pos[0], saved_pos.pos[1])
+                    return
 
         margin = 20
         screen_rect = screen.availableGeometry()
         window_width, window_height = self.width(), self.height()
 
-        # 默认位置为左上角
-        x, y = margin, margin
+        x, y = screen_rect.x() + margin, screen_rect.y() + margin
 
         match position:
             case TimerPosition.TOP_RIGHT:
-                x = screen_rect.width() - window_width - margin
+                x = screen_rect.right() - window_width - margin
             case TimerPosition.BOTTOM_LEFT:
-                y = screen_rect.height() - window_height - margin
+                y = screen_rect.bottom() - window_height - margin
             case TimerPosition.BOTTOM_RIGHT:
-                x = screen_rect.width() - window_width - margin
-                y = screen_rect.height() - window_height - margin
+                x = screen_rect.right() - window_width - margin
+                y = screen_rect.bottom() - window_height - margin
             case TimerPosition.TOP_LEFT:
                 pass
 
@@ -118,6 +138,33 @@ class TimerWindow(QDialog):
 
     def mouseReleaseEvent(self, a0: QMouseEvent | None):
         if self._offset is not None and a0 and a0.button() == Qt.MouseButton.LeftButton:
+            screen = self.screen()
+            if not screen:
+                super().mouseReleaseEvent(a0)
+                return
+
+            identifier = get_screen_identifier(screen)
+
+            app_state = get_app_state()
+            pos = self.pos()
+            current_res = screen.size()
+            logical_dpi = (
+                screen.logicalDotsPerInchX(),
+                screen.logicalDotsPerInchY(),
+            )
+
+            display_pos = DisplayPosition(
+                serial_number=identifier,  # 使用生成的标识符
+                resolution=(current_res.width(), current_res.height()),
+                logical_dpi=logical_dpi,
+                pos=(pos.x(), pos.y()),
+            )
+
+            # 更新配置
+            saved_positions = app_state.config.saved_timer_positions.copy()
+            saved_positions[identifier] = display_pos
+            app_state.update_config_value("saved_timer_positions", saved_positions)
+
             a0.accept()
         else:
             super().mouseReleaseEvent(a0)

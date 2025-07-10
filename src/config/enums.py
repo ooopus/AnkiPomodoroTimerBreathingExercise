@@ -22,6 +22,7 @@ class TimerPosition(str, Enum):
     TOP_RIGHT = "top_right", _("右上角")
     BOTTOM_LEFT = "bottom_left", _("左下角")
     BOTTOM_RIGHT = "bottom_right", _("右下角")
+    LAST_USED = "last_used", _("上次使用的位置")
 
 
 class CircularTimerStyle(str, Enum):

@@ -59,6 +59,16 @@ def get_default_audio_path(
 
 
 @dataclasses.dataclass
+class DisplayPosition:
+    """存储显示器的位置和相关信息"""
+
+    serial_number: str
+    resolution: tuple[int, int]
+    logical_dpi: tuple[float, float]
+    pos: tuple[int, int]
+
+
+@dataclasses.dataclass
 class AppConfig:
     """
     应用程序的主配置数据类。
@@ -103,6 +113,9 @@ class AppConfig:
         StatusBarFormat.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME
     )
     timer_position: TimerPosition = TimerPosition.TOP_RIGHT
+    saved_timer_positions: dict[str, DisplayPosition] = dataclasses.field(
+        default_factory=dict
+    )
 
     # 状态字段
     completed_pomodoros: int = 0
