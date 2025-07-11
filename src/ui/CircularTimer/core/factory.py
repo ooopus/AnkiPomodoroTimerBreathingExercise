@@ -1,15 +1,12 @@
-from typing import cast
+from ....config.constants import Defaults
+from ....config.enums import CircularTimerStyle
+from ..styles.default import CircularTimer as DefaultTimer
+from ..styles.rainbow import CircularTimer as RainbowTimer
+from .base import TimerClass
 
-from ...config.constants import Defaults
-from ...config.enums import CircularTimerStyle
-from .timer_base import TimerClass
-from .timer_style_default import CircularTimer as DefaultTimer
-from .timer_style_rainbow import CircularTimer as RainbowTimer
-
-# 类型安全的样式映射
 TIMER_STYLES: dict[CircularTimerStyle, TimerClass] = {
-    CircularTimerStyle.DEFAULT: cast(TimerClass, DefaultTimer),
-    CircularTimerStyle.RAINBOW: cast(TimerClass, RainbowTimer),
+    CircularTimerStyle.DEFAULT: DefaultTimer,
+    CircularTimerStyle.RAINBOW: RainbowTimer,
 }
 
 

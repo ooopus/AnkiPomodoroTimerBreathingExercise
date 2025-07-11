@@ -11,10 +11,11 @@ from aqt import (
 )
 from aqt.utils import tooltip
 
-from ..config import AppConfig
-from ..state import get_pomodoro_manager, reload_config, update_and_save_config
-from ..translator import _, set_language
-from .config_components import BreathingSettings, GeneralSettings
+from ...config import AppConfig
+from ...state import get_pomodoro_manager, reload_config, update_and_save_config
+from ...translator import _, set_language
+from .breathing import BreathingSettings
+from .general import GeneralSettings
 
 
 class ConfigDialog(QDialog):

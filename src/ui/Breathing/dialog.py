@@ -13,7 +13,7 @@ from aqt import (
 
 from ...config.enums import BreathingPhase
 from ...translator import _
-from .AnimationWidget import BreathingAnimationWidget
+from .animation import BreathingAnimationWidget
 
 
 # --- Breathing Dialog UI ---

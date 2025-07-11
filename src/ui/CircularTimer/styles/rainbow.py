@@ -19,7 +19,7 @@ from aqt import (
     theme,
 )
 
-from .constants import (
+from ..constants import (
     BG_COLOR_END_DARK,
     BG_COLOR_END_LIGHT,
     BG_COLOR_START_DARK,
@@ -31,7 +31,7 @@ from .constants import (
     SHADOW_COLOR_DARK,
     SHADOW_COLOR_LIGHT,
 )
-from .timer_base import BaseCircularTimer
+from ..core.base import BaseCircularTimer
 
 
 class CircularTimer(BaseCircularTimer):
@@ -174,10 +174,3 @@ class CircularTimer(BaseCircularTimer):
         self._text_pen.setColor(rainbow_color)
         painter.setPen(self._text_pen)
         painter.drawText(text_rect, Qt.AlignmentFlag.AlignCenter, self._remaining_time)
-
-    @override
-    def set_progress(self, current: float, total: float) -> None:
-        """设置计时器进度"""
-        self._progress = current / total if total > 0 else 0
-        self._remaining_time = self._format_time(current)
-        self.update()

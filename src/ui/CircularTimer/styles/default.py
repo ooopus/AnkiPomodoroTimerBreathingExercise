@@ -17,7 +17,7 @@ from aqt import (
     theme,
 )
 
-from .constants import (
+from ..constants import (
     BG_COLOR_END_DARK,
     BG_COLOR_END_LIGHT,
     BG_COLOR_START_DARK,
@@ -33,7 +33,7 @@ from .constants import (
     TEXT_COLOR_START_DARK,
     TEXT_COLOR_START_LIGHT,
 )
-from .timer_base import BaseCircularTimer
+from ..core.base import BaseCircularTimer
 
 
 class CircularTimer(BaseCircularTimer):
@@ -55,13 +55,6 @@ class CircularTimer(BaseCircularTimer):
         # 检测主题并设置颜色
         self.update_theme_colors()
         self._update_font_size()
-
-    @override
-    def set_progress(self, current: float, total: float) -> None:
-        """设置计时器进度"""
-        self._progress = current / total if total > 0 else 0
-        self._remaining_time = self._format_time(current)
-        self.update()
 
     @override
     def update_theme_colors(self) -> None:

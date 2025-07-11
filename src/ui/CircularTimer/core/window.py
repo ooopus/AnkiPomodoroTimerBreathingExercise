@@ -13,12 +13,12 @@ from aqt import (
     pyqtSignal,
 )
 
-from ...config.enums import TimerPosition
-from ...config.types import DisplayPosition
-from ...state import get_app_state, reload_config
-from ...translator import _
-from ..utils import get_screen_identifier
-from .timer_base import BaseCircularTimer, TimerClass
+from ....config.enums import TimerPosition
+from ....config.types import DisplayPosition
+from ....state import get_app_state, reload_config
+from ....translator import _
+from ...utils import get_screen_identifier
+from .base import BaseCircularTimer, TimerClass
 
 
 class TimerWindow(QDialog):
@@ -96,7 +96,7 @@ class TimerWindow(QDialog):
             case TimerPosition.BOTTOM_RIGHT:
                 x = screen_rect.right() - window_width - margin
                 y = screen_rect.bottom() - window_height - margin
-            case TimerPosition.TOP_LEFT:
+            case TimerPosition.TOP_LEFT | TimerPosition.LAST_USED:
                 pass
 
         self.move(x, y)

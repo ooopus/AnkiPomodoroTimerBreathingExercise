@@ -20,7 +20,6 @@ class BaseCircularTimer(QWidget, metaclass=QWidgetABCMeta):
         self._progress = 0.0
         self._remaining_time = "00:00"
 
-    @abstractmethod
     def set_progress(self, current: float, total: float) -> None:
         """
         设置计时器进度。
@@ -29,7 +28,9 @@ class BaseCircularTimer(QWidget, metaclass=QWidgetABCMeta):
             current: 当前值（例如剩余秒数）
             total: 总值
         """
-        pass
+        self._progress = current / total if total > 0 else 0
+        self._remaining_time = self._format_time(current)
+        self.update()
 
     @abstractmethod
     def update_theme_colors(self) -> None:

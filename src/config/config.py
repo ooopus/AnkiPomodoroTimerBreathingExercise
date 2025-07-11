@@ -28,12 +28,37 @@ CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.json"
 
 
 class EnhancedJSONEncoder(json.JSONEncoder):
-    """一个增强的JSON编码器，可以处理枚举类型。"""
+    """一个增强的JSON编码器,可以处理枚举类型。"""
 
     def default(self, o: Any):
         if isinstance(o, Enum):
             return o.value
         return super().default(o)
+
+
+def deep_compare(item1, item2):
+    """递归比较两个项目，将列表和元组视为等同。"""
+    # 如果类型不同，但不是列表/元组对，则认为不同
+    if (
+        not isinstance(item1, type(item2))
+        and not isinstance(item2, type(item1))
+        and not (isinstance(item1, list | tuple) and isinstance(item2, list | tuple))
+    ):
+        return False
+
+    if isinstance(item1, dict) and isinstance(item2, dict):
+        if set(item1.keys()) != set(item2.keys()):
+            return False
+        return all(deep_compare(item1[k], item2[k]) for k in item1)
+
+    # Compare lists and tuples
+    if isinstance(item1, list | tuple) and isinstance(item2, list | tuple):
+        if len(item1) != len(item2):
+            return False
+        return all(deep_compare(i1, i2) for i1, i2 in zip(item1, item2, strict=False))
+
+    else:
+        return item1 == item2
 
 
 def get_default_config() -> AppConfig:
@@ -48,11 +73,8 @@ def save_config(config: AppConfig):
     try:
         # 确保配置文件所在的目录存在
         CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        # 使用 "w" 模式以文本形式写入
         with CONFIG_PATH.open("w", encoding="utf-8") as f:
-            # dataclasses.asdict 将 dataclass 实例转换为字典
             config_dict = dataclasses.asdict(config)
-            # 使用 json.dump 写入文件，indent=4 使其格式化
             json.dump(
                 config_dict, f, indent=4, ensure_ascii=False, cls=EnhancedJSONEncoder
             )
@@ -158,6 +180,20 @@ def load_user_config() -> AppConfig:
     Returns:
         一个经过验证和完全填充的 AppConfig 实例。
     """
+    # 定义需要忽略的运行时状态字段列表
+    # 这些字段通常在运行时动态更新，不应触发配置更新提示
+    IGNORED_STATE_FIELDS = [
+        "is_timer_active",
+        "is_break_active",
+        "remaining_time",
+        "current_round",
+        "timer_end_time",
+        "last_focus_timestamp",
+        "last_review_timestamp",
+        "next_review_interval",
+        "last_state",
+    ]
+
     if not CONFIG_PATH.exists():
         return _create_default_config_file(CONFIG_PATH)
 
@@ -174,7 +210,16 @@ def load_user_config() -> AppConfig:
             config = result.val
             # 将可能已更新的配置回写到文件
             updated_dict = dataclasses.asdict(config)
-            if updated_dict != loaded_data:
+
+            # 移除运行时状态字段，只比较非状态字段的差异
+            comparison_updated = {
+                k: v for k, v in updated_dict.items() if k not in IGNORED_STATE_FIELDS
+            }
+            comparison_loaded = {
+                k: v for k, v in loaded_data.items() if k not in IGNORED_STATE_FIELDS
+            }
+
+            if not deep_compare(comparison_updated, comparison_loaded):
                 print("提示: 配置已使用新添加的默认值更新。正在回写配置文件...")
                 save_config(config)
             return config
