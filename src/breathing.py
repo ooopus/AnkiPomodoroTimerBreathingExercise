@@ -23,7 +23,7 @@ class BreathingController:
 
         # 从配置中获取活动阶段
         self._load_active_phases()
-        from .ui.Breathing import BreathingDialog
+        from .ui.breathing import BreathingDialog
 
         # UI对话框
         self.dialog: BreathingDialog | None = None
@@ -72,7 +72,7 @@ class BreathingController:
         """启动呼吸训练"""
         if not self.active_phases:
             return False
-        from .ui.Breathing import BreathingDialog
+        from .ui.breathing import BreathingDialog
 
         # 创建对话框
         self.dialog = BreathingDialog(self, parent)

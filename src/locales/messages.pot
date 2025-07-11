@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-10 16:56+0900\n"
+"POT-Creation-Date: 2025-07-12 06:25+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -151,160 +151,159 @@ msgstr ""
 msgid "休息时间过长，番茄钟连胜已清空。"
 msgstr ""
 
-#: ui/config_components.py:46 ui/config_dialog.py:34
-msgid "常规设置"
-msgstr ""
-
-#: ui/config_components.py:55
-msgid "启用番茄钟插件"
-msgstr ""
-
-#: ui/config_components.py:61
-msgid "语言:"
-msgstr ""
-
-#: ui/config_components.py:70
-msgid "全局计时器"
-msgstr ""
-
-#: ui/config_components.py:76
-msgid "显示圆形计时器"
-msgstr ""
-
-#: ui/config_components.py:82
-msgid "圆形计时器样式:"
-msgstr ""
-
-#: ui/config_components.py:95
-msgid "计时器窗口位置:"
-msgstr ""
-
-#: ui/config_components.py:108
-msgid "连胜上限:"
-msgstr ""
-
-#: ui/config_components.py:113
-msgid "个番茄钟"
-msgstr ""
-
-#: ui/config_components.py:121
-msgid "连续完成指定数量的番茄钟后，将进行长休息"
-msgstr ""
-
-#: ui/config_components.py:127
-msgid "番茄钟时长:"
-msgstr ""
-
-#: ui/config_components.py:132 ui/config_components.py:146
-#: ui/config_components.py:160
-msgid "分钟"
-msgstr ""
-
-#: ui/config_components.py:141
-msgid "长休息时长:"
-msgstr ""
-
-#: ui/config_components.py:155
-msgid "休息时间上限:"
-msgstr ""
-
-#: ui/config_components.py:168
-msgid "超过休息时间上限后，累计的番茄钟将归零"
-msgstr ""
-
-#: ui/config_components.py:176
-msgid "状态栏显示设置"
-msgstr ""
-
-#: ui/config_components.py:178
-msgid "选择状态栏显示格式："
-msgstr ""
-
-#: ui/config_components.py:261
-msgid "呼吸训练设置"
-msgstr ""
-
-#: ui/config_components.py:265
-msgid "目标循环次数:"
-msgstr ""
-
-#: ui/config_components.py:274
-msgid "呼吸阶段设置"
-msgstr ""
-
-#: ui/config_components.py:300
-msgid "选择音频"
-msgstr ""
-
-#: ui/config_components.py:302 ui/config_components.py:373
-msgid "未选择"
-msgstr ""
-
-#: ui/config_components.py:312
-msgid "持续时间:"
-msgstr ""
-
-#: ui/config_components.py:320
-msgid "秒"
-msgstr ""
-
-#: ui/config_components.py:331
-msgid "预计时间: --:--"
-msgstr ""
-
-#: ui/config_components.py:363
-#, python-brace-format
-msgid "为 {phase_key} 阶段选择音频文件"
-msgstr ""
-
-#: ui/config_components.py:365
-msgid "音频文件 (*.wav *.mp3 *.opus *.ogg);;所有文件 (*)"
-msgstr ""
-
-#: ui/config_dialog.py:27
-msgid "番茄钟/呼吸训练设置"
-msgstr ""
-
-#: ui/Breathing/Dialog.py:30 ui/config_dialog.py:35
+#: ui/breathing/dialog.py:30 ui/config/dialog.py:36
 msgid "呼吸训练"
 msgstr ""
 
-#: ui/config_dialog.py:97
-msgid "预计时间: --:-- (未启用或周期为0)"
-msgstr ""
-
-#: ui/config_dialog.py:104
-#, python-brace-format
-msgid "预计时间: {mins:02d}:{secs:02d}"
-msgstr ""
-
-#: ui/config_dialog.py:110
-msgid "预计时间: 计算错误"
-msgstr ""
-
-#: ui/config_dialog.py:133
-msgid "配置已保存"
-msgstr ""
-
-#: ui/config_dialog.py:141
-#, python-brace-format
-msgid "保存配置时出错: {}"
-msgstr ""
-
-#: ui/Breathing/Dialog.py:46
+#: ui/breathing/dialog.py:46
 msgid "准备..."
 msgstr ""
 
-#: ui/Breathing/Dialog.py:53 ui/Breathing/Dialog.py:84
+#: ui/breathing/dialog.py:53 ui/breathing/dialog.py:84
 #, python-brace-format
 msgid "循环: {current} / {total}"
 msgstr ""
 
-#: ui/Breathing/Dialog.py:61
+#: ui/breathing/dialog.py:61
 msgid "跳过训练"
 msgstr ""
 
-#: ui/CircularTimer/timer_common.py:48
+#: ui/circularTimer/core/window.py:48
 msgid "番茄钟计时器"
+msgstr ""
+
+#: ui/config/breathing.py:46
+msgid "呼吸训练设置"
+msgstr ""
+
+#: ui/config/breathing.py:50
+msgid "目标循环次数:"
+msgstr ""
+
+#: ui/config/breathing.py:59
+msgid "呼吸阶段设置"
+msgstr ""
+
+#: ui/config/breathing.py:85
+msgid "选择音频"
+msgstr ""
+
+#: ui/config/breathing.py:87 ui/config/breathing.py:158
+msgid "未选择"
+msgstr ""
+
+#: ui/config/breathing.py:97
+msgid "持续时间:"
+msgstr ""
+
+#: ui/config/breathing.py:105
+msgid "秒"
+msgstr ""
+
+#: ui/config/breathing.py:116
+msgid "预计时间: --:--"
+msgstr ""
+
+#: ui/config/breathing.py:148
+#, python-brace-format
+msgid "为 {phase_key} 阶段选择音频文件"
+msgstr ""
+
+#: ui/config/breathing.py:150
+msgid "音频文件 (*.wav *.mp3 *.opus *.ogg);;所有文件 (*)"
+msgstr ""
+
+#: ui/config/dialog.py:28
+msgid "番茄钟/呼吸训练设置"
+msgstr ""
+
+#: ui/config/dialog.py:35 ui/config/general.py:41
+msgid "常规设置"
+msgstr ""
+
+#: ui/config/dialog.py:98
+msgid "预计时间: --:-- (未启用或周期为0)"
+msgstr ""
+
+#: ui/config/dialog.py:105
+#, python-brace-format
+msgid "预计时间: {mins:02d}:{secs:02d}"
+msgstr ""
+
+#: ui/config/dialog.py:111
+msgid "预计时间: 计算错误"
+msgstr ""
+
+#: ui/config/dialog.py:134
+msgid "配置已保存"
+msgstr ""
+
+#: ui/config/dialog.py:142
+#, python-brace-format
+msgid "保存配置时出错: {}"
+msgstr ""
+
+#: ui/config/general.py:50
+msgid "启用番茄钟插件"
+msgstr ""
+
+#: ui/config/general.py:56
+msgid "语言:"
+msgstr ""
+
+#: ui/config/general.py:65
+msgid "全局计时器"
+msgstr ""
+
+#: ui/config/general.py:71
+msgid "显示圆形计时器"
+msgstr ""
+
+#: ui/config/general.py:77
+msgid "圆形计时器样式:"
+msgstr ""
+
+#: ui/config/general.py:90
+msgid "计时器窗口位置:"
+msgstr ""
+
+#: ui/config/general.py:103
+msgid "连胜上限:"
+msgstr ""
+
+#: ui/config/general.py:108
+msgid "个番茄钟"
+msgstr ""
+
+#: ui/config/general.py:116
+msgid "连续完成指定数量的番茄钟后，将进行长休息"
+msgstr ""
+
+#: ui/config/general.py:122
+msgid "番茄钟时长:"
+msgstr ""
+
+#: ui/config/general.py:127 ui/config/general.py:141 ui/config/general.py:155
+msgid "分钟"
+msgstr ""
+
+#: ui/config/general.py:136
+msgid "长休息时长:"
+msgstr ""
+
+#: ui/config/general.py:150
+msgid "休息时间上限:"
+msgstr ""
+
+#: ui/config/general.py:163
+msgid "超过休息时间上限后，累计的番茄钟将归零"
+msgstr ""
+
+#: ui/config/general.py:171
+msgid "状态栏显示设置"
+msgstr ""
+
+#: ui/config/general.py:173
+msgid "选择状态栏显示格式："
 msgstr ""
 
