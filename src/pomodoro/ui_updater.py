@@ -4,7 +4,7 @@ from ..config import AppConfig
 from ..config.constants import Defaults
 from ..config.enums import StatusBarFormat
 from ..state import get_app_state
-from ..ui.CircularTimer import (
+from ..ui.circularTimer import (
     BaseCircularTimer,
     get_timer_class,
     setup_circular_timer,

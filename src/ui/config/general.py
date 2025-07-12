@@ -16,7 +16,7 @@ from ...config import AppConfig
 from ...config.enums import StatusBarFormat, TimerPosition
 from ...config.languages import LanguageCode
 from ...translator import _
-from ..CircularTimer.core.factory import list_timer_styles
+from ..circularTimer.core.factory import list_timer_styles
 
 
 class GeneralSettings:
