@@ -1,14 +1,51 @@
 # __init__.py (插件主文件 - PyQt6 & Cycle-based Breathing)
 
+# __init__.py (插件主文件 - PyQt6 & Cycle-based Breathing)
+
 import time
 
+from anki.buildinfo import version as anki_version
 from aqt import QAction, gui_hooks, mw
 
 from .breathing import start_breathing_exercise
 from .hooks import on_reviewer_did_start, on_state_did_change, on_theme_change
 from .state import AppState, get_app_state
 from .translator import _
-from .ui import ConfigDialog
+from .ui import ConfigDialog, show_update_warning
+
+# --- Anki Version Check ---
+MIN_ANKI_VERSION = "25.07"
+
+
+def check_anki_version() -> bool:
+    """
+    Checks if the current Anki version is sufficient.
+    Shows a warning dialog if it's not.
+    """
+    try:
+        min_parts = [int(p) for p in MIN_ANKI_VERSION.split(".")]
+        current_parts = [int(p) for p in anki_version.split(".")]
+
+        # Pad shorter version with zeros for fair comparison
+        max_len = max(len(min_parts), len(current_parts))
+        min_parts.extend([0] * (max_len - len(min_parts)))
+        current_parts.extend([0] * (max_len - len(current_parts)))
+
+        if current_parts < min_parts:
+            show_update_warning(
+                required_version=MIN_ANKI_VERSION, current_version=anki_version
+            )
+            return False
+    except ValueError:
+        from aqt.utils import tooltip
+
+        tooltip(_("无法解析Anki版本: {}").format(anki_version))
+        show_update_warning(
+            required_version=MIN_ANKI_VERSION,
+            current_version=f"{anki_version} (unparsable)",
+        )
+        return False
+    return True
 
 
 def add_menu_item():
@@ -45,6 +82,8 @@ def _check_and_reset_daily_timer(app_state: AppState):
 
 def setup_plugin():
     """Loads config, sets up hooks, and adds menu item."""
+    if not check_anki_version():
+        return  # Stop setup if version is too old
 
     app_state = get_app_state()
     _check_and_reset_daily_timer(app_state)

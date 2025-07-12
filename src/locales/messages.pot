@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-12 06:25+0900\n"
+"POT-Creation-Date: 2025-07-12 23:53+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: __init__.py:15
+#: __init__.py:42
+#, python-brace-format
+msgid "无法解析Anki版本: {}"
+msgstr ""
+
+#: __init__.py:52
 msgid "番茄钟 & 呼吸设置..."
 msgstr ""
 
-#: __init__.py:18
+#: __init__.py:55
 msgid "启动呼吸训练"
 msgstr ""
 
-#: __init__.py:27
+#: __init__.py:64
 msgid "警告: 无法添加番茄钟菜单项"
 msgstr ""
 
@@ -149,6 +154,32 @@ msgstr ""
 
 #: pomodoro/pomodoro_manager.py:157
 msgid "休息时间过长，番茄钟连胜已清空。"
+msgstr ""
+
+#: ui/version_dialog.py:13
+msgid "请更新Anki"
+msgstr ""
+
+#: ui/version_dialog.py:21
+#, python-brace-format
+msgid "Anki番茄钟 & 呼吸训练插件需要Anki版本 <b>{required_version}</b> 或更高版本才能运行。"
+msgstr ""
+
+#: ui/version_dialog.py:24
+#, python-brace-format
+msgid "您当前使用的Anki版本是 <b>{current_version}</b>。"
+msgstr ""
+
+#: ui/version_dialog.py:28
+msgid "请更新Anki到最新版本以使用此插件。"
+msgstr ""
+
+#: ui/version_dialog.py:34
+msgid "跳转到Anki更新页面"
+msgstr ""
+
+#: ui/version_dialog.py:38
+msgid "确定"
 msgstr ""
 
 #: ui/breathing/dialog.py:30 ui/config/dialog.py:36

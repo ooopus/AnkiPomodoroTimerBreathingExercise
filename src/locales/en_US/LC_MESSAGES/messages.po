@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-12 06:25+0900\n"
+"POT-Creation-Date: 2025-07-12 23:53+0900\n"
 "PO-Revision-Date: 2025-04-04 12:15+0900\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -18,15 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: __init__.py:15
+#: __init__.py:42
+#, python-brace-format
+msgid "无法解析Anki版本: {}"
+msgstr "Could not parse Anki version: {}"
+
+#: __init__.py:52
 msgid "番茄钟 & 呼吸设置..."
 msgstr "Pomodoro & Breathing Settings..."
 
-#: __init__.py:18
+#: __init__.py:55
 msgid "启动呼吸训练"
 msgstr "Start Breathing Exercise"
 
-#: __init__.py:27
+#: __init__.py:64
 msgid "警告: 无法添加番茄钟菜单项"
 msgstr "Warning: Cannot add Pomodoro menu item"
 
@@ -153,6 +158,32 @@ msgstr "Long idle time detected, streak broken."
 #: pomodoro/pomodoro_manager.py:157
 msgid "休息时间过长，番茄钟连胜已清空。"
 msgstr "Break time too long, pomodoro streak has been reset."
+
+#: ui/version_dialog.py:13
+msgid "请更新Anki"
+msgstr "Please Update Anki"
+
+#: ui/version_dialog.py:21
+#, python-brace-format
+msgid "Anki番茄钟 & 呼吸训练插件需要Anki版本 <b>{required_version}</b> 或更高版本才能运行。"
+msgstr "The Anki Pomodoro Timer & Breathe Exercise addon requires Anki version <b>{required_version}</b> or later to work."
+
+#: ui/version_dialog.py:24
+#, python-brace-format
+msgid "您当前使用的Anki版本是 <b>{current_version}</b>。"
+msgstr "You are currently using Anki version <b>{current_version}</b>."
+
+#: ui/version_dialog.py:28
+msgid "请更新Anki到最新版本以使用此插件。"
+msgstr "Please update Anki to the latest version to use this addon."
+
+#: ui/version_dialog.py:34
+msgid "跳转到Anki更新页面"
+msgstr "Go to Anki Update Page"
+
+#: ui/version_dialog.py:38
+msgid "确定"
+msgstr "OK"
 
 #: ui/breathing/dialog.py:30 ui/config/dialog.py:36
 msgid "呼吸训练"
