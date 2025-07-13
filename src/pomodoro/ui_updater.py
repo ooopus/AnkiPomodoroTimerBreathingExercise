@@ -69,11 +69,16 @@ class UiUpdater:
     ) -> str:
         """生成状态栏标签的文本。"""
         # 获取显示数据
-        icon, mins, secs, progress, daily_mins, daily_secs = (
-            self._get_timer_display_data(timer_manager, config)
+        icon, mins, secs, progress, _, _ = self._get_timer_display_data(
+            timer_manager, config
         )
         completed = config.completed_pomodoros
         target = max(1, config.pomodoros_before_long_break)
+
+        # 计算每日累计小时和分钟
+        daily_total_seconds = config.daily_pomodoro_seconds
+        daily_hours = daily_total_seconds // 3600
+        daily_mins_total = (daily_total_seconds % 3600) // 60
 
         # 获取状态栏格式字符串
         statusbar_format = config.statusbar_format
@@ -85,8 +90,8 @@ class UiUpdater:
                 mins=mins,
                 secs=secs,
                 progress=progress,
-                daily_mins=daily_mins,
-                daily_secs=daily_secs,
+                daily_hours=daily_hours,
+                daily_mins=daily_mins_total,
                 completed=completed,
                 target=target,
             )
@@ -100,8 +105,8 @@ class UiUpdater:
                 mins=mins,
                 secs=secs,
                 progress=progress,
-                daily_mins=daily_mins,
-                daily_secs=daily_secs,
+                daily_hours=daily_hours,
+                daily_mins=daily_mins_total,
                 completed=completed,
                 target=target,
             )

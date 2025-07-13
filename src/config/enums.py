@@ -103,6 +103,6 @@ class StatusBarFormat(str, Enum):
         _("显示图标+倒计时+进度"),
     )
     ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME = (
-        "{icon} {mins:02d}:{secs:02d} {progress} ",
+        "{icon} {mins:02d}:{secs:02d} {progress}  🕒 {daily_hours}h {daily_mins}m",
         _("显示图标+倒计时+进度+累计使用时间"),
     )
