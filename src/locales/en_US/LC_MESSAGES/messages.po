@@ -166,7 +166,9 @@ msgstr "Please Update Anki"
 #: ui/version_dialog.py:21
 #, python-brace-format
 msgid "Anki番茄钟 & 呼吸训练插件需要Anki版本 <b>{required_version}</b> 或更高版本才能运行。"
-msgstr "The Anki Pomodoro Timer & Breathe Exercise addon requires Anki version <b>{required_version}</b> or later to work."
+msgstr ""
+"The Anki Pomodoro Timer & Breathe Exercise addon requires Anki version "
+"<b>{required_version}</b> or later to work."
 
 #: ui/version_dialog.py:24
 #, python-brace-format
