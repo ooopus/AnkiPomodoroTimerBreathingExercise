@@ -112,6 +112,7 @@ class AppConfig:
     statusbar_format: StatusBarFormat = (
         StatusBarFormat.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME
     )
+    progress_display_threshold: int = 10
     timer_position: TimerPosition = TimerPosition.TOP_RIGHT
     saved_timer_positions: dict[str, DisplayPosition] = dataclasses.field(
         default_factory=dict

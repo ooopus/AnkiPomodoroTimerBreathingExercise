@@ -113,10 +113,15 @@ class UiUpdater:
         completed = config.completed_pomodoros
         target = max(1, config.pomodoros_before_long_break)
         completed_display = completed % target
-        progress = (
-            Defaults.StatusBar.FILLED_TOMATO * completed_display
-            + Defaults.StatusBar.EMPTY_TOMATO * (target - completed_display)
-        )
+
+        if target > config.progress_display_threshold:
+            remaining_display = target - completed_display
+            progress = f"{Defaults.StatusBar.FILLED_TOMATO} x {completed_display}, {Defaults.StatusBar.EMPTY_TOMATO} x {remaining_display}"
+        else:
+            progress = (
+                Defaults.StatusBar.FILLED_TOMATO * completed_display
+                + Defaults.StatusBar.EMPTY_TOMATO * (target - completed_display)
+            )
 
         daily_total_seconds = config.daily_pomodoro_seconds
         daily_mins, daily_secs = divmod(daily_total_seconds, 60)

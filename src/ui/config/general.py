@@ -30,6 +30,7 @@ class GeneralSettings:
         self.circular_timer_style_combobox: QComboBox | None = None
         self.timer_position_combobox: QComboBox | None = None
         self.streak_spinbox: QSpinBox | None = None
+        self.progress_display_threshold_spinbox: QSpinBox | None = None
         self.pomodoro_spinbox: QSpinBox | None = None
         self.long_break_minutes_spinbox: QSpinBox | None = None
         self.max_break_spinbox: QSpinBox | None = None
@@ -118,6 +119,35 @@ class GeneralSettings:
         grid_layout.addWidget(streak_hint, row, 1, 1, 1)
         row += 1
 
+        # 进度显示阈值
+        progress_display_threshold_label = QLabel(_("进度显示阈值:"), parent)
+        self.progress_display_threshold_spinbox = QSpinBox(parent)
+        self.progress_display_threshold_spinbox.setMinimum(1)
+        self.progress_display_threshold_spinbox.setMaximum(100)
+        self.progress_display_threshold_spinbox.setValue(
+            self.config.progress_display_threshold
+        )
+        progress_display_threshold_unit_label = QLabel(_("个番茄钟"), parent)
+        progress_display_threshold_layout = QHBoxLayout()
+        progress_display_threshold_layout.addWidget(
+            self.progress_display_threshold_spinbox
+        )
+        progress_display_threshold_layout.addWidget(
+            progress_display_threshold_unit_label
+        )
+        grid_layout.addWidget(progress_display_threshold_label, row, 0)
+        grid_layout.addLayout(progress_display_threshold_layout, row, 1)
+        row += 1
+
+        progress_display_threshold_hint = QLabel(
+            _("当目标番茄钟数量超过此值时，将以 '🍅 x N' 的形式显示进度"), parent
+        )
+        progress_display_threshold_hint.setStyleSheet(
+            "font-style: italic; color: grey;"
+        )
+        grid_layout.addWidget(progress_display_threshold_hint, row, 1, 1, 1)
+        row += 1
+
         # 番茄钟时长
         pomo_label = QLabel(_("番茄钟时长:"), parent)
         self.pomodoro_spinbox = QSpinBox(parent)
@@ -200,6 +230,7 @@ class GeneralSettings:
         assert self.show_timer_checkbox is not None
         assert self.circular_timer_style_combobox is not None
         assert self.streak_spinbox is not None
+        assert self.progress_display_threshold_spinbox is not None
         assert self.pomodoro_spinbox is not None
         assert self.long_break_minutes_spinbox is not None
         assert self.max_break_spinbox is not None
@@ -222,6 +253,7 @@ class GeneralSettings:
             "circular_timer_style": self.circular_timer_style_combobox.currentText(),
             "timer_position": position_key,
             "pomodoros_before_long_break": self.streak_spinbox.value(),
+            "progress_display_threshold": self.progress_display_threshold_spinbox.value(),
             "pomodoro_minutes": self.pomodoro_spinbox.value(),
             "long_break_minutes": self.long_break_minutes_spinbox.value(),
             "max_break_duration": self.max_break_spinbox.value() * 60,
