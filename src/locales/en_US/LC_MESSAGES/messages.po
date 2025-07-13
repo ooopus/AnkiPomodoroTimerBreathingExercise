@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-12 23:53+0900\n"
+"POT-Creation-Date: 2025-07-13 12:58+0900\n"
 "PO-Revision-Date: 2025-04-04 12:15+0900\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en_US\n"
@@ -18,20 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: __init__.py:42
+#: __init__.py:52
 #, python-brace-format
 msgid "无法解析Anki版本: {}"
 msgstr "Could not parse Anki version: {}"
 
-#: __init__.py:52
+#: __init__.py:107
 msgid "番茄钟 & 呼吸设置..."
 msgstr "Pomodoro & Breathing Settings..."
 
-#: __init__.py:55
+#: __init__.py:110
 msgid "启动呼吸训练"
 msgstr "Start Breathing Exercise"
 
-#: __init__.py:64
+#: __init__.py:119
 msgid "警告: 无法添加番茄钟菜单项"
 msgstr "Warning: Cannot add Pomodoro menu item"
 
@@ -253,7 +253,7 @@ msgstr "Audio files (*.wav *.mp3 *.opus *.ogg);;All files (*)"
 msgid "番茄钟/呼吸训练设置"
 msgstr "Pomodoro/Breathing Exercise Settings"
 
-#: ui/config/dialog.py:35 ui/config/general.py:41
+#: ui/config/dialog.py:35 ui/config/general.py:42
 msgid "常规设置"
 msgstr "General Settings"
 
@@ -279,67 +279,75 @@ msgstr "Configuration saved"
 msgid "保存配置时出错: {}"
 msgstr "Error saving configuration: {}"
 
-#: ui/config/general.py:50
+#: ui/config/general.py:51
 msgid "启用番茄钟插件"
 msgstr "Enable Pomodoro Plugin"
 
-#: ui/config/general.py:56
+#: ui/config/general.py:57
 msgid "语言:"
 msgstr "Language:"
 
-#: ui/config/general.py:65
+#: ui/config/general.py:66
 msgid "全局计时器"
 msgstr "Global Timer"
 
-#: ui/config/general.py:71
+#: ui/config/general.py:72
 msgid "显示圆形计时器"
 msgstr "Show Circular Timer"
 
-#: ui/config/general.py:77
+#: ui/config/general.py:78
 msgid "圆形计时器样式:"
 msgstr "Circular Timer Style:"
 
-#: ui/config/general.py:90
+#: ui/config/general.py:91
 msgid "计时器窗口位置:"
 msgstr "Timer Window Position:"
 
-#: ui/config/general.py:103
+#: ui/config/general.py:104
 msgid "连胜上限:"
 msgstr "Streak Limit:"
 
-#: ui/config/general.py:108
+#: ui/config/general.py:109 ui/config/general.py:130
 msgid "个番茄钟"
 msgstr "pomodoros"
 
-#: ui/config/general.py:116
+#: ui/config/general.py:117
 msgid "连续完成指定数量的番茄钟后，将进行长休息"
 msgstr "Take a long break after completing specified number of pomodoros"
 
-#: ui/config/general.py:122
+#: ui/config/general.py:123
+msgid "进度显示阈值:"
+msgstr "Progress Display Threshold:"
+
+#: ui/config/general.py:143
+msgid "当目标番茄钟数量超过此值时，将以 '🍅 x N' 的形式显示进度"
+msgstr "When the target number of pomodoros exceeds this value, the progress will be displayed as '🍅 x N'"
+
+#: ui/config/general.py:152
 msgid "番茄钟时长:"
 msgstr "Pomodoro Duration:"
 
-#: ui/config/general.py:127 ui/config/general.py:141 ui/config/general.py:155
+#: ui/config/general.py:157 ui/config/general.py:171 ui/config/general.py:185
 msgid "分钟"
 msgstr "minutes"
 
-#: ui/config/general.py:136
+#: ui/config/general.py:166
 msgid "长休息时长:"
 msgstr "Long Break Duration:"
 
-#: ui/config/general.py:150
+#: ui/config/general.py:180
 msgid "休息时间上限:"
 msgstr "Break Time Limit:"
 
-#: ui/config/general.py:163
+#: ui/config/general.py:193
 msgid "超过休息时间上限后，累计的番茄钟将归零"
 msgstr "Reset accumulated pomodoros when break time limit is exceeded"
 
-#: ui/config/general.py:171
+#: ui/config/general.py:201
 msgid "状态栏显示设置"
 msgstr "Status Bar Display Settings"
 
-#: ui/config/general.py:173
+#: ui/config/general.py:203
 msgid "选择状态栏显示格式："
 msgstr "Select Status Bar Display Format:"
 
