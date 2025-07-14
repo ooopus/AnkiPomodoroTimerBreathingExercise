@@ -19,6 +19,8 @@ def get_lang_from_config() -> str:
         with open(config_path, encoding="utf-8") as f:
             config = cast(ConfigJson, json.load(f))
         lang_value = config.get("language")
+        if lang_value == "auto":
+            return QLocale.system().name()
         return lang_value
     except Exception as e:
         print(f"[translator] Error reading config file: {e}")
