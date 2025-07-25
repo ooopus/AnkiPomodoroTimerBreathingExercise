@@ -16,8 +16,8 @@ from aqt import (
     QWidget,
 )
 
-from ...config import AppConfig
 from ...config.enums import PHASES
+from ...config.types import AppConfig
 from ...translator import _
 
 

@@ -14,6 +14,10 @@ class LanguageCode(str, Enum):
     def display_name(self) -> str:
         return self._display_name
 
+    @property
+    def value(self) -> str:
+        return self._value_
+
     # Define members with their display names
     AUTO = "auto", "Auto"
     ENGLISH = "en_US", "English"

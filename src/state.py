@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from aqt import QLabel
 from aqt.utils import tooltip
 
-from .config.config import AppConfig, load_user_config, save_config
+from .config.config import AppConfig
 
 # 仅为类型检查导入 PomodoroManager，以避免循环导入
 if TYPE_CHECKING:
@@ -35,6 +35,8 @@ class AppState:
 
     def _load_config(self) -> AppConfig:
         """内部方法，从文件加载用户配置。"""
+        from .config.config import load_user_config
+
         return load_user_config()
 
     def reload_config(self) -> AppConfig:
@@ -47,6 +49,8 @@ class AppState:
 
     def save_config(self) -> None:
         """将当前内存中的配置保存到 JSON 文件。"""
+        from .config.config import save_config
+
         if self._config is None:
             tooltip("无法保存配置：没有加载任何配置。", period=3000)
             return

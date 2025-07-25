@@ -11,7 +11,7 @@ from aqt import (
 )
 from aqt.utils import tooltip
 
-from ...config import AppConfig
+from ...config.types import AppConfig
 from ...state import get_pomodoro_manager, reload_config, update_and_save_config
 from ...translator import _, set_language
 from .breathing import BreathingSettings

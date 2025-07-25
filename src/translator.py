@@ -1,12 +1,11 @@
 import gettext
 import json
 import os
-from typing import TYPE_CHECKING, TypedDict, cast
+from typing import TypedDict, cast
 
 from aqt import QLocale
 
-if TYPE_CHECKING:
-    from .config.languages import LanguageCode
+from .config.languages import LanguageCode
 
 
 class ConfigJson(TypedDict):
@@ -19,7 +18,7 @@ def get_lang_from_config() -> str:
         with open(config_path, encoding="utf-8") as f:
             config = cast(ConfigJson, json.load(f))
         lang_value = config.get("language")
-        if lang_value == "auto":
+        if lang_value == LanguageCode.AUTO.value:
             return QLocale.system().name()
         return lang_value
     except Exception as e:
@@ -45,9 +44,7 @@ def _(s: str) -> str:
     return translation.gettext(s)
 
 
-def set_language(language_code: "LanguageCode"):
-    from .config.languages import LanguageCode
-
+def set_language(language_code: LanguageCode):
     if language_code == LanguageCode.AUTO.value:
         global lang
         lang = QLocale.system().name()  # like "zh_CN"

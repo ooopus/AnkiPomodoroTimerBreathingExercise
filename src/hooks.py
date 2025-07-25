@@ -3,7 +3,7 @@ from aqt import QTimer, mw
 from aqt.utils import tooltip
 
 from .breathing import start_breathing_exercise
-from .config import save_config
+from .config.config import save_config
 from .config.constants import AnkiStates
 from .config.enums import PHASES
 from .pomodoro.pomodoro_manager import PomodoroManager

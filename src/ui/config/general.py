@@ -12,9 +12,9 @@ from aqt import (
     QWidget,
 )
 
-from ...config import AppConfig
 from ...config.enums import StatusBarFormat, TimerPosition
 from ...config.languages import LanguageCode
+from ...config.types import AppConfig
 from ...translator import _
 from ..circularTimer.core.factory import list_timer_styles
 
