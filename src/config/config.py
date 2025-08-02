@@ -10,12 +10,12 @@ if str(vendor_dir) not in sys.path:
 
 import dataclasses
 import json
+import os
 from enum import Enum
 from typing import Any
 
 from koda_validate import Valid
 
-from . import anki_config
 from .enums import CircularTimerStyle, StatusBarFormat, TimerPosition
 from .types import AppConfig, config_validator
 
@@ -29,6 +29,14 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 
+def _get_config_file_path() -> Path:
+    """获取配置文件的完整路径。"""
+    module_path = os.path.abspath(__file__)
+    package_root = os.path.dirname(os.path.dirname(module_path))
+    config_file_path = Path(package_root) / "user_files" / "config.json"
+    return config_file_path
+
+
 def get_default_config() -> AppConfig:
     """方便地获取一个包含所有默认值的 AppConfig 实例。"""
     return AppConfig()
@@ -36,17 +44,27 @@ def get_default_config() -> AppConfig:
 
 def save_config(config: AppConfig):
     """
-    将一个 AppConfig 实例保存到 Anki 的配置中。
+    将一个 AppConfig 实例保存到自定义配置文件中。
     """
     config_dict = dataclasses.asdict(config)
-    anki_config.write_anki_config(config_dict)
+    config_file_path = _get_config_file_path()
+
+    # 确保目录存在
+    config_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        with open(config_file_path, "w", encoding="utf-8") as f:
+            json.dump(
+                config_dict, f, cls=EnhancedJSONEncoder, indent=2, ensure_ascii=False
+            )
+    except OSError as e:
+        print(f"Error saving config to {config_file_path}: {e}")
 
 
-def _migrate_config_data(data: dict[str, Any]) -> dict[str, Any]:
+def _convert_to_enum(data: dict[str, Any]) -> dict[str, Any]:
     """
-    迁移旧的配置数据格式到新的枚举类型。
+    将文本配置转换为枚举
     """
-    # 迁移 circular_timer_style
     if "circular_timer_style" in data and isinstance(data["circular_timer_style"], str):
         try:
             data["circular_timer_style"] = CircularTimerStyle(
@@ -55,23 +73,20 @@ def _migrate_config_data(data: dict[str, Any]) -> dict[str, Any]:
         except ValueError:
             data["circular_timer_style"] = CircularTimerStyle.DEFAULT
 
-    # 迁移 statusbar_format
     if "statusbar_format" in data and isinstance(data["statusbar_format"], str):
         try:
             data["statusbar_format"] = StatusBarFormat(data["statusbar_format"])
         except ValueError:
-            data[
-                "statusbar_format"
-            ] = StatusBarFormat.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME
+            data["statusbar_format"] = (
+                StatusBarFormat.ICON_COUNTDOWN_PROGRESS_WITH_TOTAL_TIME
+            )
 
-    # 迁移 timer_position
     if "timer_position" in data and isinstance(data["timer_position"], str):
         try:
             data["timer_position"] = TimerPosition(data["timer_position"])
         except ValueError:
             data["timer_position"] = TimerPosition.TOP_RIGHT
 
-    # 迁移 language
     if "language" in data and isinstance(data["language"], str):
         from .languages import LanguageCode
 
@@ -85,7 +100,7 @@ def _migrate_config_data(data: dict[str, Any]) -> dict[str, Any]:
 
 def load_user_config() -> AppConfig:
     """
-    从 Anki 的配置中加载、验证并返回用户配置。
+    从自定义配置文件中加载、验证并返回用户配置。
     - 如果配置不存在，则创建一个包含默认值的配置。
     - 如果配置损坏或无效，则返回默认配置。
     - 如果配置缺少字段，则使用默认值填充。
@@ -93,20 +108,24 @@ def load_user_config() -> AppConfig:
     Returns:
         一个经过验证和完全填充的 AppConfig 实例。
     """
-    # 首先，尝试从旧的 config.json 迁移
-    anki_config.migrate_from_json_if_needed()
+    config_file_path = _get_config_file_path()
 
-    loaded_data = anki_config.get_anki_config()
-
-    if loaded_data is None:
-        # No configuration found, create a new default one
+    # 如果配置文件不存在，创建默认配置
+    if not config_file_path.exists():
         default_config = get_default_config()
         save_config(default_config)
         return default_config
 
     try:
-        # 在验证之前进行数据迁移
-        migrated_data = _migrate_config_data(loaded_data)
+        with open(config_file_path, encoding="utf-8") as f:
+            loaded_data = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"Error loading config from {config_file_path}: {e}")
+        return get_default_config()
+
+    try:
+        # 在验证之前进行枚举转换
+        migrated_data = _convert_to_enum(loaded_data)
 
         # 使用从 types.py 导入的验证器进行验证和填充
         result = config_validator(migrated_data)

@@ -1,6 +1,7 @@
 import gettext
 import json
 import os
+from pathlib import Path
 from typing import TypedDict, cast
 
 from aqt import QLocale
@@ -12,8 +13,16 @@ class ConfigJson(TypedDict):
     language: str
 
 
+def _get_config_file_path() -> Path:
+    """获取配置文件的完整路径。"""
+    module_path = os.path.abspath(__file__)
+    package_root = os.path.dirname(module_path)
+    config_file_path = Path(package_root) / "user_files" / "config.json"
+    return config_file_path
+
+
 def get_lang_from_config() -> str:
-    config_path: str = os.path.join(os.path.dirname(__file__), "config.json")
+    config_path = _get_config_file_path()
     try:
         with open(config_path, encoding="utf-8") as f:
             config = cast(ConfigJson, json.load(f))
